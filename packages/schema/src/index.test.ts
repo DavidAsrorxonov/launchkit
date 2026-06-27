@@ -2,19 +2,30 @@ import { describe, expect, it } from "vitest";
 
 import {
   authOptions,
+  authMetadata,
   databaseOptions,
+  databaseMetadata,
   dockerOptions,
+  dockerMetadata,
   frameworkOptions,
+  frameworkMetadata,
   languageOptions,
+  languageMetadata,
   LaunchKitConfigSchema,
   defaultLaunchKitConfig,
   ormOptions,
+  ormMetadata,
   packageManagerOptions,
+  packageManagerMetadata,
   parseLaunchKitConfig,
   projectStructureOptions,
+  projectStructureMetadata,
   routerOptions,
+  routerMetadata,
   stylingOptions,
+  stylingMetadata,
   uiOptions,
+  uiMetadata,
 } from "./index";
 
 describe("schema package", () => {
@@ -86,6 +97,134 @@ describe("defaultLaunchKitConfig", () => {
       packageManager: "npm",
     });
   });
+});
+
+type MetadataItem = {
+  value: string;
+  label: string;
+  description: string;
+};
+
+const metadataCases: {
+  category: string;
+  options: readonly string[];
+  metadata: readonly MetadataItem[];
+}[] = [
+  {
+    category: "framework",
+    options: frameworkOptions,
+    metadata: frameworkMetadata,
+  },
+  {
+    category: "language",
+    options: languageOptions,
+    metadata: languageMetadata,
+  },
+  {
+    category: "router",
+    options: routerOptions,
+    metadata: routerMetadata,
+  },
+  {
+    category: "project structure",
+    options: projectStructureOptions,
+    metadata: projectStructureMetadata,
+  },
+  {
+    category: "styling",
+    options: stylingOptions,
+    metadata: stylingMetadata,
+  },
+  {
+    category: "UI",
+    options: uiOptions,
+    metadata: uiMetadata,
+  },
+  {
+    category: "database",
+    options: databaseOptions,
+    metadata: databaseMetadata,
+  },
+  {
+    category: "ORM",
+    options: ormOptions,
+    metadata: ormMetadata,
+  },
+  {
+    category: "auth",
+    options: authOptions,
+    metadata: authMetadata,
+  },
+  {
+    category: "Docker",
+    options: dockerOptions,
+    metadata: dockerMetadata,
+  },
+  {
+    category: "package manager",
+    options: packageManagerOptions,
+    metadata: packageManagerMetadata,
+  },
+];
+
+describe("option metadata", () => {
+  it("has metadata for every MVP option category", () => {
+    expect(metadataCases.map(({ category }) => category)).toEqual([
+      "framework",
+      "language",
+      "router",
+      "project structure",
+      "styling",
+      "UI",
+      "database",
+      "ORM",
+      "auth",
+      "Docker",
+      "package manager",
+    ]);
+  });
+
+  it.each(metadataCases)(
+    "matches the $category option values exactly",
+    ({ options, metadata }) => {
+      const metadataValues = metadata.map(({ value }) => value);
+
+      expect(metadataValues).toEqual([...options]);
+      expect(new Set(metadataValues).size).toBe(metadataValues.length);
+    },
+  );
+
+  it.each(metadataCases)(
+    "uses only supported $category option values",
+    ({ options, metadata }) => {
+      for (const item of metadata) {
+        expect(options).toContain(item.value);
+      }
+    },
+  );
+
+  it.each(metadataCases)(
+    "has exactly one metadata item for every $category option",
+    ({ options, metadata }) => {
+      const metadataValues = metadata.map(({ value }) => value);
+
+      for (const option of options) {
+        expect(metadataValues.filter((value) => value === option)).toHaveLength(
+          1,
+        );
+      }
+    },
+  );
+
+  it.each(metadataCases)(
+    "has non-empty labels and descriptions for $category metadata",
+    ({ metadata }) => {
+      for (const item of metadata) {
+        expect(item.label.trim()).not.toBe("");
+        expect(item.description.trim()).not.toBe("");
+      }
+    },
+  );
 });
 
 const minimalMvpConfig = {

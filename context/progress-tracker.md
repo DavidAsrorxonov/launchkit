@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 3 Step 4 complete
-Primary focus: LaunchKit default config completed; metadata and compatibility rules not started
+Current phase: Phase 3 Step 5 complete
+Primary focus: LaunchKit option metadata completed; compatibility rules not started
 ```
 
 ## Phase Progress
@@ -17,7 +17,7 @@ Primary focus: LaunchKit default config completed; metadata and compatibility ru
 | ------- | ------------------------------------- | ----------- | ---------------------------------------------------------------- |
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
-| Phase 3 | Shared Schema and Compatibility Rules | In Progress | Step 4 default config completed; metadata and compatibility rules not started. |
+| Phase 3 | Shared Schema and Compatibility Rules | In Progress | Step 5 option metadata completed; compatibility rules not started. |
 | Phase 4 | Generator Core                        | Not Started | Will build reusable project generation engine.                   |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
@@ -28,6 +28,98 @@ Primary focus: LaunchKit default config completed; metadata and compatibility ru
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-06-27
+
+Changes:
+
+- Completed Phase 3 Step 5: Add Option Metadata.
+- Added `OptionMetadata` type in `@launchkit/schema`.
+- Added human-readable metadata exports for every MVP option category.
+- Re-exported option metadata from the schema package entry point.
+- Added Vitest coverage proving metadata categories are present, metadata values match option arrays exactly, every metadata value is supported, every option has exactly one metadata entry, and labels/descriptions are non-empty.
+- Did not add compatibility rules, generator logic, website UI, templates, CLI functionality, or disabled-state metadata.
+
+Files changed:
+
+- `packages/schema/src/metadata.ts`
+- `packages/schema/src/index.ts`
+- `packages/schema/src/index.test.ts`
+- `context/progress-tracker.md`
+
+Metadata exports added:
+
+- `frameworkMetadata`
+- `languageMetadata`
+- `routerMetadata`
+- `projectStructureMetadata`
+- `stylingMetadata`
+- `uiMetadata`
+- `databaseMetadata`
+- `ormMetadata`
+- `authMetadata`
+- `dockerMetadata`
+- `packageManagerMetadata`
+
+Notes:
+
+- Metadata values are typed against the existing option union types from `options.ts`.
+- Metadata arrays are ordered to match the corresponding option arrays.
+- Recommended flags were added only where the Step 5 prompt specified them.
+- The first sandboxed `npm run build` hit the known Turbopack process/port restriction in `apps/web`. Rerunning the build outside the sandbox completed successfully.
+- Existing untracked prompt file `.agents/prompts/phase-03/step-5.md` was left untouched.
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-03/step-5.md
+rg --files
+sed -n '1,280p' context/project-overview.md
+sed -n '1,380p' context/architecture.md
+sed -n '1,420p' context/build-plan.md
+sed -n '1,320p' context/ui-rules.md
+sed -n '1,260p' .agents/prompts/phase-03/step-1.md
+sed -n '1,300p' .agents/prompts/phase-03/step-2.md
+sed -n '1,320p' .agents/prompts/phase-03/step-3.md
+sed -n '1,280p' .agents/prompts/phase-03/step-4.md
+sed -n '1,260p' packages/schema/src/options.ts
+sed -n '1,260p' packages/schema/src/config.ts
+sed -n '1,220p' packages/schema/src/defaults.ts
+sed -n '1,360p' packages/schema/src/index.test.ts
+sed -n '1,200p' packages/schema/src/index.ts
+git status --short
+npm run typecheck -w packages/schema
+npm run test -w packages/schema
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff -- packages/schema/src/metadata.ts packages/schema/src/index.ts packages/schema/src/index.test.ts
+sed -n '1,220p' packages/schema/src/metadata.ts
+```
+
+Verification:
+
+- [x] Workspace typecheck passed
+- [x] Schema package typecheck passed
+- [x] Lint passed
+- [x] Workspace build passed
+- [x] Package tests passed
+
+Verification result:
+
+- `npm run typecheck -w packages/schema` passed.
+- `npm run test -w packages/schema` passed: schema package Vitest suite ran 66 tests successfully.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces with the schema package Vitest suite.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Next suggested step:
+
+- Proceed to the next Phase 3 schema step: add compatibility rules when prompted.
 
 ### 2026-06-27
 
