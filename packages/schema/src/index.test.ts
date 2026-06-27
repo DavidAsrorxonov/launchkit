@@ -7,6 +7,7 @@ import {
   frameworkOptions,
   languageOptions,
   LaunchKitConfigSchema,
+  defaultLaunchKitConfig,
   ormOptions,
   packageManagerOptions,
   parseLaunchKitConfig,
@@ -59,6 +60,31 @@ describe("schema package", () => {
 
   it("exports package manager options", () => {
     expect(packageManagerOptions).toEqual(["npm", "pnpm"]);
+  });
+});
+
+describe("defaultLaunchKitConfig", () => {
+  it("parses successfully with LaunchKitConfigSchema", () => {
+    expect(LaunchKitConfigSchema.safeParse(defaultLaunchKitConfig).success).toBe(
+      true,
+    );
+  });
+
+  it("matches the MVP defaults", () => {
+    expect(defaultLaunchKitConfig).toEqual({
+      name: "my-app",
+      framework: "next",
+      language: "typescript",
+      router: "app",
+      projectStructure: "no-src",
+      styling: "tailwind",
+      ui: "none",
+      database: "none",
+      orm: "none",
+      auth: "none",
+      docker: "none",
+      packageManager: "npm",
+    });
   });
 });
 

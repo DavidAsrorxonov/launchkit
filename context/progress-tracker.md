@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 3 Step 3 complete
-Primary focus: LaunchKit config schema completed; defaults, metadata, and compatibility rules not started
+Current phase: Phase 3 Step 4 complete
+Primary focus: LaunchKit default config completed; metadata and compatibility rules not started
 ```
 
 ## Phase Progress
@@ -17,7 +17,7 @@ Primary focus: LaunchKit config schema completed; defaults, metadata, and compat
 | ------- | ------------------------------------- | ----------- | ---------------------------------------------------------------- |
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
-| Phase 3 | Shared Schema and Compatibility Rules | In Progress | Step 3 config schema completed; defaults, metadata, and compatibility rules not started. |
+| Phase 3 | Shared Schema and Compatibility Rules | In Progress | Step 4 default config completed; metadata and compatibility rules not started. |
 | Phase 4 | Generator Core                        | Not Started | Will build reusable project generation engine.                   |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
@@ -28,6 +28,98 @@ Primary focus: LaunchKit config schema completed; defaults, metadata, and compat
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-06-27
+
+Changes:
+
+- Completed Phase 3 Step 4: Add Default Config.
+- Added `defaultLaunchKitConfig` in `@launchkit/schema`.
+- Re-exported the default config from the schema package entry point.
+- Added Vitest coverage proving the default config validates with `LaunchKitConfigSchema`.
+- Added Vitest coverage for every required default field value.
+- Did not add option metadata, compatibility rules, generator logic, website UI, templates, CLI functionality, or default-merge helpers.
+
+Files changed:
+
+- `packages/schema/src/defaults.ts`
+- `packages/schema/src/index.ts`
+- `packages/schema/src/index.test.ts`
+- `context/progress-tracker.md`
+
+Default config added:
+
+- `name`: `my-app`
+- `framework`: `next`
+- `language`: `typescript`
+- `router`: `app`
+- `projectStructure`: `no-src`
+- `styling`: `tailwind`
+- `ui`: `none`
+- `database`: `none`
+- `orm`: `none`
+- `auth`: `none`
+- `docker`: `none`
+- `packageManager`: `npm`
+
+Notes:
+
+- `defaultLaunchKitConfig` uses `satisfies LaunchKitConfig`.
+- The default config is intentionally a plain export only; no override/merge helper was added in this step.
+- The first sandboxed `npm run build` hit the known Turbopack process/port restriction in `apps/web`. Rerunning the build outside the sandbox completed successfully.
+- Existing untracked prompt file `.agents/prompts/phase-03/step-4.md` was left untouched.
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-03/step-4.md
+pwd && rg --files
+sed -n '1,260p' context/project-overview.md
+sed -n '1,360p' context/architecture.md
+sed -n '1,380p' context/build-plan.md
+sed -n '1,300p' context/ui-rules.md
+sed -n '1,220p' .agents/prompts/phase-03/step-1.md
+sed -n '1,260p' .agents/prompts/phase-03/step-2.md
+sed -n '1,280p' .agents/prompts/phase-03/step-3.md
+sed -n '1,240p' packages/schema/src/config.ts
+sed -n '1,260p' packages/schema/src/index.test.ts
+sed -n '1,200p' packages/schema/src/index.ts
+sed -n '1,220p' package.json
+sed -n '1,220p' packages/schema/package.json
+sed -n '1,220p' packages/schema/src/options.ts
+git status --short
+npm run typecheck -w packages/schema
+npm run test -w packages/schema
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff -- packages/schema/src/defaults.ts packages/schema/src/index.ts packages/schema/src/index.test.ts
+sed -n '1,220p' packages/schema/src/defaults.ts
+```
+
+Verification:
+
+- [x] Workspace typecheck passed
+- [x] Schema package typecheck passed
+- [x] Lint passed
+- [x] Workspace build passed
+- [x] Package tests passed
+
+Verification result:
+
+- `npm run typecheck -w packages/schema` passed.
+- `npm run test -w packages/schema` passed: schema package Vitest suite ran 21 tests successfully.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces with the schema package Vitest suite.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Next suggested step:
+
+- Proceed to the next Phase 3 schema step: add option metadata when prompted.
 
 ### 2026-06-27
 
