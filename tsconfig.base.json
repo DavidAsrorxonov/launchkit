@@ -12,12 +12,11 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "baseUrl": ".",
     "paths": {
-      "@launchkit/schema": ["packages/schema/src"],
-      "@launchkit/generator": ["packages/generator/src"],
-      "@launchkit/shared": ["packages/shared/src"],
-      "@launchkit/templates": ["packages/templates/src"]
+      "@launchkit/schema": ["./packages/schema/src"],
+      "@launchkit/generator": ["./packages/generator/src"],
+      "@launchkit/shared": ["./packages/shared/src"],
+      "@launchkit/templates": ["./packages/templates/src"]
     }
   }
 }
