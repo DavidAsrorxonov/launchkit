@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 3 Step 2 complete
-Primary focus: Config option enums completed; full config schema not started
+Current phase: Phase 3 Step 3 complete
+Primary focus: LaunchKit config schema completed; defaults, metadata, and compatibility rules not started
 ```
 
 ## Phase Progress
@@ -17,7 +17,7 @@ Primary focus: Config option enums completed; full config schema not started
 | ------- | ------------------------------------- | ----------- | ---------------------------------------------------------------- |
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
-| Phase 3 | Shared Schema and Compatibility Rules | In Progress | Step 2 config option enums completed; full schema, defaults, metadata, and compatibility rules not started. |
+| Phase 3 | Shared Schema and Compatibility Rules | In Progress | Step 3 config schema completed; defaults, metadata, and compatibility rules not started. |
 | Phase 4 | Generator Core                        | Not Started | Will build reusable project generation engine.                   |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
@@ -28,6 +28,104 @@ Primary focus: Config option enums completed; full config schema not started
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-06-27
+
+Changes:
+
+- Completed Phase 3 Step 3: Create LaunchKit Config Schema.
+- Added Zod as an explicit `@launchkit/schema` dependency.
+- Added `LaunchKitConfigSchema`, inferred `LaunchKitConfig` type, and `parseLaunchKitConfig` helper.
+- Built schema enum validation from the Step 2 option arrays instead of duplicating option values.
+- Added strict object validation for the MVP config shape.
+- Added project name validation for lowercase letters, numbers, and hyphen-separated words.
+- Added Vitest coverage for valid minimal/full configs and invalid names/unknown enum values.
+- Did not add default config, option metadata, cross-field compatibility rules, generator logic, website UI, templates, or CLI functionality.
+
+Files changed:
+
+- `package-lock.json`
+- `packages/schema/package.json`
+- `packages/schema/src/config.ts`
+- `packages/schema/src/index.ts`
+- `packages/schema/src/index.test.ts`
+- `context/progress-tracker.md`
+
+Schema fields added:
+
+- `name`
+- `framework`
+- `language`
+- `router`
+- `projectStructure`
+- `styling`
+- `ui`
+- `database`
+- `orm`
+- `auth`
+- `docker`
+- `packageManager`
+
+Notes:
+
+- `name` is required and must match lowercase package/folder-style names such as `my-app`, `launchkit-demo`, and `app123`.
+- Unknown enum values fail validation through Zod enums derived from the exported option arrays.
+- The first sandboxed `npm install zod -w packages/schema` failed because registry DNS/network access was restricted. Rerunning with approved network access completed successfully.
+- The first sandboxed `npm run build` hit the known Turbopack process/port restriction in `apps/web`. Rerunning the build outside the sandbox completed successfully.
+- Existing unrelated working tree entries were left untouched: `memory.md` and `.agents/prompts/phase-03/step-3.md`.
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-03/step-3.md
+rg --files
+sed -n '1,260p' context/project-overview.md
+sed -n '1,360p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '1,240p' .agents/prompts/phase-03/step-1.md
+sed -n '1,260p' .agents/prompts/phase-03/step-2.md
+sed -n '1,220p' packages/schema/src/options.ts
+sed -n '1,220p' packages/schema/src/index.ts
+sed -n '1,260p' packages/schema/src/index.test.ts
+sed -n '1,220p' packages/schema/package.json
+sed -n '1,240p' package.json
+rg '"zod"|node_modules/zod|zod@' package-lock.json package.json packages apps
+sed -n '1,220p' packages/schema/tsconfig.json
+git status --short
+npm install zod -w packages/schema
+npm install zod -w packages/schema
+npm run typecheck -w packages/schema
+npm run test -w packages/schema
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff -- packages/schema/src/config.ts packages/schema/src/index.ts packages/schema/src/index.test.ts packages/schema/package.json package-lock.json
+```
+
+Verification:
+
+- [x] Workspace typecheck passed
+- [x] Schema package typecheck passed
+- [x] Lint passed
+- [x] Workspace build passed
+- [x] Package tests passed
+
+Verification result:
+
+- `npm run typecheck -w packages/schema` passed.
+- `npm run test -w packages/schema` passed: schema package Vitest suite ran 19 tests successfully.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces with the schema package Vitest suite.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Next suggested step:
+
+- Proceed to the next Phase 3 schema step: add default config selections when prompted.
 
 ### 2026-06-27
 

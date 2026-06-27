@@ -1,76 +1,69 @@
-# Memory - Phase 3 Step 1 Schema Package Foundation
+# Memory - Phase 3 Step 3 Schema Work
 
-Last updated: 2026-06-27 22:56:54 JST
+Last updated: 2026-06-27 23:21 JST
 
 ## What was built
 
-Phase 3 Step 1 from `.agents/prompts/phase-03/step-1.md` was completed.
+Completed Phase 3 Step 3: Create LaunchKit Config Schema.
 
-The schema package foundation was reviewed and confirmed:
+Created `packages/schema/src/config.ts` with:
 
-- `packages/schema/package.json` is named `@launchkit/schema`.
-- `packages/schema` has `build`, `typecheck`, and `test` scripts.
-- `packages/schema/src/index.ts` still exports the existing placeholder entry point.
-- `packages/schema/vitest.config.ts` uses Vitest with Node environment and `src/**/*.test.ts`.
-- No real `LaunchKitConfigSchema`, compatibility rules, option metadata, generator logic, website UI, templates, or CLI work was added.
+- `LaunchKitConfigSchema`
+- inferred `LaunchKitConfig` type
+- `parseLaunchKitConfig(input: unknown)` helper
 
-Files changed this session:
+Updated:
 
-- `packages/schema/tsconfig.json`
-- `context/progress-tracker.md`
-- `memory.md`
+- `packages/schema/src/index.ts` to re-export config exports
+- `packages/schema/src/index.test.ts` with config validation coverage
+- `packages/schema/package.json` and `package-lock.json` to add `zod`
+- `context/progress-tracker.md` to mark Phase 3 Step 3 complete
 
 ## Decisions made
 
-Phase 3 Step 1 was kept intentionally narrow. The schema package remains a foundation-only package with a placeholder export; full schema design starts in a later Phase 3 step.
+The config schema uses Zod and derives enum validation from the Step 2 option arrays in `packages/schema/src/options.ts`, avoiding duplicated option values.
 
-The pre-existing `packages/generator/tsconfig.json` issue was left untouched because it was outside the scope of Phase 3 Step 1 and appeared as an existing/user-side modification.
+The schema is strict, so unknown top-level config keys fail validation.
+
+Project names must be lowercase package/folder-style names using letters, numbers, and hyphen-separated words. Valid examples include `my-app`, `launchkit-demo`, and `app123`.
+
+No defaults, option metadata, cross-field compatibility rules, generator logic, website UI, templates, or CLI functionality were added in this step.
 
 ## Problems solved
 
-The schema package TypeScript blocker was fixed by removing invalid `ignoreDeprecations: "6.0"` from `packages/schema/tsconfig.json`.
+`zod` was only present transitively before this step. It is now an explicit dependency of `@launchkit/schema`.
 
-After that change, `@launchkit/schema` typechecks successfully on its own, and workspace typecheck/build now get past the schema package.
+The first sandboxed `npm install zod -w packages/schema` failed due restricted registry DNS/network access. Rerunning with approved network access succeeded.
 
-The sandboxed `npm run build` still hits the known Turbopack process/port restriction in `apps/web`; rerunning the workspace build outside the sandbox confirmed the web app builds successfully.
+The first sandboxed `npm run build` hit the known Next/Turbopack process/port sandbox restriction in `apps/web`. Rerunning with elevated permissions passed.
 
 ## Current state
 
-`npm run typecheck -w packages/schema` passes.
+Phase 3 Step 3 is complete.
 
-`npm run test` passes and runs the schema Vitest suite successfully.
+Verification passed:
 
-`npm run lint` passes.
+- `npm run typecheck -w packages/schema`
+- `npm run test -w packages/schema` with 19 passing tests
+- `npm run typecheck`
+- `npm run test`
+- `npm run lint`
+- `npm run build` after elevated rerun
 
-`npm run typecheck` fails in `@launchkit/generator` because `packages/generator/tsconfig.json` contains invalid `ignoreDeprecations: "6.0"`.
-
-`npm run build` fails in the sandbox because of the known Turbopack process/port restriction. When rerun outside the sandbox, the web app builds successfully, but the workspace build still fails in `@launchkit/generator` for the invalid TypeScript config setting.
-
-`context/progress-tracker.md` was updated to record Phase 3 Step 1 completion, verification results, and the generator tsconfig blocker.
-
-Current `git status --short` showed only:
-
-```txt
-?? .agents/prompts/phase-03/step-2.md
-```
+Current working tree includes intentional Step 3 changes plus the untracked prompt file `.agents/prompts/phase-03/step-3.md`. `memory.md` has been overwritten for this handoff.
 
 ## Next session starts with
 
-Read `.agents/prompts/phase-03/step-2.md`, then implement only that step's requested scope.
+Proceed to the next Phase 3 schema step when prompted: add default config selections.
 
-If Step 2 allows it, fix the generator package TypeScript config blocker in `packages/generator/tsconfig.json`, then rerun:
+Start by reading:
 
-```bash
-npm run typecheck
-npm run build
-npm run test
-npm run lint
-```
-
-Update `context/progress-tracker.md` with the results.
+- `context/progress-tracker.md`
+- the next `.agents/prompts/phase-03/step-*.md` prompt
+- `packages/schema/src/config.ts`
+- `packages/schema/src/options.ts`
+- `packages/schema/src/index.test.ts`
 
 ## Open questions
 
-- Should the untracked `.agents/prompts/phase-03/step-2.md` be treated as the next implementation prompt?
-- Should Phase 2 checklist items in `context/progress-tracker.md` be marked complete now that the repo already contains the app/package structure?
-- Should the 2 moderate dependency audit vulnerabilities reported by `npm install` be addressed during Phase 2 tooling cleanup or deferred until later hardening?
+No open technical questions from Step 3. Future steps still need to define defaults, option metadata, and compatibility rules.

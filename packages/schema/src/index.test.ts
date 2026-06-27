@@ -6,8 +6,10 @@ import {
   dockerOptions,
   frameworkOptions,
   languageOptions,
+  LaunchKitConfigSchema,
   ormOptions,
   packageManagerOptions,
+  parseLaunchKitConfig,
   projectStructureOptions,
   routerOptions,
   stylingOptions,
@@ -57,5 +59,91 @@ describe("schema package", () => {
 
   it("exports package manager options", () => {
     expect(packageManagerOptions).toEqual(["npm", "pnpm"]);
+  });
+});
+
+const minimalMvpConfig = {
+  name: "my-app",
+  framework: "next",
+  language: "typescript",
+  router: "app",
+  projectStructure: "no-src",
+  styling: "tailwind",
+  ui: "none",
+  database: "none",
+  orm: "none",
+  auth: "none",
+  docker: "none",
+  packageManager: "npm",
+} as const;
+
+describe("LaunchKitConfigSchema", () => {
+  it("accepts a valid minimal MVP config", () => {
+    expect(LaunchKitConfigSchema.safeParse(minimalMvpConfig).success).toBe(
+      true,
+    );
+  });
+
+  it("accepts a valid full MVP config", () => {
+    const config = {
+      ...minimalMvpConfig,
+      name: "launchkit-demo",
+      ui: "shadcn",
+      database: "postgres",
+      orm: "prisma",
+      auth: "authjs-credentials",
+      docker: "postgres",
+      packageManager: "pnpm",
+    } as const;
+
+    expect(parseLaunchKitConfig(config)).toEqual(config);
+  });
+
+  it("rejects an empty project name", () => {
+    expect(
+      LaunchKitConfigSchema.safeParse({ ...minimalMvpConfig, name: "" })
+        .success,
+    ).toBe(false);
+  });
+
+  it("rejects a project name with spaces", () => {
+    expect(
+      LaunchKitConfigSchema.safeParse({ ...minimalMvpConfig, name: "my app" })
+        .success,
+    ).toBe(false);
+  });
+
+  it("rejects an uppercase project name", () => {
+    expect(
+      LaunchKitConfigSchema.safeParse({ ...minimalMvpConfig, name: "My-App" })
+        .success,
+    ).toBe(false);
+  });
+
+  it("rejects an unknown framework", () => {
+    expect(
+      LaunchKitConfigSchema.safeParse({
+        ...minimalMvpConfig,
+        framework: "react",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects an unknown database", () => {
+    expect(
+      LaunchKitConfigSchema.safeParse({
+        ...minimalMvpConfig,
+        database: "mysql",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects an unknown package manager", () => {
+    expect(
+      LaunchKitConfigSchema.safeParse({
+        ...minimalMvpConfig,
+        packageManager: "yarn",
+      }).success,
+    ).toBe(false);
   });
 });
