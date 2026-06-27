@@ -1,0 +1,7 @@
+- Use npm workspaces.
+- Use TypeScript.
+- Keep generation logic out of apps/web.
+- Shared generator logic belongs in packages/generator.
+- Shared config/schema belongs in packages/schema.
+- Do not add CLI until requested.
+- Do not add unsupported stack options.

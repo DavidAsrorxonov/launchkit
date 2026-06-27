@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@launchkit/schema": ["packages/schema/src"],
+      "@launchkit/generator": ["packages/generator/src"],
+      "@launchkit/shared": ["packages/shared/src"],
+      "@launchkit/templates": ["packages/templates/src"]
+    }
+  }
+}
