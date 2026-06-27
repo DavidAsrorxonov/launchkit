@@ -704,9 +704,9 @@ next + tailwind + prisma + authjs
 For important combinations:
 
 ```bash
-pnpm install
-pnpm typecheck
-pnpm build
+npm install
+npm typecheck
+npm build
 ```
 
 These tests prove the generated project actually works.

@@ -209,7 +209,7 @@ Create the monorepo root with:
 Recommended package manager:
 
 ```txt
-pnpm
+npm
 ```
 
 ### 2.2 Create App And Package Structure
@@ -317,7 +317,7 @@ database: none
 orm: none
 auth: none
 docker: no
-package manager: pnpm
+package manager: npm
 ```
 
 ### 3.4 Define Option Metadata
@@ -800,9 +800,9 @@ Snapshot file trees for:
 For key generated outputs, verify:
 
 ```bash
-pnpm install
-pnpm typecheck
-pnpm build
+npm install
+npm typecheck
+npm build
 ```
 
 These may be slower, so they can be separated from fast unit tests.
@@ -1006,8 +1006,8 @@ Example:
 ```txt
 Next steps:
   cd my-app
-  pnpm install
-  pnpm dev
+  npm install
+  npm dev
 ```
 
 ### Phase 9 Completion Criteria
@@ -1057,8 +1057,8 @@ Example:
 
 ```bash
 cd my-app
-pnpm install
-pnpm dev
+npm install
+npm dev
 ```
 
 The generated project should feel intentional, clean, and ready for real development.

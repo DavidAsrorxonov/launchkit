@@ -170,7 +170,7 @@ await generateProject({
   database: "postgres",
   orm: "prisma",
   auth: "authjs",
-  packageManager: "pnpm",
+  packageManager: "npm",
 });
 ```
 
@@ -243,7 +243,7 @@ Example request:
   "database": "postgres",
   "orm": "prisma",
   "auth": "authjs",
-  "packageManager": "pnpm"
+  "packageManager": "npm"
 }
 ```
 
@@ -282,8 +282,8 @@ Project generated successfully.
 
 Next steps:
   cd my-app
-  pnpm install
-  pnpm dev
+  npm install
+  npm dev
 ```
 
 The CLI should mostly handle:
@@ -508,7 +508,7 @@ The hard part is not showing many options. The hard part is generating correct, 
 
 LaunchKit itself:
 
-- Monorepo: pnpm workspaces or Turborepo
+- Monorepo: npm workspaces or Turborepo
 - Website: Next.js with App Router
 - Language: TypeScript
 - Validation: Zod
@@ -651,8 +651,8 @@ Example:
 
 ```bash
 cd my-app
-pnpm install
-pnpm dev
+npm install
+npm dev
 ```
 
 The generated project should feel like a clean starter, not a rough file dump.
