@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   authOptions,
   authMetadata,
+  assertCompatibleConfig,
   databaseOptions,
   databaseMetadata,
   dockerOptions,
@@ -12,6 +13,7 @@ import {
   languageOptions,
   languageMetadata,
   LaunchKitConfigSchema,
+  LaunchKitCompatibilityError,
   defaultLaunchKitConfig,
   ormOptions,
   ormMetadata,
@@ -26,6 +28,7 @@ import {
   stylingMetadata,
   uiOptions,
   uiMetadata,
+  validateCompatibility,
 } from "./index";
 
 describe("schema package", () => {
@@ -310,5 +313,117 @@ describe("LaunchKitConfigSchema", () => {
         packageManager: "yarn",
       }).success,
     ).toBe(false);
+  });
+});
+
+describe("compatibility rules", () => {
+  it("returns no issues for the default config", () => {
+    expect(validateCompatibility(defaultLaunchKitConfig)).toEqual([]);
+  });
+
+  it("returns an issue when Prisma is selected without PostgreSQL", () => {
+    const issues = validateCompatibility({
+      ...minimalMvpConfig,
+      orm: "prisma",
+      database: "none",
+    });
+
+    expect(issues).toContainEqual({
+      code: "prisma_requires_postgresql",
+      message: "Prisma requires PostgreSQL.",
+      path: ["orm", "database"],
+    });
+  });
+
+  it("returns no issues when Prisma is selected with PostgreSQL", () => {
+    expect(
+      validateCompatibility({
+        ...minimalMvpConfig,
+        orm: "prisma",
+        database: "postgres",
+      }),
+    ).toEqual([]);
+  });
+
+  it("returns an issue when PostgreSQL Docker Compose is selected without PostgreSQL", () => {
+    const issues = validateCompatibility({
+      ...minimalMvpConfig,
+      docker: "postgres",
+      database: "none",
+    });
+
+    expect(issues).toContainEqual({
+      code: "docker_postgres_requires_postgresql",
+      message:
+        "PostgreSQL Docker Compose is only available when PostgreSQL is selected.",
+      path: ["docker", "database"],
+    });
+  });
+
+  it("returns no issues when PostgreSQL Docker Compose is selected with PostgreSQL", () => {
+    expect(
+      validateCompatibility({
+        ...minimalMvpConfig,
+        docker: "postgres",
+        database: "postgres",
+      }),
+    ).toEqual([]);
+  });
+
+  it("returns no issues for Auth.js credentials without a database", () => {
+    expect(
+      validateCompatibility({
+        ...minimalMvpConfig,
+        auth: "authjs-credentials",
+        database: "none",
+        orm: "none",
+      }),
+    ).toEqual([]);
+  });
+
+  it("returns no issues for Auth.js credentials with Prisma and PostgreSQL", () => {
+    expect(
+      validateCompatibility({
+        ...minimalMvpConfig,
+        auth: "authjs-credentials",
+        database: "postgres",
+        orm: "prisma",
+      }),
+    ).toEqual([]);
+  });
+
+  it("returns an issue for Auth.js credentials with Prisma but no PostgreSQL", () => {
+    const issues = validateCompatibility({
+      ...minimalMvpConfig,
+      auth: "authjs-credentials",
+      database: "none",
+      orm: "prisma",
+    });
+
+    expect(issues).toContainEqual({
+      code: "authjs_credentials_prisma_requires_postgresql",
+      message: "Auth.js credentials with Prisma requires Prisma and PostgreSQL.",
+      path: ["auth", "orm", "database"],
+    });
+  });
+
+  it("returns no issues when shadcn/ui is selected with Tailwind CSS", () => {
+    expect(
+      validateCompatibility({
+        ...minimalMvpConfig,
+        ui: "shadcn",
+        styling: "tailwind",
+      }),
+    ).toEqual([]);
+  });
+
+  it("throws a typed error when asserting an incompatible config", () => {
+    expect(() =>
+      assertCompatibleConfig({
+        ...minimalMvpConfig,
+        docker: "postgres",
+        database: "none",
+      }),
+    ).toThrow(LaunchKitCompatibilityError);
   });
 });

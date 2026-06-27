@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 3 Step 5 complete
-Primary focus: LaunchKit option metadata completed; compatibility rules not started
+Current phase: Phase 3 Step 6 complete
+Primary focus: LaunchKit compatibility rules completed; generator core not started
 ```
 
 ## Phase Progress
@@ -17,7 +17,7 @@ Primary focus: LaunchKit option metadata completed; compatibility rules not star
 | ------- | ------------------------------------- | ----------- | ---------------------------------------------------------------- |
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
-| Phase 3 | Shared Schema and Compatibility Rules | In Progress | Step 5 option metadata completed; compatibility rules not started. |
+| Phase 3 | Shared Schema and Compatibility Rules | Complete | Step 6 compatibility rules completed and test-covered. |
 | Phase 4 | Generator Core                        | Not Started | Will build reusable project generation engine.                   |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
@@ -28,6 +28,102 @@ Primary focus: LaunchKit option metadata completed; compatibility rules not star
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-06-27
+
+Changes:
+
+- Completed Phase 3 Step 6: Add Compatibility Rules.
+- Added typed compatibility issues and validation helpers in `@launchkit/schema`.
+- Added `LaunchKitCompatibilityError` and `assertCompatibleConfig`.
+- Re-exported compatibility exports from the schema package entry point.
+- Added Vitest coverage for the required MVP compatibility behavior.
+- Did not add generator logic, website UI, templates, CLI functionality, or unsupported stack options.
+
+Files changed:
+
+- `packages/schema/src/compatibility.ts`
+- `packages/schema/src/index.ts`
+- `packages/schema/src/index.test.ts`
+- `context/progress-tracker.md`
+
+Compatibility rules added:
+
+- `prisma_requires_postgresql`: Prisma requires PostgreSQL.
+- `docker_postgres_requires_postgresql`: PostgreSQL Docker Compose is only available when PostgreSQL is selected.
+- `authjs_credentials_prisma_requires_postgresql`: Auth.js credentials with Prisma requires Prisma and PostgreSQL.
+- `shadcn_requires_tailwind`: shadcn/ui requires Tailwind CSS.
+
+Notes:
+
+- `validateCompatibility(config)` returns `CompatibilityIssue[]` with `code`, `message`, and `path`.
+- `assertCompatibleConfig(config)` throws `LaunchKitCompatibilityError` when compatibility issues are present.
+- Compatibility checks are exported separately from `parseLaunchKitConfig`; Zod parsing remains focused on config shape and enum validation.
+- Auth.js credentials without a database remains valid.
+- The `shadcn/ui` rule is represented even though Tailwind is currently the only supported styling option.
+- The first sandboxed `npm run build` hit the known Turbopack process/port restriction in `apps/web`. Rerunning the build outside the sandbox completed successfully.
+- Existing untracked prompt file `.agents/prompts/phase-03/step-6.md` was left untouched.
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-03/step-6.md
+rg --files
+git status --short
+sed -n '1,280p' context/project-overview.md
+sed -n '1,380p' context/architecture.md
+sed -n '1,420p' context/build-plan.md
+sed -n '1,340p' context/ui-rules.md
+sed -n '1,260p' .agents/prompts/phase-03/step-1.md
+sed -n '1,300p' .agents/prompts/phase-03/step-2.md
+sed -n '1,320p' .agents/prompts/phase-03/step-3.md
+sed -n '1,280p' .agents/prompts/phase-03/step-4.md
+sed -n '1,300p' .agents/prompts/phase-03/step-5.md
+sed -n '1,260p' packages/schema/src/options.ts
+sed -n '1,260p' packages/schema/src/config.ts
+sed -n '1,240p' packages/schema/src/defaults.ts
+sed -n '1,320p' packages/schema/src/metadata.ts
+sed -n '1,220p' packages/schema/src/index.ts
+sed -n '1,460p' packages/schema/src/index.test.ts
+sed -n '1,220p' package.json
+sed -n '1,220p' packages/schema/package.json
+sed -n '1,220p' packages/schema/tsconfig.json
+sed -n '1,220p' packages/schema/vitest.config.ts
+sed -n '1,220p' tsconfig.base.json
+sed -n '1,220p' eslint.config.mjs
+npm run typecheck -w packages/schema
+npm run test -w packages/schema
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/schema/src/compatibility.ts packages/schema/src/index.ts packages/schema/src/index.test.ts
+sed -n '1,220p' packages/schema/src/compatibility.ts
+```
+
+Verification:
+
+- [x] Workspace typecheck passed
+- [x] Schema package typecheck passed
+- [x] Lint passed
+- [x] Workspace build passed
+- [x] Package tests passed
+
+Verification result:
+
+- `npm run typecheck -w packages/schema` passed.
+- `npm run test -w packages/schema` passed: schema package Vitest suite ran 76 tests successfully.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces with the schema package Vitest suite.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Next suggested step:
+
+- Proceed to Phase 4: build the reusable generator core when prompted.
 
 ### 2026-06-27
 

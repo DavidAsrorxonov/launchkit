@@ -1,67 +1,66 @@
-# Memory - Phase 3 Schema Metadata
+# Memory - Phase 3 Schema Compatibility
 
-Last updated: 2026-06-27 23:52 JST
+Last updated: 2026-06-28 00:08:37 JST
 
 ## What was built
 
-Completed Phase 3 Step 5: Add Option Metadata.
+Completed Phase 3 Step 6: Add Compatibility Rules.
 
-Created `packages/schema/src/metadata.ts` with:
+Created `packages/schema/src/compatibility.ts` with:
 
-- `OptionMetadata<TValue extends string = string>`
-- `frameworkMetadata`
-- `languageMetadata`
-- `routerMetadata`
-- `projectStructureMetadata`
-- `stylingMetadata`
-- `uiMetadata`
-- `databaseMetadata`
-- `ormMetadata`
-- `authMetadata`
-- `dockerMetadata`
-- `packageManagerMetadata`
+- `CompatibilityIssue`
+- `LaunchKitCompatibilityError`
+- `validateCompatibility(config)`
+- `assertCompatibleConfig(config)`
 
-Updated `packages/schema/src/index.ts` to re-export metadata.
+Updated `packages/schema/src/index.ts` to re-export compatibility exports.
 
-Expanded `packages/schema/src/index.test.ts` with metadata completeness tests:
+Expanded `packages/schema/src/index.test.ts` with compatibility tests covering:
 
-- every MVP metadata category is present
-- metadata values match option arrays exactly and in order
-- every metadata value is supported by the corresponding option array
-- every option value has exactly one metadata item
-- every metadata item has a non-empty label and description
+- default config has no compatibility issues
+- Prisma without PostgreSQL returns an issue
+- Prisma with PostgreSQL returns no issue
+- PostgreSQL Docker Compose without PostgreSQL returns an issue
+- PostgreSQL Docker Compose with PostgreSQL returns no issue
+- Auth.js credentials without a database returns no issue
+- Auth.js credentials with Prisma and PostgreSQL returns no issue
+- Auth.js credentials with Prisma but no PostgreSQL returns an issue
+- shadcn/ui with Tailwind returns no issue
+- `assertCompatibleConfig` throws `LaunchKitCompatibilityError` for incompatible configs
 
-Updated `context/progress-tracker.md` to mark Phase 3 Step 5 complete.
+Updated `context/progress-tracker.md` to mark Phase 3 Step 6 complete and Phase 3 complete.
 
 ## Decisions made
 
-Metadata is data-only for this step. No compatibility rules, disabled states, generator logic, website UI, templates, or CLI behavior were added.
+Compatibility validation is a separate schema package API. `parseLaunchKitConfig` and `LaunchKitConfigSchema` remain focused on config shape and enum validation.
 
-Metadata values are typed against existing option union types from `packages/schema/src/options.ts`, and metadata arrays are ordered to match the corresponding option arrays.
+Compatibility issues use stable machine-readable `code` values, actionable `message` values, and optional `path` arrays for future UI and generator error handling.
 
-Recommended flags were added only where `.agents/prompts/phase-03/step-5.md` specified them.
+Auth.js credentials without a database is valid. Auth.js credentials with Prisma requires PostgreSQL because Prisma itself requires PostgreSQL in the MVP.
+
+The `shadcn/ui` requires Tailwind rule is represented even though Tailwind is currently the only supported styling option, so future styling options can reuse the same compatibility layer.
 
 ## Problems solved
 
-The schema package now exposes human-readable option labels and descriptions from `@launchkit/schema`, avoiding duplicated option copy in the future website wizard, generator preview, and CLI prompts.
+The schema package now owns cross-field compatibility rules instead of leaving that logic for the future website, generator, or CLI to duplicate.
 
 The known sandboxed Turbopack build failure still occurs when `npm run build` is run inside the sandbox because Next/Turbopack tries to create a worker process and bind a local port. Running the same command with elevated permissions passes.
 
 ## Current state
 
-Working tree includes the Step 5 implementation:
+Working tree includes the Phase 3 Step 6 implementation:
 
 - modified `context/progress-tracker.md`
 - modified `packages/schema/src/index.test.ts`
 - modified `packages/schema/src/index.ts`
-- new `packages/schema/src/metadata.ts`
+- new `packages/schema/src/compatibility.ts`
 
-There is also an existing untracked prompt file: `.agents/prompts/phase-03/step-5.md`.
+There is also an existing untracked prompt file: `.agents/prompts/phase-03/step-6.md`.
 
 Verification passed:
 
 - `npm run typecheck -w packages/schema`
-- `npm run test -w packages/schema` with 66 tests
+- `npm run test -w packages/schema` with 76 tests
 - `npm run typecheck`
 - `npm run test`
 - `npm run lint`
@@ -69,10 +68,10 @@ Verification passed:
 
 ## Next session starts with
 
-Proceed to the next Phase 3 schema step: add compatibility rules when prompted.
+Proceed to Phase 4: build the reusable generator core when prompted.
 
-Start by reading `context/progress-tracker.md` and the next `.agents/prompts/phase-03/step-*.md` prompt, then implement only the requested compatibility scope.
+Start by reading `context/progress-tracker.md`, `context/project-overview.md`, `context/architecture.md`, `context/build-plan.md`, and the relevant Phase 4 prompt. Keep the next implementation scoped to generator core work unless the prompt says otherwise.
 
 ## Open questions
 
-None for Step 5.
+None for Phase 3 Step 6.
