@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 3 Step 6 complete
-Primary focus: LaunchKit compatibility rules completed; generator core not started
+Current phase: Phase 3 Step 7 complete
+Primary focus: Shared schema test coverage completed; generator core not started
 ```
 
 ## Phase Progress
@@ -17,7 +17,7 @@ Primary focus: LaunchKit compatibility rules completed; generator core not start
 | ------- | ------------------------------------- | ----------- | ---------------------------------------------------------------- |
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
-| Phase 3 | Shared Schema and Compatibility Rules | Complete | Step 6 compatibility rules completed and test-covered. |
+| Phase 3 | Shared Schema and Compatibility Rules | Complete | Step 7 schema test coverage completed; schema behavior is test-covered for MVP options, config, defaults, metadata, and compatibility. |
 | Phase 4 | Generator Core                        | Not Started | Will build reusable project generation engine.                   |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
@@ -28,6 +28,119 @@ Primary focus: LaunchKit compatibility rules completed; generator core not start
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-06-28
+
+Changes:
+
+- Completed Phase 3 Step 7: Add Schema Tests.
+- Replaced the broad schema `index.test.ts` suite with focused Vitest suites by responsibility under `packages/schema/src/__tests__/`.
+- Expanded schema coverage for option exports, config validation, defaults, metadata completeness, and compatibility rules.
+- Added missing config validation coverage for unknown UI, ORM, auth, Docker, and package manager values.
+- Added project-name edge case coverage and strict unknown-key validation coverage.
+- Added compatibility coverage for the represented `shadcn/ui` without Tailwind CSS rule.
+- Did not change schema behavior, MVP options, generator logic, website UI, templates, or CLI functionality.
+
+Files changed:
+
+- `packages/schema/src/__tests__/options.test.ts`
+- `packages/schema/src/__tests__/config.test.ts`
+- `packages/schema/src/__tests__/defaults.test.ts`
+- `packages/schema/src/__tests__/metadata.test.ts`
+- `packages/schema/src/__tests__/compatibility.test.ts`
+- `packages/schema/src/index.test.ts` removed
+- `context/progress-tracker.md`
+
+Test files added or updated:
+
+- Added `packages/schema/src/__tests__/options.test.ts`.
+- Added `packages/schema/src/__tests__/config.test.ts`.
+- Added `packages/schema/src/__tests__/defaults.test.ts`.
+- Added `packages/schema/src/__tests__/metadata.test.ts`.
+- Added `packages/schema/src/__tests__/compatibility.test.ts`.
+- Removed `packages/schema/src/index.test.ts` after moving coverage into focused suites.
+
+Test coverage added:
+
+- Option arrays are exported from `@launchkit/schema` and match the confirmed MVP values exactly.
+- Option union types are exercised with confirmed MVP literals.
+- `LaunchKitConfigSchema` accepts the default config and a full MVP config.
+- `LaunchKitConfigSchema` rejects invalid project names, unknown option values for required categories, and unknown object keys.
+- `defaultLaunchKitConfig` validates and matches every confirmed MVP default.
+- Metadata exists for every MVP option category, matches option arrays exactly, has no duplicate option entries, uses only supported option values, and has non-empty labels/descriptions.
+- Compatibility tests cover Prisma/PostgreSQL, Docker/PostgreSQL, Auth.js credentials without database, Auth.js credentials with Prisma/PostgreSQL, `shadcn/ui` with Tailwind, and `shadcn/ui` without Tailwind.
+- `assertCompatibleConfig` is covered for typed `LaunchKitCompatibilityError` issue details.
+
+Notes:
+
+- Schema package tests now use Vitest only.
+- No implementation files changed because the existing schema behavior already matched the Step 7 requirements.
+- The package TypeScript config excludes test files from package builds; the practical union type coverage is represented in Vitest test source without changing build semantics.
+- The first sandboxed `npm run build` hit the known Turbopack process/port restriction in `apps/web`. Rerunning the build outside the sandbox completed successfully.
+- Existing untracked prompt file `.agents/prompts/phase-03/step-7.md` was left untouched.
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-03/step-7.md
+rg --files
+sed -n '1,280p' context/project-overview.md
+sed -n '1,420p' context/architecture.md
+sed -n '1,460p' context/build-plan.md
+sed -n '1,360p' context/ui-rules.md
+sed -n '1,260p' .agents/prompts/phase-03/step-1.md
+sed -n '1,300p' .agents/prompts/phase-03/step-2.md
+sed -n '1,320p' .agents/prompts/phase-03/step-3.md
+sed -n '1,300p' .agents/prompts/phase-03/step-4.md
+sed -n '1,320p' .agents/prompts/phase-03/step-5.md
+sed -n '1,300p' .agents/prompts/phase-03/step-6.md
+sed -n '1,320p' packages/schema/src/options.ts
+sed -n '1,320p' packages/schema/src/config.ts
+sed -n '1,280p' packages/schema/src/defaults.ts
+sed -n '1,380p' packages/schema/src/metadata.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+sed -n '1,520p' packages/schema/src/index.test.ts
+sed -n '1,220p' packages/schema/src/index.ts
+sed -n '1,220p' packages/schema/package.json
+sed -n '1,220p' packages/schema/vitest.config.ts
+sed -n '1,220p' packages/schema/tsconfig.json
+sed -n '1,220p' tsconfig.base.json
+sed -n '1,260p' package.json
+npm run test -w packages/schema
+npm run typecheck -w packages/schema
+npm run test
+npm run typecheck
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/schema/src/__tests__/options.test.ts packages/schema/src/__tests__/config.test.ts packages/schema/src/__tests__/defaults.test.ts packages/schema/src/__tests__/metadata.test.ts packages/schema/src/__tests__/compatibility.test.ts packages/schema/src/index.test.ts
+rg 'from "\./index"' packages/schema/src
+npm run test -w packages/schema
+npm run typecheck -w packages/schema
+```
+
+Verification:
+
+- [x] Workspace typecheck passed
+- [x] Schema package typecheck passed
+- [x] Lint passed
+- [x] Workspace build passed
+- [x] Package tests passed
+
+Verification result:
+
+- `npm run test -w packages/schema` passed: schema package Vitest suite ran 72 tests across 5 test files successfully.
+- `npm run typecheck -w packages/schema` passed.
+- `npm run test` passed across workspaces with the schema package Vitest suite.
+- `npm run typecheck` passed across all workspaces.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Next suggested step:
+
+- Proceed to Phase 4: build the reusable generator core when prompted.
 
 ### 2026-06-27
 

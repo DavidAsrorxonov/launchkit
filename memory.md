@@ -1,68 +1,69 @@
-# Memory - Phase 3 Schema Compatibility
+# Memory - Phase 3 Schema Tests
 
-Last updated: 2026-06-28 00:08:37 JST
+Last updated: 2026-06-28 00:32 JST
 
 ## What was built
 
-Completed Phase 3 Step 6: Add Compatibility Rules.
+Completed Phase 3 Step 7: Add Schema Tests.
 
-Created `packages/schema/src/compatibility.ts` with:
+Replaced the broad schema test file `packages/schema/src/index.test.ts` with focused Vitest suites under `packages/schema/src/__tests__/`:
 
-- `CompatibilityIssue`
-- `LaunchKitCompatibilityError`
-- `validateCompatibility(config)`
-- `assertCompatibleConfig(config)`
+- `packages/schema/src/__tests__/options.test.ts`
+- `packages/schema/src/__tests__/config.test.ts`
+- `packages/schema/src/__tests__/defaults.test.ts`
+- `packages/schema/src/__tests__/metadata.test.ts`
+- `packages/schema/src/__tests__/compatibility.test.ts`
 
-Updated `packages/schema/src/index.ts` to re-export compatibility exports.
-
-Expanded `packages/schema/src/index.test.ts` with compatibility tests covering:
-
-- default config has no compatibility issues
-- Prisma without PostgreSQL returns an issue
-- Prisma with PostgreSQL returns no issue
-- PostgreSQL Docker Compose without PostgreSQL returns an issue
-- PostgreSQL Docker Compose with PostgreSQL returns no issue
-- Auth.js credentials without a database returns no issue
-- Auth.js credentials with Prisma and PostgreSQL returns no issue
-- Auth.js credentials with Prisma but no PostgreSQL returns an issue
-- shadcn/ui with Tailwind returns no issue
-- `assertCompatibleConfig` throws `LaunchKitCompatibilityError` for incompatible configs
-
-Updated `context/progress-tracker.md` to mark Phase 3 Step 6 complete and Phase 3 complete.
+Updated `context/progress-tracker.md` to mark Phase 3 Step 7 complete and to reference the new `__tests__` paths.
 
 ## Decisions made
 
-Compatibility validation is a separate schema package API. `parseLaunchKitConfig` and `LaunchKitConfigSchema` remain focused on config shape and enum validation.
+Schema tests are organized by responsibility in `packages/schema/src/__tests__/`.
 
-Compatibility issues use stable machine-readable `code` values, actionable `message` values, and optional `path` arrays for future UI and generator error handling.
+No schema implementation behavior changed during Step 7. The existing schema, defaults, metadata, and compatibility APIs already matched the required behavior.
 
-Auth.js credentials without a database is valid. Auth.js credentials with Prisma requires PostgreSQL because Prisma itself requires PostgreSQL in the MVP.
+Vitest discovery remains unchanged because `packages/schema/vitest.config.ts` already includes `src/**/*.test.ts`.
 
-The `shadcn/ui` requires Tailwind rule is represented even though Tailwind is currently the only supported styling option, so future styling options can reuse the same compatibility layer.
+Package build behavior remains unchanged because `packages/schema/tsconfig.json` already excludes `src/**/*.test.ts`.
 
 ## Problems solved
 
-The schema package now owns cross-field compatibility rules instead of leaving that logic for the future website, generator, or CLI to duplicate.
+Expanded test coverage for missing schema validation cases:
+
+- unknown UI option
+- unknown ORM option
+- unknown auth option
+- unknown Docker option
+- unknown package manager option
+- invalid project-name edge cases
+- unknown object keys
+- `shadcn/ui` compatibility issue when Tailwind is absent
+- typed `LaunchKitCompatibilityError` issue details
+
+Confirmed that moving tests into `src/__tests__/` does not break Vitest discovery or schema package typechecking.
 
 The known sandboxed Turbopack build failure still occurs when `npm run build` is run inside the sandbox because Next/Turbopack tries to create a worker process and bind a local port. Running the same command with elevated permissions passes.
 
 ## Current state
 
-Working tree includes the Phase 3 Step 6 implementation:
+Working tree includes Phase 3 Step 7 test organization and tracker updates:
 
 - modified `context/progress-tracker.md`
-- modified `packages/schema/src/index.test.ts`
-- modified `packages/schema/src/index.ts`
-- new `packages/schema/src/compatibility.ts`
+- deleted `packages/schema/src/index.test.ts`
+- added `packages/schema/src/__tests__/options.test.ts`
+- added `packages/schema/src/__tests__/config.test.ts`
+- added `packages/schema/src/__tests__/defaults.test.ts`
+- added `packages/schema/src/__tests__/metadata.test.ts`
+- added `packages/schema/src/__tests__/compatibility.test.ts`
 
-There is also an existing untracked prompt file: `.agents/prompts/phase-03/step-6.md`.
+There is also an existing untracked prompt file: `.agents/prompts/phase-03/step-7.md`.
 
 Verification passed:
 
+- `npm run test -w packages/schema` with 72 tests across 5 files
 - `npm run typecheck -w packages/schema`
-- `npm run test -w packages/schema` with 76 tests
-- `npm run typecheck`
 - `npm run test`
+- `npm run typecheck`
 - `npm run lint`
 - `npm run build` after elevated rerun
 
@@ -74,4 +75,4 @@ Start by reading `context/progress-tracker.md`, `context/project-overview.md`, `
 
 ## Open questions
 
-None for Phase 3 Step 6.
+None for Phase 3 Step 7.
