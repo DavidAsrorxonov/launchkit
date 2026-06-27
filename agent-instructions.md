@@ -2,7 +2,7 @@ Before making changes:
 
 1. Read all files in context/.
 2. Read progress-tracker.md.
-3. Read the specific step file in .agents/prompts/.
+3. Read the specific step from context/build-plan.md.
 4. Implement only that step.
 5. Do not move to the next step.
 6. Run required checks.

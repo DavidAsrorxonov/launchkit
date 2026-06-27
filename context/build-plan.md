@@ -253,6 +253,8 @@ Add:
 
 Add a test runner for package-level tests.
 
+Use Vitest as the test runner.
+
 Recommended focus:
 
 - schema tests
