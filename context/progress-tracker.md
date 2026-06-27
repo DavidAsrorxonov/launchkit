@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 1 / Phase 2
-Primary focus: Repository structure, planning docs, and initial monorepo setup
+Current phase: Phase 2
+Primary focus: Monorepo tooling and package-level test setup
 ```
 
 ## Phase Progress
@@ -16,7 +16,7 @@ Primary focus: Repository structure, planning docs, and initial monorepo setup
 | Phase   | Name                                  | Status      | Notes                                                            |
 | ------- | ------------------------------------- | ----------- | ---------------------------------------------------------------- |
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
-| Phase 2 | Monorepo and Tooling Setup            | Not Started | Initial npm workspace setup, Next.js app, and packages.          |
+| Phase 2 | Monorepo and Tooling Setup            | In Progress | Vitest package-level test runner added for schema package tests.  |
 | Phase 3 | Shared Schema and Compatibility Rules | Not Started | Will define config schema, options, defaults, and validation.    |
 | Phase 4 | Generator Core                        | Not Started | Will build reusable project generation engine.                   |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
@@ -28,6 +28,77 @@ Primary focus: Repository structure, planning docs, and initial monorepo setup
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-06-27
+
+Changes:
+
+- Implemented Phase 2.5 testing setup with Vitest.
+- Added a root workspace `test` script.
+- Added a schema package `test` script and Vitest config.
+- Added an initial schema package test for the current schema entry point.
+- Excluded schema test files from package build output.
+- Updated `package-lock.json` after installing Vitest.
+
+Files changed:
+
+- `package.json`
+- `package-lock.json`
+- `packages/schema/package.json`
+- `packages/schema/tsconfig.json`
+- `packages/schema/vitest.config.ts`
+- `packages/schema/src/index.test.ts`
+- `context/progress-tracker.md`
+
+Notes:
+
+- The initial sandboxed `npm install` failed because network DNS resolution was blocked. It was rerun with approved network access and completed.
+- `npm install` reported 2 moderate vulnerabilities from the current dependency graph.
+- Broader typecheck/build verification is blocked by `packages/schema/tsconfig.json` using `ignoreDeprecations: "6.0"`, which is invalid for the installed TypeScript version.
+
+Commands run:
+
+```bash
+sed -n '1,240p' agent-instructions.md
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,520p' context/build-plan.md
+sed -n '521,900p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,520p' context/project-overview.md
+sed -n '521,780p' context/project-overview.md
+sed -n '1,260p' context/architecture.md
+sed -n '261,520p' context/architecture.md
+sed -n '521,780p' context/architecture.md
+sed -n '781,980p' context/architecture.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,520p' context/ui-rules.md
+rg --files
+rg '"vitest"|vitest' package-lock.json package.json packages apps
+npm install
+npm test
+npm run lint
+npm run typecheck
+npm run build
+```
+
+Verification:
+
+- [ ] Typecheck passed
+- [x] Lint passed
+- [ ] Build passed
+- [x] Package tests passed
+
+Verification result:
+
+- `npm test` passed: schema package Vitest suite ran 1 test successfully.
+- `npm run lint` passed.
+- `npm run typecheck` failed in `@launchkit/schema` because `ignoreDeprecations: "6.0"` is invalid.
+- `npm run build` was rerun with elevated permissions after a sandbox-specific Turbopack process/port error. The web app built successfully outside the sandbox, but the workspace build still failed in `@launchkit/schema` for the same invalid `ignoreDeprecations` setting.
+
+Next suggested step:
+
+- Fix the schema package TypeScript config blocker, then rerun `npm run typecheck` and `npm run build` before proceeding beyond Phase 2 tooling completion.
 
 ### YYYY-MM-DD
 
@@ -82,7 +153,7 @@ Use this section for general implementation notes.
 
 | Date | Blocker | Status | Resolution |
 | ---- | ------- | ------ | ---------- |
-|      |         |        |            |
+| 2026-06-27 | `packages/schema/tsconfig.json` has invalid `ignoreDeprecations: "6.0"` for the installed TypeScript version. | Open | Fix the setting, then rerun typecheck and build. |
 
 ## Open Questions
 
@@ -106,13 +177,17 @@ Update this list as development progresses.
 - [ ] Create package folders.
 - [ ] Add placeholder exports for shared packages.
 - [ ] Configure typecheck, lint, and build scripts.
+- [x] Add Vitest package-level test runner.
 - [ ] Run verification commands.
 
 ## Verification History
 
 | Date | Command | Result | Notes |
 | ---- | ------- | ------ | ----- |
-|      |         |        |       |
+| 2026-06-27 | `npm test` | Passed | Vitest ran the schema package test suite successfully. |
+| 2026-06-27 | `npm run lint` | Passed | Workspace lint completed successfully. |
+| 2026-06-27 | `npm run typecheck` | Failed | Blocked by invalid `ignoreDeprecations: "6.0"` in `packages/schema/tsconfig.json`. |
+| 2026-06-27 | `npm run build` | Failed | Web app built outside sandbox; workspace build failed at schema TypeScript config. |
 
 ## Release Notes Draft
 
