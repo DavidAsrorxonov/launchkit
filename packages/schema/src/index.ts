@@ -1,1 +1,1 @@
-export const launchkitSchemaPlaceholder = "launchkit-schema";
+export * from "./options";

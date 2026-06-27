@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 3 Step 1
-Primary focus: Schema package foundation
+Current phase: Phase 3 Step 2 complete
+Primary focus: Config option enums completed; full config schema not started
 ```
 
 ## Phase Progress
@@ -16,8 +16,8 @@ Primary focus: Schema package foundation
 | Phase   | Name                                  | Status      | Notes                                                            |
 | ------- | ------------------------------------- | ----------- | ---------------------------------------------------------------- |
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
-| Phase 2 | Monorepo and Tooling Setup            | In Progress | Schema package blocker fixed; workspace checks still blocked by generator tsconfig. |
-| Phase 3 | Shared Schema and Compatibility Rules | In Progress | Step 1 schema package foundation completed; full schema not started. |
+| Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
+| Phase 3 | Shared Schema and Compatibility Rules | In Progress | Step 2 config option enums completed; full schema, defaults, metadata, and compatibility rules not started. |
 | Phase 4 | Generator Core                        | Not Started | Will build reusable project generation engine.                   |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
@@ -28,6 +28,101 @@ Primary focus: Schema package foundation
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-06-27
+
+Changes:
+
+- Completed Phase 3 Step 2: Define Config Option Enums.
+- Added readonly option arrays and inferred TypeScript union types for every supported MVP option category.
+- Re-exported the option arrays and types from `@launchkit/schema`.
+- Replaced the placeholder schema package test with Vitest coverage for the exact MVP option values.
+- Did not add the full `LaunchKitConfigSchema`, defaults, option metadata, compatibility rules, generator logic, website UI, templates, or CLI functionality.
+
+Files changed:
+
+- `packages/schema/src/options.ts`
+- `packages/schema/src/index.ts`
+- `packages/schema/src/index.test.ts`
+- `context/progress-tracker.md`
+
+Option categories added:
+
+- Framework: `next`
+- Language: `typescript`
+- Router: `app`
+- Project structure: `no-src`
+- Styling: `tailwind`
+- UI: `none`, `shadcn`
+- Database: `none`, `postgres`
+- ORM: `none`, `prisma`
+- Auth: `none`, `authjs-credentials`
+- Docker: `none`, `postgres`
+- Package manager: `npm`, `pnpm`
+
+Notes:
+
+- `@launchkit/schema` typechecks successfully with the new option exports.
+- Workspace typecheck now passes; the previously recorded generator `ignoreDeprecations` blocker is no longer present in `packages/generator/tsconfig.json`.
+- The first sandboxed `npm run build` hit the known Turbopack process/port restriction in `apps/web`. Rerunning the build outside the sandbox completed successfully.
+- Existing unrelated working tree entries were left untouched: `memory.md` and `.agents/prompts/phase-03/step-2.md`.
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-03/step-2.md
+rg --files
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,760p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '321,760p' context/architecture.md
+sed -n '761,1200p' context/architecture.md
+sed -n '1,340p' context/build-plan.md
+sed -n '341,760p' context/build-plan.md
+sed -n '761,1240p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '1,220p' packages/schema/src/index.ts
+sed -n '1,220p' packages/schema/src/index.test.ts
+sed -n '1,220p' packages/schema/package.json
+sed -n '1,220p' packages/schema/tsconfig.json
+sed -n '1,220p' package.json
+sed -n '1,220p' tsconfig.base.json
+npm run typecheck -w packages/schema
+npm run test -w packages/schema
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+sed -n '1,220p' packages/generator/tsconfig.json
+git status --short
+git diff -- packages/schema/src/options.ts packages/schema/src/index.ts packages/schema/src/index.test.ts context/progress-tracker.md
+find packages -maxdepth 3 -type d -name dist -print
+```
+
+Verification:
+
+- [x] Workspace typecheck passed
+- [x] Schema package typecheck passed
+- [x] Lint passed
+- [x] Workspace build passed
+- [x] Package tests passed
+
+Verification result:
+
+- `npm run typecheck -w packages/schema` passed.
+- `npm run test -w packages/schema` passed: schema package Vitest suite ran 11 tests successfully.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces with the schema package Vitest suite.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Next suggested step:
+
+- Proceed to the next Phase 3 schema step: add the full config schema and validation when prompted.
 
 ### 2026-06-27
 
@@ -217,7 +312,7 @@ Use this section for general implementation notes.
 
 | Date | Blocker | Status | Resolution |
 | ---- | ------- | ------ | ---------- |
-| 2026-06-27 | `packages/generator/tsconfig.json` has invalid `ignoreDeprecations: "6.0"` for the installed TypeScript version. | Open | Fix the setting, then rerun workspace typecheck and build. |
+| 2026-06-27 | `packages/generator/tsconfig.json` has invalid `ignoreDeprecations: "6.0"` for the installed TypeScript version. | Resolved | The setting is no longer present in the current checkout; workspace typecheck and build pass. |
 | 2026-06-27 | `packages/schema/tsconfig.json` has invalid `ignoreDeprecations: "6.0"` for the installed TypeScript version. | Resolved | Removed the invalid setting; schema package typecheck now passes. |
 
 ## Open Questions
@@ -244,13 +339,21 @@ Update this list as development progresses.
 - [ ] Configure typecheck, lint, and build scripts.
 - [x] Add Vitest package-level test runner.
 - [x] Complete Phase 3 Step 1 schema package foundation.
-- [ ] Fix generator TypeScript config blocker.
-- [ ] Run verification commands.
+- [x] Complete Phase 3 Step 2 config option enums.
+- [x] Confirm generator TypeScript config blocker is resolved in the current checkout.
+- [x] Run verification commands.
+- [ ] Add full config schema and validation.
 
 ## Verification History
 
 | Date | Command | Result | Notes |
 | ---- | ------- | ------ | ----- |
+| 2026-06-27 | `npm run build` | Passed | Passed outside the sandbox after the known Turbopack process/port restriction blocked the sandboxed run. |
+| 2026-06-27 | `npm run lint` | Passed | Workspace lint completed successfully. |
+| 2026-06-27 | `npm run test` | Passed | Vitest ran the schema package suite: 11 tests passed. |
+| 2026-06-27 | `npm run typecheck` | Passed | All workspaces typechecked successfully. |
+| 2026-06-27 | `npm run test -w packages/schema` | Passed | Schema package Vitest suite ran 11 tests successfully. |
+| 2026-06-27 | `npm run typecheck -w packages/schema` | Passed | Schema package typechecked successfully with option exports. |
 | 2026-06-27 | `npm test` | Passed | Vitest ran the schema package test suite successfully. |
 | 2026-06-27 | `npm run lint` | Passed | Workspace lint completed successfully. |
 | 2026-06-27 | `npm run typecheck -w packages/schema` | Passed | Schema package typechecked successfully after removing invalid `ignoreDeprecations`. |
