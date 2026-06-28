@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 4 Step 1 complete
-Primary focus: Generator package foundation verified; generator engine implementation not started
+Current phase: Phase 4 Step 2 complete
+Primary focus: Generated file tree model and safe path helpers are in place; generation engine implementation not started
 ```
 
 ## Phase Progress
@@ -18,7 +18,7 @@ Primary focus: Generator package foundation verified; generator engine implement
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | In Progress | Step 1 completed generator package foundation, exports, schema import, Vitest setup, and schema project reference. |
+| Phase 4 | Generator Core                        | In Progress | Step 2 completed generated file/project types, path normalization, path safety tests, and public exports. |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                    |
@@ -30,6 +30,104 @@ Primary focus: Generator package foundation verified; generator engine implement
 Add entries in reverse chronological order.
 
 ### 2026-06-28
+
+Phase 4 Step 2 changes:
+
+- Completed Phase 4 Step 2: Define Generated File Tree Model.
+- Added `GeneratedFile` and `GeneratedProject` types in `packages/generator`.
+- Added `InvalidGeneratedPathError` for clearly named invalid generated path failures.
+- Added `normalizeGeneratedPath()` with POSIX-style internal path normalization and validation.
+- Added `createGeneratedFile()` and `createGeneratedProject()` helpers.
+- Re-exported file tree types and helpers from `@launchkit/generator`.
+- Added Vitest coverage for valid root paths, valid nested paths, Windows-style backslash normalization, leading slash rejection, parent directory segment rejection, empty segment rejection, empty/current-directory path rejection, generated file creation, generated project creation, and invalid project file failure.
+- Did not implement `generateProject`, generation planning, feature registry logic, `package.json` merging, template loading, real templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/src/file-tree.ts`
+- `packages/generator/src/file-tree.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+File tree types/helpers added:
+
+- `GeneratedFile`
+- `GeneratedProject`
+- `InvalidGeneratedPathError`
+- `normalizeGeneratedPath()`
+- `createGeneratedFile()`
+- `createGeneratedProject()`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-04/step-2.md
+rg --files
+wc -l context/project-overview.md context/architecture.md context/build-plan.md context/ui-rules.md .agents/prompts/phase-04/step-1.md packages/generator/src/index.ts packages/generator/src/index.test.ts packages/generator/package.json packages/generator/tsconfig.json
+sed -n '1,260p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '261,674p' context/project-overview.md
+sed -n '321,930p' context/architecture.md
+sed -n '361,1066p' context/build-plan.md
+sed -n '1,416p' context/ui-rules.md
+sed -n '1,220p' .agents/prompts/phase-04/step-1.md
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,220p' packages/generator/src/index.test.ts
+sed -n '1,220p' packages/generator/package.json
+sed -n '1,220p' packages/schema/src/options.ts
+git status --short
+sed -n '1,220p' packages/generator/tsconfig.json
+sed -n '1,220p' packages/generator/vitest.config.ts
+sed -n '1,260p' package.json
+sed -n '1,220p' tsconfig.base.json
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/file-tree.ts packages/generator/src/file-tree.test.ts
+find packages -maxdepth 3 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 13 tests successfully.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 13 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- Generated paths are stored internally with POSIX-style `/` separators.
+- Windows-style backslashes are normalized to `/`, while Windows absolute paths such as `C:\...` are rejected.
+- Paths containing `.`, `..`, empty segments, leading slashes, and blank values are rejected.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-2.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 3 when prompted: begin the generation plan model without adding templates, website integration, or CLI functionality.
+
+Previous Phase 4 Step 1 changes:
 
 Changes:
 
