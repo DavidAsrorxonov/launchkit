@@ -1,98 +1,47 @@
-# Memory - Phase 4 Generator Core Utilities
+# Memory - Phase 4 Generator Checkpoint
 
-Last updated: 2026-06-28 22:06 JST
+Last updated: 2026-06-28 23:33 JST
 
 ## What was built
 
-Completed Phase 4 Steps 2 through 6 in `packages/generator` and updated `context/progress-tracker.md` after each step.
-
-Added generated file tree modeling and path safety:
-
-- `packages/generator/src/file-tree.ts`
-- `packages/generator/src/file-tree.test.ts`
-
-Added generation plan modeling:
-
-- `packages/generator/src/generation-plan.ts`
-- `packages/generator/src/generation-plan.test.ts`
-
-Added MVP feature definitions and registry:
-
-- `packages/generator/src/features/definitions.ts`
-- `packages/generator/src/features/registry.ts`
-- `packages/generator/src/features/registry.test.ts`
-
-Added `package.json` patch merging:
-
-- `packages/generator/src/package-json.ts`
-- `packages/generator/src/package-json.test.ts`
-
-Added env var merging and `.env.example` rendering:
-
-- `packages/generator/src/env.ts`
-- `packages/generator/src/env.test.ts`
-
-Updated `packages/generator/src/index.ts` to re-export the new generator APIs.
+- Completed Phase 4 Step 10 and updated `context/progress-tracker.md`.
+- Marked Phase 4 as complete and Phase 5 as ready.
+- Fixed built ESM package loading for `@launchkit/schema` and `@launchkit/generator`.
+- Updated schema and generator package TypeScript configs to use `NodeNext` module and module resolution.
+- Updated production relative imports/exports in schema and generator source to use `.js` specifiers.
+- Confirmed generator tests live under `packages/generator/src/__tests__/`, matching the schema package test folder structure.
 
 ## Decisions made
 
-Generator paths are normalized and validated in `file-tree.ts`; plan and feature file path fields remain plain strings until later pipeline/file-tree integration.
-
-Feature definitions are declarative only. No `apply()` behavior was added.
-
-Feature enablement is config-based only. Compatibility validation remains centralized in `@launchkit/schema`, not in the generator feature registry.
-
-`PackageJsonPatch` in `generation-plan.ts` is the shared package patch shape for plans, feature definitions, and merge utilities.
-
-Env rendering only emits provided placeholder values. It does not generate secrets.
+- Generator package tests should remain in `packages/generator/src/__tests__/`.
+- Schema and generator packages should emit Node-loadable ESM using NodeNext settings and explicit `.js` relative specifiers.
+- Phase 4 remains limited to the generator core foundation; real templates, adapters, UI, and CLI work stay out of scope until later phases.
 
 ## Problems solved
 
-The package merge utility initially failed generator typecheck/build because an internal merged object inferred as `{}` had no string index signature. Fixed by typing the merged map as `Record<string, string>`.
-
-The known sandboxed `npm run build` failure still occurs because Next/Turbopack tries to create/bind worker processes. Rerunning `npm run build` with elevated permissions passes.
+- Direct Node import of `packages/generator/dist/index.js` originally failed because emitted ESM used extensionless relative imports.
+- The failure was fixed by switching schema/generator builds to NodeNext and updating production relative import/export specifiers.
+- Workspace build fails inside the sandbox because Next/Turbopack cannot create or bind its worker process there; rerunning the same build outside the sandbox passes.
 
 ## Current state
 
-Phase 4 is in progress through Step 6.
-
-Working generator exports now include:
-
-- `GeneratedFile`, `GeneratedProject`, `normalizeGeneratedPath()`, `createGeneratedFile()`, `createGeneratedProject()`
-- `GenerationPlan`, supporting plan types, and `createEmptyGenerationPlan()`
-- `FeatureDefinition`, MVP feature definitions, `featureRegistry`, `getFeatureDefinition()`, `getEnabledFeatures()`
-- `mergePackageJsonPatches()` and `PackageJsonMergeConflictError`
-- `mergeEnvVars()`, `EnvVarMergeConflictError`, and `renderEnvExample()`
-
-The generator still does not implement:
-
-- `generateProject`
-- full generation pipeline
-- template loading
-- actual file creation from templates
-- file output adapters
-- real templates
-- website UI
-- CLI functionality
-
-Verification passed after Step 6:
-
-- `npm run typecheck -w packages/generator`
-- `npm run test -w packages/generator` with 57 generator tests
-- `npm run build -w packages/generator`
-- `npm run typecheck`
-- `npm run test` with 57 generator tests and 72 schema tests
-- `npm run lint`
-- `npm run build` after elevated rerun
-
-Current untracked prompt files from this session are under `.agents/prompts/phase-04/`, including the latest `.agents/prompts/phase-04/step-6.md`. They were intentionally left untouched except for reading.
+- Worktree was clean before saving this memory, except this new `memory.md` file.
+- `context/progress-tracker.md` records Phase 4 Step 10 completion and Phase 4 completion.
+- Verification passed:
+  - `npm run typecheck`
+  - `npm run test` with generator 87 tests and schema 72 tests
+  - `npm run lint`
+  - `npm run build` after elevated rerun outside the sandbox
+  - Direct Node smoke import of `packages/generator/dist/index.js`
+- The built generator smoke check generated placeholder files: `package.json`, `.env.example`, and `README.md`.
+- No Phase 5 templates, output adapters, website UI, or CLI features have been added.
 
 ## Next session starts with
 
-Read `context/progress-tracker.md` first, then implement the next Phase 4 prompt, likely `.agents/prompts/phase-04/step-7.md` if present.
-
-Keep the next change scoped to the prompt. Do not implement `generateProject`, template loading, website integration, or CLI functionality unless the prompt explicitly asks for it.
+- Start Phase 5 Step 1 when prompted.
+- Read `context/progress-tracker.md` and the relevant Phase 5 prompt before editing.
+- Keep Phase 5 work scoped to template implementation unless the prompt explicitly expands scope.
 
 ## Open questions
 
-None for Phase 4 Steps 2 through 6.
+- None currently documented.
