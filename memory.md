@@ -1,76 +1,78 @@
-# Memory - Phase 3 Step 1 Schema Package Foundation
+# Memory - Phase 3 Schema Tests
 
-Last updated: 2026-06-27 22:56:54 JST
+Last updated: 2026-06-28 00:32 JST
 
 ## What was built
 
-Phase 3 Step 1 from `.agents/prompts/phase-03/step-1.md` was completed.
+Completed Phase 3 Step 7: Add Schema Tests.
 
-The schema package foundation was reviewed and confirmed:
+Replaced the broad schema test file `packages/schema/src/index.test.ts` with focused Vitest suites under `packages/schema/src/__tests__/`:
 
-- `packages/schema/package.json` is named `@launchkit/schema`.
-- `packages/schema` has `build`, `typecheck`, and `test` scripts.
-- `packages/schema/src/index.ts` still exports the existing placeholder entry point.
-- `packages/schema/vitest.config.ts` uses Vitest with Node environment and `src/**/*.test.ts`.
-- No real `LaunchKitConfigSchema`, compatibility rules, option metadata, generator logic, website UI, templates, or CLI work was added.
+- `packages/schema/src/__tests__/options.test.ts`
+- `packages/schema/src/__tests__/config.test.ts`
+- `packages/schema/src/__tests__/defaults.test.ts`
+- `packages/schema/src/__tests__/metadata.test.ts`
+- `packages/schema/src/__tests__/compatibility.test.ts`
 
-Files changed this session:
-
-- `packages/schema/tsconfig.json`
-- `context/progress-tracker.md`
-- `memory.md`
+Updated `context/progress-tracker.md` to mark Phase 3 Step 7 complete and to reference the new `__tests__` paths.
 
 ## Decisions made
 
-Phase 3 Step 1 was kept intentionally narrow. The schema package remains a foundation-only package with a placeholder export; full schema design starts in a later Phase 3 step.
+Schema tests are organized by responsibility in `packages/schema/src/__tests__/`.
 
-The pre-existing `packages/generator/tsconfig.json` issue was left untouched because it was outside the scope of Phase 3 Step 1 and appeared as an existing/user-side modification.
+No schema implementation behavior changed during Step 7. The existing schema, defaults, metadata, and compatibility APIs already matched the required behavior.
+
+Vitest discovery remains unchanged because `packages/schema/vitest.config.ts` already includes `src/**/*.test.ts`.
+
+Package build behavior remains unchanged because `packages/schema/tsconfig.json` already excludes `src/**/*.test.ts`.
 
 ## Problems solved
 
-The schema package TypeScript blocker was fixed by removing invalid `ignoreDeprecations: "6.0"` from `packages/schema/tsconfig.json`.
+Expanded test coverage for missing schema validation cases:
 
-After that change, `@launchkit/schema` typechecks successfully on its own, and workspace typecheck/build now get past the schema package.
+- unknown UI option
+- unknown ORM option
+- unknown auth option
+- unknown Docker option
+- unknown package manager option
+- invalid project-name edge cases
+- unknown object keys
+- `shadcn/ui` compatibility issue when Tailwind is absent
+- typed `LaunchKitCompatibilityError` issue details
 
-The sandboxed `npm run build` still hits the known Turbopack process/port restriction in `apps/web`; rerunning the workspace build outside the sandbox confirmed the web app builds successfully.
+Confirmed that moving tests into `src/__tests__/` does not break Vitest discovery or schema package typechecking.
+
+The known sandboxed Turbopack build failure still occurs when `npm run build` is run inside the sandbox because Next/Turbopack tries to create a worker process and bind a local port. Running the same command with elevated permissions passes.
 
 ## Current state
 
-`npm run typecheck -w packages/schema` passes.
+Working tree includes Phase 3 Step 7 test organization and tracker updates:
 
-`npm run test` passes and runs the schema Vitest suite successfully.
+- modified `context/progress-tracker.md`
+- deleted `packages/schema/src/index.test.ts`
+- added `packages/schema/src/__tests__/options.test.ts`
+- added `packages/schema/src/__tests__/config.test.ts`
+- added `packages/schema/src/__tests__/defaults.test.ts`
+- added `packages/schema/src/__tests__/metadata.test.ts`
+- added `packages/schema/src/__tests__/compatibility.test.ts`
 
-`npm run lint` passes.
+There is also an existing untracked prompt file: `.agents/prompts/phase-03/step-7.md`.
 
-`npm run typecheck` fails in `@launchkit/generator` because `packages/generator/tsconfig.json` contains invalid `ignoreDeprecations: "6.0"`.
+Verification passed:
 
-`npm run build` fails in the sandbox because of the known Turbopack process/port restriction. When rerun outside the sandbox, the web app builds successfully, but the workspace build still fails in `@launchkit/generator` for the invalid TypeScript config setting.
-
-`context/progress-tracker.md` was updated to record Phase 3 Step 1 completion, verification results, and the generator tsconfig blocker.
-
-Current `git status --short` showed only:
-
-```txt
-?? .agents/prompts/phase-03/step-2.md
-```
+- `npm run test -w packages/schema` with 72 tests across 5 files
+- `npm run typecheck -w packages/schema`
+- `npm run test`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build` after elevated rerun
 
 ## Next session starts with
 
-Read `.agents/prompts/phase-03/step-2.md`, then implement only that step's requested scope.
+Proceed to Phase 4: build the reusable generator core when prompted.
 
-If Step 2 allows it, fix the generator package TypeScript config blocker in `packages/generator/tsconfig.json`, then rerun:
-
-```bash
-npm run typecheck
-npm run build
-npm run test
-npm run lint
-```
-
-Update `context/progress-tracker.md` with the results.
+Start by reading `context/progress-tracker.md`, `context/project-overview.md`, `context/architecture.md`, `context/build-plan.md`, and the relevant Phase 4 prompt. Keep the next implementation scoped to generator core work unless the prompt says otherwise.
 
 ## Open questions
 
-- Should the untracked `.agents/prompts/phase-03/step-2.md` be treated as the next implementation prompt?
-- Should Phase 2 checklist items in `context/progress-tracker.md` be marked complete now that the repo already contains the app/package structure?
-- Should the 2 moderate dependency audit vulnerabilities reported by `npm install` be addressed during Phase 2 tooling cleanup or deferred until later hardening?
+None for Phase 3 Step 7.
