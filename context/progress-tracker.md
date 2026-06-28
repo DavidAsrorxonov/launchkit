@@ -7,23 +7,23 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 4 Step 4 complete
-Primary focus: MVP feature definitions and registry helpers are in place; generation pipeline and template loading not started
+Current phase: Phase 4 Step 5 complete
+Primary focus: package.json patch merge utility and conflict handling are in place; generation pipeline and template loading not started
 ```
 
 ## Phase Progress
 
-| Phase   | Name                                  | Status      | Notes                                                            |
-| ------- | ------------------------------------- | ----------- | ---------------------------------------------------------------- |
-| Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
-| Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
-| Phase 3 | Shared Schema and Compatibility Rules | Complete | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | In Progress | Step 4 completed MVP feature definitions, feature registry, config-based enabled feature lookup, tests, and public exports. |
-| Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
-| Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
-| Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                    |
-| Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.             |
-| Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                            |
+| Phase   | Name                                  | Status      | Notes                                                                                                   |
+| ------- | ------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
+| Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined.                                        |
+| Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
+| Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
+| Phase 4 | Generator Core                        | In Progress | Step 5 completed package.json patch merging, conflict detection, tests, and public exports.             |
+| Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                                                                    |
+| Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
+| Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
+| Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
+| Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
 ## Change Log
 
@@ -31,7 +31,111 @@ Add entries in reverse chronological order.
 
 ### 2026-06-28
 
-Phase 4 Step 4 changes:
+Phase 4 Step 5 changes:
+
+- Completed Phase 4 Step 5: Create Package.json Merge Utility.
+- Extended `PackageJsonPatch` with package metadata fields: `name`, `version`, `private`, and `type`.
+- Added `mergePackageJsonPatches()` for merging metadata, scripts, dependencies, and dev dependencies.
+- Added `PackageJsonMergeConflictError` for conflicting package patch values.
+- Added conflict detection for dependency version conflicts, dev dependency version conflicts, script command conflicts, and package metadata conflicts.
+- Added Vitest coverage for empty patch lists, successful dependency/dev dependency/script/metadata merges, duplicate identical values, conflict cases, and input immutability.
+- Re-exported the package merge helper and conflict error from `@launchkit/generator`.
+- Did not implement `generateProject`, the full generation pipeline, template loading, file output adapters, real templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/src/package-json.ts`
+- `packages/generator/src/package-json.test.ts`
+- `packages/generator/src/generation-plan.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+package.json merge utility added:
+
+- `mergePackageJsonPatches()`
+- `PackageJsonMergeConflictError`
+
+Conflict behavior added:
+
+- Duplicate dependency with different versions throws.
+- Duplicate dev dependency with different versions throws.
+- Duplicate script with different commands throws.
+- Duplicate metadata field with different defined values throws.
+- Duplicate identical values are accepted.
+- `undefined` metadata fields are ignored.
+
+Commands run:
+
+```bash
+sed -n '1,320p' context/progress-tracker.md
+sed -n '1,320p' .agents/prompts/phase-04/step-5.md
+rg --files packages/generator packages/templates packages/schema context .agents/prompts/phase-04
+sed -n '321,760p' context/progress-tracker.md
+sed -n '761,1400p' context/progress-tracker.md
+sed -n '1,674p' context/project-overview.md
+sed -n '1,465p' context/architecture.md
+sed -n '466,930p' context/architecture.md
+sed -n '1,533p' context/build-plan.md
+sed -n '534,1066p' context/build-plan.md
+sed -n '1,416p' context/ui-rules.md
+sed -n '1,320p' .agents/prompts/phase-04/step-4.md
+sed -n '1,260p' packages/generator/src/generation-plan.ts
+sed -n '1,260p' packages/generator/src/features/definitions.ts
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/generation-plan.ts packages/generator/src/package-json.ts packages/generator/src/package-json.test.ts
+find packages -maxdepth 4 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- Initial `npm run typecheck -w packages/generator` and `npm run build -w packages/generator` failed on an internal map typing issue in `package-json.ts`; this was fixed by typing the merged map as `Record<string, string>`.
+- `npm run typecheck -w packages/generator` passed after the fix.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 44 tests successfully.
+- `npm run build -w packages/generator` passed after the fix.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 44 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- `mergePackageJsonPatches()` returns a new patch and does not mutate input patches.
+- `PackageJsonPatch` remains the shared package patch type used by the generation plan and feature definitions.
+- The package merge utility is not wired into a generation pipeline yet.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-5.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 6 when prompted: continue the next scoped generator utility without implementing the full generation pipeline, website integration, or CLI functionality.
+
+Previous Phase 4 Step 4 changes:
+
+Changes:
 
 - Completed Phase 4 Step 4: Create Feature Definition And Registry.
 - Added declarative `FeatureDefinition` model in `packages/generator`.
@@ -1356,10 +1460,10 @@ Use this section for general implementation notes.
 
 ## Blockers
 
-| Date | Blocker | Status | Resolution |
-| ---- | ------- | ------ | ---------- |
+| Date       | Blocker                                                                                                          | Status   | Resolution                                                                                    |
+| ---------- | ---------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------- |
 | 2026-06-27 | `packages/generator/tsconfig.json` has invalid `ignoreDeprecations: "6.0"` for the installed TypeScript version. | Resolved | The setting is no longer present in the current checkout; workspace typecheck and build pass. |
-| 2026-06-27 | `packages/schema/tsconfig.json` has invalid `ignoreDeprecations: "6.0"` for the installed TypeScript version. | Resolved | Removed the invalid setting; schema package typecheck now passes. |
+| 2026-06-27 | `packages/schema/tsconfig.json` has invalid `ignoreDeprecations: "6.0"` for the installed TypeScript version.    | Resolved | Removed the invalid setting; schema package typecheck now passes.                             |
 
 ## Open Questions
 
@@ -1392,21 +1496,21 @@ Update this list as development progresses.
 
 ## Verification History
 
-| Date | Command | Result | Notes |
-| ---- | ------- | ------ | ----- |
-| 2026-06-27 | `npm run build` | Passed | Passed outside the sandbox after the known Turbopack process/port restriction blocked the sandboxed run. |
-| 2026-06-27 | `npm run lint` | Passed | Workspace lint completed successfully. |
-| 2026-06-27 | `npm run test` | Passed | Vitest ran the schema package suite: 11 tests passed. |
-| 2026-06-27 | `npm run typecheck` | Passed | All workspaces typechecked successfully. |
-| 2026-06-27 | `npm run test -w packages/schema` | Passed | Schema package Vitest suite ran 11 tests successfully. |
-| 2026-06-27 | `npm run typecheck -w packages/schema` | Passed | Schema package typechecked successfully with option exports. |
-| 2026-06-27 | `npm test` | Passed | Vitest ran the schema package test suite successfully. |
-| 2026-06-27 | `npm run lint` | Passed | Workspace lint completed successfully. |
-| 2026-06-27 | `npm run typecheck -w packages/schema` | Passed | Schema package typechecked successfully after removing invalid `ignoreDeprecations`. |
-| 2026-06-27 | `npm run typecheck` | Failed | Schema passed; workspace blocked by invalid `ignoreDeprecations: "6.0"` in `packages/generator/tsconfig.json`. |
-| 2026-06-27 | `npm run build` | Failed | Web app built outside sandbox; workspace build failed at generator TypeScript config. |
-| 2026-06-27 | `npm run typecheck` | Failed | Blocked by invalid `ignoreDeprecations: "6.0"` in `packages/schema/tsconfig.json`. |
-| 2026-06-27 | `npm run build` | Failed | Web app built outside sandbox; workspace build failed at schema TypeScript config. |
+| Date       | Command                                | Result | Notes                                                                                                          |
+| ---------- | -------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| 2026-06-27 | `npm run build`                        | Passed | Passed outside the sandbox after the known Turbopack process/port restriction blocked the sandboxed run.       |
+| 2026-06-27 | `npm run lint`                         | Passed | Workspace lint completed successfully.                                                                         |
+| 2026-06-27 | `npm run test`                         | Passed | Vitest ran the schema package suite: 11 tests passed.                                                          |
+| 2026-06-27 | `npm run typecheck`                    | Passed | All workspaces typechecked successfully.                                                                       |
+| 2026-06-27 | `npm run test -w packages/schema`      | Passed | Schema package Vitest suite ran 11 tests successfully.                                                         |
+| 2026-06-27 | `npm run typecheck -w packages/schema` | Passed | Schema package typechecked successfully with option exports.                                                   |
+| 2026-06-27 | `npm test`                             | Passed | Vitest ran the schema package test suite successfully.                                                         |
+| 2026-06-27 | `npm run lint`                         | Passed | Workspace lint completed successfully.                                                                         |
+| 2026-06-27 | `npm run typecheck -w packages/schema` | Passed | Schema package typechecked successfully after removing invalid `ignoreDeprecations`.                           |
+| 2026-06-27 | `npm run typecheck`                    | Failed | Schema passed; workspace blocked by invalid `ignoreDeprecations: "6.0"` in `packages/generator/tsconfig.json`. |
+| 2026-06-27 | `npm run build`                        | Failed | Web app built outside sandbox; workspace build failed at generator TypeScript config.                          |
+| 2026-06-27 | `npm run typecheck`                    | Failed | Blocked by invalid `ignoreDeprecations: "6.0"` in `packages/schema/tsconfig.json`.                             |
+| 2026-06-27 | `npm run build`                        | Failed | Web app built outside sandbox; workspace build failed at schema TypeScript config.                             |
 
 ## Release Notes Draft
 

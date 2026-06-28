@@ -33,6 +33,10 @@ export type GeneratedFileDefinition = {
 };
 
 export type PackageJsonPatch = {
+  name?: string;
+  version?: string;
+  private?: boolean;
+  type?: string;
   dependencies?: DependencyMap;
   devDependencies?: DependencyMap;
   scripts?: ScriptMap;
