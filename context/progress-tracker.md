@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 3 Step 8 complete
-Primary focus: Shared schema and compatibility contract verified; generator core ready to start
+Current phase: Phase 4 Step 1 complete
+Primary focus: Generator package foundation verified; generator engine implementation not started
 ```
 
 ## Phase Progress
@@ -18,7 +18,7 @@ Primary focus: Shared schema and compatibility contract verified; generator core
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | Ready | Next phase will build the reusable project generation engine.    |
+| Phase 4 | Generator Core                        | In Progress | Step 1 completed generator package foundation, exports, schema import, Vitest setup, and schema project reference. |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                    |
@@ -32,6 +32,134 @@ Add entries in reverse chronological order.
 ### 2026-06-28
 
 Changes:
+
+- Completed Phase 4 Step 1: Create Generator Package Foundation.
+- Reviewed `packages/generator` structure and confirmed required `package.json`, `tsconfig.json`, and `src/index.ts` are present.
+- Added the generator package Vitest script and package-level Vitest config.
+- Added a minimal generator package test using Vitest.
+- Replaced the old placeholder export with `generatorPackageReady()`.
+- Added `getGeneratorDefaultConfig()` as a lightweight package-boundary import from `@launchkit/schema`.
+- Added a TypeScript project reference from `@launchkit/generator` to `@launchkit/schema` so generator builds can compile cleanly against the schema package from a fresh checkout.
+- Added `noEmitOnError` to prevent partial generated output after failed generator builds.
+- Confirmed `@launchkit/generator` does not import from `apps/web` or `packages/cli`.
+- Did not implement `generateProject`, file tree logic, feature registry logic, package merging, template loading, templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/package.json`
+- `packages/generator/tsconfig.json`
+- `packages/generator/vitest.config.ts`
+- `packages/generator/src/index.ts`
+- `packages/generator/src/index.test.ts`
+- `packages/schema/tsconfig.json`
+- `context/progress-tracker.md`
+
+Generator foundation exports:
+
+- `generatorPackageReady()`
+- `getGeneratorDefaultConfig()`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-04/step-1.md
+rg --files
+sed -n '1,280p' context/project-overview.md
+sed -n '1,520p' context/architecture.md
+sed -n '1,560p' context/build-plan.md
+sed -n '1,420p' context/ui-rules.md
+sed -n '1,260p' package.json
+sed -n '1,240p' packages/generator/package.json
+sed -n '1,220p' packages/generator/tsconfig.json
+sed -n '1,220p' packages/generator/src/index.ts
+wc -l context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md context/progress-tracker.md
+sed -n '1,240p' packages/schema/package.json
+sed -n '1,220p' packages/schema/tsconfig.json
+sed -n '1,220p' packages/schema/vitest.config.ts
+sed -n '1,220p' packages/schema/src/index.ts
+sed -n '1,220p' packages/schema/src/defaults.ts
+sed -n '1,200p' packages/templates/package.json
+sed -n '1,200p' packages/shared/package.json
+rg "node:test|node --test|vitest|@launchkit/generator|@launchkit/schema|apps/web|packages/cli" packages/generator packages/schema package.json -g '!dist'
+git status --short
+sed -n '281,760p' context/project-overview.md
+sed -n '521,980p' context/architecture.md
+sed -n '561,1120p' context/build-plan.md
+sed -n '421,720p' context/ui-rules.md
+sed -n '221,1040p' context/progress-tracker.md
+sed -n '1,220p' tsconfig.base.json
+find packages -maxdepth 3 -type d -name dist -print
+find packages/schema -maxdepth 3 -type f -path '*dist*' -print
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+rg "apps/web|packages/cli|node:test|node --test" packages/generator -g '!dist'
+npm run build -w packages/schema
+npm run build -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+sed -n '1,80p' packages/schema/src/index.js
+find packages/schema/src -maxdepth 1 -type f | sort
+find packages/schema/dist -maxdepth 1 -type f | sort
+git ls-files packages/schema/src
+npm run build -w packages/schema -- --showConfig
+find packages/schema/src -maxdepth 1 -type f | sort
+npx tsc --build packages/schema/tsconfig.json packages/generator/tsconfig.json --dry
+npx tsc --build packages/schema/tsconfig.json packages/generator/tsconfig.json --noEmit
+npx tsc --build packages/schema/tsconfig.json packages/generator/tsconfig.json --clean --dry
+npx tsc -p packages/generator/tsconfig.json --noEmit
+npm run typecheck -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+git diff -- packages/generator/package.json packages/generator/tsconfig.json packages/generator/src/index.ts packages/generator/vitest.config.ts packages/generator/src/index.test.ts
+find packages/generator -maxdepth 3 -type f | sort
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 2 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 2 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- `packages/schema/tsconfig.json` now enables `composite` so it can be referenced by the generator package.
+- `packages/generator/tsconfig.json` references `../schema`, while the generator build script uses TypeScript build mode for dependency ordering.
+- The generator package keeps a no-emission typecheck script with `tsc -p tsconfig.json --noEmit`.
+- An exploratory `tsc --build ... --noEmit` check failed because TypeScript build mode does not allow disabling emit for the referenced schema project; the final package scripts avoid that mode.
+- The first failed generator build emitted temporary schema `.js` and `.d.ts` files under `packages/schema/src`; those generated artifacts were removed.
+- Existing untracked prompt directory `.agents/prompts/phase-04/` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 2 when prompted: begin the generator core model work without adding templates or website integration yet.
+
+Previous Phase 3 Step 8 changes:
 
 - Completed Phase 3 Step 8: Verify Phase 3 Completion.
 - Reviewed the Phase 3 completion checklist against `packages/schema`.
