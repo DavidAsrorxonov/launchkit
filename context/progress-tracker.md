@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 4 Step 6 complete
-Primary focus: Env var merge utility and .env.example renderer are in place; generation pipeline and template loading not started
+Current phase: Phase 4 Step 7 complete
+Primary focus: Template loader interface, placeholder helper, in-memory loader, and path-safe template target handling are in place; real templates and generation pipeline not started
 ```
 
 ## Phase Progress
@@ -18,7 +18,7 @@ Primary focus: Env var merge utility and .env.example renderer are in place; gen
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined.                                        |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | In Progress | Step 6 completed env var merging, .env.example rendering, conflict detection, tests, and public exports. |
+| Phase 4 | Generator Core                        | In Progress | Step 7 completed template loader types, placeholder replacement, in-memory loader, target path validation, tests, and public exports. |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                                                                    |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
@@ -30,6 +30,125 @@ Primary focus: Env var merge utility and .env.example renderer are in place; gen
 Add entries in reverse chronological order.
 
 ### 2026-06-28
+
+Phase 4 Step 7 changes:
+
+- Completed Phase 4 Step 7: Create Template Loader Interface.
+- Added `TemplateContext`, `TemplateFile`, and `TemplateLoader` public types.
+- Added `applyTemplatePlaceholders()` for simple `{{projectName}}` and `{{packageName}}` replacement.
+- Added `createInMemoryTemplateLoader()` for testing and future pipeline integration.
+- Added `TemplateNotFoundError` for unknown in-memory template IDs.
+- Applied placeholders to text file contents and template target paths.
+- Reused `normalizeGeneratedPath()` so unsafe template target paths are rejected consistently.
+- Preserved binary template contents by returning copied `Uint8Array` values.
+- Re-exported template loader types and helpers from `@launchkit/generator`.
+- Did not add real Next.js templates, feature templates, filesystem template loading, output adapters, website UI, CLI functionality, or the full `generateProject` pipeline.
+
+Files changed:
+
+- `packages/generator/src/template-loader.ts`
+- `packages/generator/src/template-loader.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+Template loader interface added:
+
+- `TemplateContext`
+- `TemplateFile`
+- `TemplateLoader`
+- `TemplateNotFoundError`
+- `applyTemplatePlaceholders()`
+- `createInMemoryTemplateLoader()`
+
+Placeholder and path behavior added:
+
+- Known placeholders `{{projectName}}` and `{{packageName}}` are replaced.
+- Repeated and multiple known placeholders are replaced.
+- Unknown placeholders are left unchanged.
+- Context objects are not mutated.
+- Target path placeholders are supported.
+- Target paths are normalized and validated with the generated file path helper.
+- Unsafe target paths throw `InvalidGeneratedPathError`.
+- Unknown template IDs throw `TemplateNotFoundError`.
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-04/step-7.md
+git status --short
+sed -n '1,260p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,320p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '321,760p' context/architecture.md
+sed -n '321,760p' context/build-plan.md
+sed -n '261,520p' context/ui-rules.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '761,1160p' context/architecture.md
+sed -n '761,1180p' context/build-plan.md
+sed -n '1,220p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,300p' .agents/prompts/phase-04/step-3.md
+sed -n '1,340p' .agents/prompts/phase-04/step-4.md
+sed -n '1,340p' .agents/prompts/phase-04/step-5.md
+sed -n '1,320p' .agents/prompts/phase-04/step-6.md
+rg --files packages/generator/src packages/schema/src packages/templates
+sed -n '1,240p' packages/generator/src/file-tree.ts
+sed -n '1,260p' packages/generator/src/generation-plan.ts
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,260p' packages/generator/src/env.ts
+sed -n '1,300p' packages/generator/src/env.test.ts
+sed -n '1,220p' packages/generator/src/file-tree.test.ts
+sed -n '1,220p' packages/generator/package.json
+sed -n '1,220p' package.json
+sed -n '1,260p' packages/generator/src/package-json.ts
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/template-loader.ts packages/generator/src/template-loader.test.ts
+sed -n '1,180p' context/progress-tracker.md
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 67 tests successfully.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 67 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces, including the generator package build.
+
+Notes:
+
+- The in-memory loader is intentionally for tests and future pipeline wiring only.
+- Template source paths are retained as template references; generated target paths are the path-safety boundary for this step.
+- Placeholder logic is intentionally simple and does not support conditionals, loops, embedded JavaScript, or arbitrary placeholder evaluation.
+- Real templates under `packages/templates/base/` and `packages/templates/features/` are still not implemented.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-7.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 8 when prompted: continue the next scoped generator utility without implementing the full generation pipeline, website integration, or CLI functionality.
 
 Phase 4 Step 6 changes:
 
