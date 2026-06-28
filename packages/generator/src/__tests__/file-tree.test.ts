@@ -5,7 +5,7 @@ import {
   createGeneratedFile,
   createGeneratedProject,
   normalizeGeneratedPath,
-} from "./file-tree";
+} from "../file-tree";
 
 describe("generated file tree paths", () => {
   it("accepts a valid root file path", () => {

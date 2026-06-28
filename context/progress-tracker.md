@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 4 Step 8 complete
-Primary focus: First generateProject pipeline skeleton is in place; it validates config, resolves features, merges package/env contributions, and emits placeholder project files without real templates
+Current phase: Phase 4 Step 9 complete
+Primary focus: Generator foundation has expanded Vitest coverage, including new __tests__ hardening coverage for Phase 4 modules and pipeline output safety
 ```
 
 ## Phase Progress
@@ -18,7 +18,7 @@ Primary focus: First generateProject pipeline skeleton is in place; it validates
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined.                                        |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | In Progress | Step 8 completed the first generateProject pipeline skeleton with schema validation, compatibility checks, feature resolution, package/env merging, placeholder files, tests, and public exports. |
+| Phase 4 | Generator Core                        | In Progress | Step 9 expanded generator Vitest coverage for Phase 4 modules, full MVP plan/output safety, feature metadata, binary/text preservation, and edge cases. |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                                                                    |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
@@ -30,6 +30,156 @@ Primary focus: First generateProject pipeline skeleton is in place; it validates
 Add entries in reverse chronological order.
 
 ### 2026-06-28
+
+Phase 4 Step 9 changes:
+
+- Completed Phase 4 Step 9: Add Generator Tests.
+- Reviewed current generator tests and confirmed they use Vitest.
+- Confirmed no `node:test`, Jest, or Mocha usage exists in `packages/generator`.
+- Added new generator coverage in `packages/generator/src/__tests__/` to match the requested test folder preference.
+- Added full MVP plan coverage for resolved feature order.
+- Added feature definition metadata coverage for non-empty labels and descriptions.
+- Added file tree coverage for preserving text and binary contents.
+- Added generated project coverage for normalized safe file paths.
+- Added full MVP generated output coverage for merged Prisma package contributions and PostgreSQL/Auth.js env variables.
+- Added template-loader pipeline coverage for binary template files included through `generateProject()`.
+- Added edge coverage for empty `.env.example` rendering and undefined package metadata.
+- Follow-up: moved all generator test files into `packages/generator/src/__tests__/` to match the schema package test folder structure.
+- No Phase 4 bugs were found by the added tests.
+- Did not add real Next.js templates, real feature templates, zip adapters, filesystem adapters, website UI, CLI functionality, or new MVP options.
+
+Files changed:
+
+- `packages/generator/src/__tests__/env.test.ts`
+- `packages/generator/src/__tests__/feature-registry.test.ts`
+- `packages/generator/src/__tests__/file-tree.test.ts`
+- `packages/generator/src/__tests__/generate-project.test.ts`
+- `packages/generator/src/__tests__/generation-plan.test.ts`
+- `packages/generator/src/__tests__/index.test.ts`
+- `packages/generator/src/__tests__/package-json.test.ts`
+- `packages/generator/src/__tests__/phase-4-coverage.test.ts`
+- `packages/generator/src/__tests__/template-loader.test.ts`
+- `packages/generator/src/env.test.ts` moved to `packages/generator/src/__tests__/env.test.ts`
+- `packages/generator/src/features/registry.test.ts` moved to `packages/generator/src/__tests__/feature-registry.test.ts`
+- `packages/generator/src/file-tree.test.ts` moved to `packages/generator/src/__tests__/file-tree.test.ts`
+- `packages/generator/src/generate-project.test.ts` moved to `packages/generator/src/__tests__/generate-project.test.ts`
+- `packages/generator/src/generation-plan.test.ts` moved to `packages/generator/src/__tests__/generation-plan.test.ts`
+- `packages/generator/src/index.test.ts` moved to `packages/generator/src/__tests__/index.test.ts`
+- `packages/generator/src/package-json.test.ts` moved to `packages/generator/src/__tests__/package-json.test.ts`
+- `packages/generator/src/template-loader.test.ts` moved to `packages/generator/src/__tests__/template-loader.test.ts`
+- `context/progress-tracker.md`
+
+Test coverage added:
+
+- Feature definitions include labels and descriptions.
+- Full MVP config resolves `next`, `tailwind`, `shadcn`, `postgres`, `prisma`, `authjs-credentials`, and `docker-postgres` in plan order.
+- Generated files preserve text and binary contents.
+- Generated projects store normalized safe text and binary file paths.
+- Full MVP generated output contains only safe normalized paths.
+- Full MVP generated output includes Prisma package/scripts and required env vars.
+- Template-loaded binary files remain binary when included through `generateProject()`.
+- Empty env rendering is stable.
+- Undefined package metadata does not overwrite defined metadata.
+
+Commands run:
+
+```bash
+sed -n '1,280p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-04/step-9.md
+git status --short
+sed -n '1,420p' context/project-overview.md
+sed -n '1,520p' context/architecture.md
+sed -n '1,620p' context/build-plan.md
+sed -n '1,380p' context/ui-rules.md
+sed -n '421,900p' context/project-overview.md
+sed -n '521,1040p' context/architecture.md
+sed -n '621,1240p' context/build-plan.md
+sed -n '381,760p' context/ui-rules.md
+sed -n '1,220p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,300p' .agents/prompts/phase-04/step-3.md
+sed -n '1,340p' .agents/prompts/phase-04/step-4.md
+sed -n '1,340p' .agents/prompts/phase-04/step-5.md
+sed -n '1,320p' .agents/prompts/phase-04/step-6.md
+sed -n '1,300p' .agents/prompts/phase-04/step-7.md
+sed -n '1,280p' .agents/prompts/phase-04/step-8.md
+rg --files packages/generator/src
+rg "node:test|jest|mocha" packages/generator/src packages/generator/package.json
+sed -n '1,260p' packages/generator/src/file-tree.test.ts
+sed -n '1,260p' packages/generator/src/generation-plan.test.ts
+sed -n '1,320p' packages/generator/src/package-json.test.ts
+sed -n '1,320p' packages/generator/src/env.test.ts
+sed -n '1,320p' packages/generator/src/template-loader.test.ts
+sed -n '1,340p' packages/generator/src/generate-project.test.ts
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/__tests__/phase-4-coverage.test.ts
+git diff --stat
+find packages -maxdepth 4 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+sed -n '1,260p' packages/generator/src/__tests__/phase-4-coverage.test.ts
+sed -n '1,180p' context/progress-tracker.md
+rg --files packages/schema/src/__tests__ packages/generator/src
+sed -n '1,120p' packages/schema/src/__tests__/config.test.ts
+mv packages/generator/src/env.test.ts packages/generator/src/__tests__/env.test.ts
+mv packages/generator/src/file-tree.test.ts packages/generator/src/__tests__/file-tree.test.ts
+mv packages/generator/src/generation-plan.test.ts packages/generator/src/__tests__/generation-plan.test.ts
+mv packages/generator/src/package-json.test.ts packages/generator/src/__tests__/package-json.test.ts
+mv packages/generator/src/template-loader.test.ts packages/generator/src/__tests__/template-loader.test.ts
+mv packages/generator/src/generate-project.test.ts packages/generator/src/__tests__/generate-project.test.ts
+mv packages/generator/src/index.test.ts packages/generator/src/__tests__/index.test.ts
+mv packages/generator/src/features/registry.test.ts packages/generator/src/__tests__/feature-registry.test.ts
+rg "from \"\.\/|from './" packages/generator/src/__tests__
+npm run test -w packages/generator
+npm run typecheck -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 87 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 87 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces, including the generator package build.
+
+Notes:
+
+- All generator tests now live under `packages/generator/src/__tests__/`, matching the schema package test folder pattern.
+- New tests were added under `packages/generator/src/__tests__/` per the requested preference.
+- This step added coverage only; no generator behavior changes were needed.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-9.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to the next scoped Phase 4 step when prompted, keeping real templates, output adapters, website integration, and CLI work out of scope unless explicitly requested.
 
 Phase 4 Step 8 changes:
 

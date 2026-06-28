@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { EnvVarDefinition } from "./generation-plan";
-import { EnvVarMergeConflictError, mergeEnvVars, renderEnvExample } from "./env";
+import type { EnvVarDefinition } from "../generation-plan";
+import { EnvVarMergeConflictError, mergeEnvVars, renderEnvExample } from "../env";
 
 describe("env var merging", () => {
   it("returns an empty array for empty input", () => {

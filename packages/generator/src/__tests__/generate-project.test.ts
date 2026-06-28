@@ -6,8 +6,8 @@ import {
   type LaunchKitConfig,
 } from "@launchkit/schema";
 
-import { createInMemoryTemplateLoader } from "./template-loader";
-import { createGenerationPlan, generateProject } from "./generate-project";
+import { createInMemoryTemplateLoader } from "../template-loader";
+import { createGenerationPlan, generateProject } from "../generate-project";
 
 describe("generation pipeline", () => {
   it("generates a project for the default config", async () => {

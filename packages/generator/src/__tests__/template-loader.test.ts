@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { InvalidGeneratedPathError } from "./file-tree";
+import { InvalidGeneratedPathError } from "../file-tree";
 import {
   TemplateNotFoundError,
   applyTemplatePlaceholders,
   createInMemoryTemplateLoader,
-} from "./template-loader";
+} from "../template-loader";
 
 const context = {
   projectName: "my-app",

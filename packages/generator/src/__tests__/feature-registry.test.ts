@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { defaultLaunchKitConfig } from "@launchkit/schema";
 
-import { featureRegistry, getEnabledFeatures, getFeatureDefinition } from "./registry";
+import { featureRegistry, getEnabledFeatures, getFeatureDefinition } from "../features/registry";
 
 const mvpFeatureIds = [
   "next",

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { defaultLaunchKitConfig } from "@launchkit/schema";
 
-import { generatorPackageReady, getGeneratorDefaultConfig } from "./index";
+import { generatorPackageReady, getGeneratorDefaultConfig } from "../index";
 
 describe("@launchkit/generator package foundation", () => {
   it("exports a readiness placeholder", () => {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { PackageJsonPatch } from "./generation-plan";
-import { PackageJsonMergeConflictError, mergePackageJsonPatches } from "./package-json";
+import type { PackageJsonPatch } from "../generation-plan";
+import { PackageJsonMergeConflictError, mergePackageJsonPatches } from "../package-json";
 
 describe("package.json patch merging", () => {
   it("returns an empty patch for an empty patch list", () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { defaultLaunchKitConfig } from "@launchkit/schema";
 
-import { createEmptyGenerationPlan } from "./generation-plan";
+import { createEmptyGenerationPlan } from "../generation-plan";
 
 describe("generation plan model", () => {
   it("creates an empty generation plan with the provided config", () => {
