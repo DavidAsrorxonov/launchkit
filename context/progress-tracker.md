@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 4 Step 3 complete
-Primary focus: Generation plan model and empty-plan helper are in place; feature resolution and generation pipeline not started
+Current phase: Phase 4 Step 4 complete
+Primary focus: MVP feature definitions and registry helpers are in place; generation pipeline and template loading not started
 ```
 
 ## Phase Progress
@@ -18,7 +18,7 @@ Primary focus: Generation plan model and empty-plan helper are in place; feature
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | In Progress | Step 3 completed generation plan types, empty-plan helper, tests, and public exports. |
+| Phase 4 | Generator Core                        | In Progress | Step 4 completed MVP feature definitions, feature registry, config-based enabled feature lookup, tests, and public exports. |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                    |
@@ -31,7 +31,116 @@ Add entries in reverse chronological order.
 
 ### 2026-06-28
 
-Phase 4 Step 3 changes:
+Phase 4 Step 4 changes:
+
+- Completed Phase 4 Step 4: Create Feature Definition And Registry.
+- Added declarative `FeatureDefinition` model in `packages/generator`.
+- Added MVP feature definitions for `next`, `tailwind`, `shadcn`, `postgres`, `prisma`, `authjs-credentials`, and `docker-postgres`.
+- Added lightweight feature contributions for Prisma package dependencies/dev dependencies/scripts, PostgreSQL `DATABASE_URL`, Auth.js `AUTH_SECRET`, feature requirements, and Auth.js implementation note.
+- Added `featureRegistry`, `getFeatureDefinition()`, and `getEnabledFeatures(config)`.
+- Added `UnknownFeatureError` for predictable runtime lookup failures.
+- Re-exported feature definitions and registry helpers from `@launchkit/generator`.
+- Added Vitest coverage for registry completeness, lookup behavior, unknown feature handling, default enabled features, conditional feature enablement, and Prisma package contributions.
+- Did not implement `generateProject`, the full generation pipeline, template loading, actual file creation from templates, `package.json` merge utility, env var merge utility, real templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/src/features/definitions.ts`
+- `packages/generator/src/features/registry.ts`
+- `packages/generator/src/features/registry.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+Feature definitions added:
+
+- `next`
+- `tailwind`
+- `shadcn`
+- `postgres`
+- `prisma`
+- `authjs-credentials`
+- `docker-postgres`
+
+Registry helpers added:
+
+- `featureRegistry`
+- `getFeatureDefinition()`
+- `getEnabledFeatures()`
+- `UnknownFeatureError`
+
+Commands run:
+
+```bash
+sed -n '1,280p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-04/step-4.md
+rg --files packages/generator packages/schema context .agents/prompts/phase-04
+sed -n '281,620p' .agents/prompts/phase-04/step-4.md
+sed -n '281,760p' context/progress-tracker.md
+wc -l context/project-overview.md context/architecture.md context/build-plan.md context/ui-rules.md context/progress-tracker.md .agents/prompts/phase-04/step-1.md .agents/prompts/phase-04/step-2.md .agents/prompts/phase-04/step-3.md
+sed -n '761,1308p' context/progress-tracker.md
+sed -n '1,674p' context/project-overview.md
+sed -n '1,465p' context/architecture.md
+sed -n '466,930p' context/architecture.md
+sed -n '1,533p' context/build-plan.md
+sed -n '534,1066p' context/build-plan.md
+sed -n '1,416p' context/ui-rules.md
+sed -n '1,261p' .agents/prompts/phase-04/step-3.md
+sed -n '1,240p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,260p' packages/generator/src/generation-plan.ts
+sed -n '1,240p' packages/schema/src/defaults.ts
+git status --short
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/features/definitions.ts packages/generator/src/features/registry.ts packages/generator/src/features/registry.test.ts
+find packages -maxdepth 4 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 32 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 32 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- `getEnabledFeatures(config)` always includes `next` and `tailwind`, then conditionally includes the remaining MVP features from config selections.
+- The feature registry intentionally does not perform compatibility validation; `@launchkit/schema` remains the source of compatibility rules.
+- Feature definitions are declarative only and do not include `apply()` behavior.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-4.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 5 when prompted: begin template-loading structure without implementing the full generation pipeline, website integration, or CLI functionality.
+
+Previous Phase 4 Step 3 changes:
+
+Changes:
 
 - Completed Phase 4 Step 3: Define Generation Plan Model.
 - Added `GenerationPlan` and supporting plan types in `packages/generator`.
