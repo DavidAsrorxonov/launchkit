@@ -4,6 +4,7 @@ export * from "./env";
 export * from "./file-tree";
 export * from "./features/definitions";
 export * from "./features/registry";
+export * from "./generate-project";
 export * from "./generation-plan";
 export * from "./package-json";
 export * from "./template-loader";

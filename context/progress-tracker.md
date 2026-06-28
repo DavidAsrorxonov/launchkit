@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 4 Step 7 complete
-Primary focus: Template loader interface, placeholder helper, in-memory loader, and path-safe template target handling are in place; real templates and generation pipeline not started
+Current phase: Phase 4 Step 8 complete
+Primary focus: First generateProject pipeline skeleton is in place; it validates config, resolves features, merges package/env contributions, and emits placeholder project files without real templates
 ```
 
 ## Phase Progress
@@ -18,7 +18,7 @@ Primary focus: Template loader interface, placeholder helper, in-memory loader, 
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined.                                        |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | In Progress | Step 7 completed template loader types, placeholder replacement, in-memory loader, target path validation, tests, and public exports. |
+| Phase 4 | Generator Core                        | In Progress | Step 8 completed the first generateProject pipeline skeleton with schema validation, compatibility checks, feature resolution, package/env merging, placeholder files, tests, and public exports. |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                                                                    |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
@@ -30,6 +30,139 @@ Primary focus: Template loader interface, placeholder helper, in-memory loader, 
 Add entries in reverse chronological order.
 
 ### 2026-06-28
+
+Phase 4 Step 8 changes:
+
+- Completed Phase 4 Step 8: Create Generate Project Pipeline.
+- Added exported `createGenerationPlan(config)` pipeline helper.
+- Added exported `generateProject(config)` pipeline entry point.
+- Added `GenerateProjectOptions` with an optional `TemplateLoader` hook for future template-driven generation and tests.
+- Validated generator inputs with `parseLaunchKitConfig()` from `@launchkit/schema`.
+- Validated stack compatibility with `assertCompatibleConfig()` from `@launchkit/schema`.
+- Resolved selected features with `getEnabledFeatures()`.
+- Merged selected feature `packageJson` contributions with `mergePackageJsonPatches()`.
+- Merged selected feature env var contributions with `mergeEnvVars()`.
+- Rendered `.env.example` with `renderEnvExample()`.
+- Generated a minimal placeholder file tree containing `package.json`, `.env.example`, and `README.md`.
+- Reused the generated file tree helpers so generated paths are normalized and validated.
+- Re-exported the pipeline API from `@launchkit/generator`.
+- Did not add real Next.js templates, real feature templates, zip adapters, filesystem adapters, website UI, CLI functionality, or dependency installation.
+
+Files changed:
+
+- `packages/generator/src/generate-project.ts`
+- `packages/generator/src/generate-project.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+Generate project pipeline added:
+
+- `createGenerationPlan(config)`
+- `generateProject(config, options?)`
+- `GenerateProjectOptions`
+
+Pipeline behavior added:
+
+- Default config generates a `GeneratedProject`.
+- Generated project name and package manager mirror the validated config.
+- Generated `package.json` includes the project name, `private: true`, scripts, dependencies, and dev dependencies.
+- Prisma config contributes `@prisma/client`, `prisma`, `db:generate`, and `db:migrate`.
+- PostgreSQL config contributes `DATABASE_URL` to `.env.example`.
+- Auth.js credentials config contributes `AUTH_SECRET` to `.env.example`.
+- README includes the project name, selected feature labels, package-manager-specific setup commands, and early skeleton wording.
+- Invalid schema configs reject.
+- Incompatible configs reject with `LaunchKitCompatibilityError`.
+- Optional in-memory template loader files can be included without introducing real templates.
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-04/step-8.md
+git status --short
+sed -n '1,320p' context/project-overview.md
+sed -n '1,420p' context/architecture.md
+sed -n '1,520p' context/build-plan.md
+sed -n '1,320p' context/ui-rules.md
+sed -n '421,900p' context/architecture.md
+sed -n '521,1100p' context/build-plan.md
+sed -n '321,620p' context/ui-rules.md
+sed -n '321,760p' context/project-overview.md
+sed -n '1,220p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,300p' .agents/prompts/phase-04/step-3.md
+sed -n '1,340p' .agents/prompts/phase-04/step-4.md
+sed -n '1,340p' .agents/prompts/phase-04/step-5.md
+sed -n '1,320p' .agents/prompts/phase-04/step-6.md
+sed -n '1,300p' .agents/prompts/phase-04/step-7.md
+rg --files packages/generator/src packages/schema/src
+sed -n '1,260p' packages/schema/src/index.ts
+sed -n '1,300p' packages/schema/src/config.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+sed -n '1,240p' packages/schema/src/defaults.ts
+sed -n '1,260p' packages/generator/src/features/definitions.ts
+sed -n '1,260p' packages/generator/src/features/registry.ts
+sed -n '1,260p' packages/generator/src/generation-plan.ts
+sed -n '1,260p' packages/generator/src/package-json.ts
+sed -n '1,220p' packages/generator/src/env.ts
+sed -n '1,220p' packages/generator/src/file-tree.ts
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,260p' packages/generator/src/features/registry.test.ts
+sed -n '1,220p' packages/generator/tsconfig.json
+sed -n '1,260p' packages/schema/src/__tests__/compatibility.test.ts
+sed -n '1,260p' packages/schema/src/__tests__/config.test.ts
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/generate-project.ts packages/generator/src/generate-project.test.ts packages/generator/src/index.ts
+find packages -maxdepth 4 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+sed -n '1,280p' packages/generator/src/generate-project.ts
+sed -n '1,320p' packages/generator/src/generate-project.test.ts
+sed -n '1,180p' context/progress-tracker.md
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 78 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 78 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces, including the generator package build.
+
+Notes:
+
+- `generateProject()` currently produces a pipeline skeleton, not a runnable Next.js app.
+- The generated `README.md` intentionally says this is an early LaunchKit skeleton until real templates are implemented.
+- `package.json` only includes merged feature scripts and does not add a base `dev` script yet because real app templates are not part of this step.
+- `.env.example` is empty when no selected features contribute env vars.
+- The optional template loader hook is present for future wiring and tests, but no filesystem template loading or real templates were added.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-8.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to the next Phase 4 step when prompted: continue the next scoped generator utility without adding real templates, website integration, output adapters, or CLI functionality unless explicitly requested.
 
 Phase 4 Step 7 changes:
 
