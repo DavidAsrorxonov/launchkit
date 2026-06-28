@@ -1,5 +1,6 @@
 import { defaultLaunchKitConfig } from "@launchkit/schema";
 
+export * from "./env";
 export * from "./file-tree";
 export * from "./features/definitions";
 export * from "./features/registry";

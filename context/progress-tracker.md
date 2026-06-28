@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 4 Step 5 complete
-Primary focus: package.json patch merge utility and conflict handling are in place; generation pipeline and template loading not started
+Current phase: Phase 4 Step 6 complete
+Primary focus: Env var merge utility and .env.example renderer are in place; generation pipeline and template loading not started
 ```
 
 ## Phase Progress
@@ -18,7 +18,7 @@ Primary focus: package.json patch merge utility and conflict handling are in pla
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined.                                        |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | In Progress | Step 5 completed package.json patch merging, conflict detection, tests, and public exports.             |
+| Phase 4 | Generator Core                        | In Progress | Step 6 completed env var merging, .env.example rendering, conflict detection, tests, and public exports. |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                                                                    |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
@@ -31,7 +31,100 @@ Add entries in reverse chronological order.
 
 ### 2026-06-28
 
-Phase 4 Step 5 changes:
+Phase 4 Step 6 changes:
+
+- Completed Phase 4 Step 6: Create Env Var Merge Utility.
+- Added `mergeEnvVars()` for deterministic environment variable definition merging.
+- Added `EnvVarMergeConflictError` for conflicting env var values.
+- Added `renderEnvExample()` for simple `.env.example` output.
+- Added merge behavior for duplicate env vars with the same value, first-description preference, later-description fallback when the first is missing, required-flag promotion, first-appearance ordering, and input immutability.
+- Added `.env.example` rendering behavior for comments, quoted values, escaped quotes, preserved order, trailing newline, and placeholder secret values.
+- Re-exported env helpers and conflict error from `@launchkit/generator`.
+- Did not implement `generateProject`, the full generation pipeline, template loading, file output adapters, real templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/src/env.ts`
+- `packages/generator/src/env.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+Env var merge utility added:
+
+- `mergeEnvVars()`
+- `EnvVarMergeConflictError`
+- `renderEnvExample()`
+
+Conflict behavior added:
+
+- Duplicate env var with a different value throws.
+- Duplicate env var with the same value merges.
+- Duplicate env var with different descriptions keeps the first description.
+- Duplicate env var promotes `required` to `true` when any definition is required.
+
+Commands run:
+
+```bash
+sed -n '1,340p' context/progress-tracker.md
+sed -n '1,340p' .agents/prompts/phase-04/step-6.md
+rg --files packages/generator packages/templates packages/schema context .agents/prompts/phase-04
+sed -n '1,240p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,280p' .agents/prompts/phase-04/step-3.md
+sed -n '1,340p' .agents/prompts/phase-04/step-5.md
+sed -n '1,220p' packages/generator/src/index.ts
+git status --short
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/env.ts packages/generator/src/env.test.ts
+find packages -maxdepth 4 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 57 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 57 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- `mergeEnvVars()` returns new env var definitions and does not mutate input arrays.
+- `renderEnvExample()` only renders provided values; it does not generate real secrets.
+- The env utility is not wired into a generation pipeline yet.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-6.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 7 when prompted: continue the next scoped generator utility without implementing the full generation pipeline, website integration, or CLI functionality.
+
+Previous Phase 4 Step 5 changes:
+
+Changes:
 
 - Completed Phase 4 Step 5: Create Package.json Merge Utility.
 - Extended `PackageJsonPatch` with package metadata fields: `name`, `version`, `private`, and `type`.
