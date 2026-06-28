@@ -1,0 +1,68 @@
+import type { LaunchKitConfig } from "@launchkit/schema";
+
+export type BaseTemplateId = "next";
+
+export type FeatureId =
+  | "next"
+  | "tailwind"
+  | "shadcn"
+  | "postgres"
+  | "prisma"
+  | "authjs-credentials"
+  | "docker-postgres";
+
+export type DependencyMap = Record<string, string>;
+
+export type ScriptMap = Record<string, string>;
+
+export type EnvVarDefinition = {
+  name: string;
+  value: string;
+  description?: string;
+  required?: boolean;
+};
+
+export type TemplateFileReference = {
+  sourcePath: string;
+  targetPath: string;
+};
+
+export type GeneratedFileDefinition = {
+  path: string;
+  contents: string;
+};
+
+export type PackageJsonPatch = {
+  dependencies?: DependencyMap;
+  devDependencies?: DependencyMap;
+  scripts?: ScriptMap;
+};
+
+export type ResolvedFeature = {
+  id: FeatureId;
+  label: string;
+};
+
+export type GenerationPlan = {
+  config: LaunchKitConfig;
+  baseTemplate: BaseTemplateId;
+  features: ResolvedFeature[];
+  packageJson: PackageJsonPatch;
+  env: EnvVarDefinition[];
+  templateFiles: TemplateFileReference[];
+  generatedFiles: GeneratedFileDefinition[];
+  notes: string[];
+};
+
+export function createEmptyGenerationPlan(config: LaunchKitConfig): GenerationPlan {
+  return {
+    config,
+    baseTemplate: "next",
+    features: [],
+    packageJson: {},
+    env: [],
+    templateFiles: [],
+    generatedFiles: [],
+    notes: [],
+  };
+}

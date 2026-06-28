@@ -1,6 +1,7 @@
 import { defaultLaunchKitConfig } from "@launchkit/schema";
 
 export * from "./file-tree";
+export * from "./generation-plan";
 
 export function generatorPackageReady() {
   return true;

@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 4 Step 2 complete
-Primary focus: Generated file tree model and safe path helpers are in place; generation engine implementation not started
+Current phase: Phase 4 Step 3 complete
+Primary focus: Generation plan model and empty-plan helper are in place; feature resolution and generation pipeline not started
 ```
 
 ## Phase Progress
@@ -18,7 +18,7 @@ Primary focus: Generated file tree model and safe path helpers are in place; gen
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | In Progress | Step 2 completed generated file/project types, path normalization, path safety tests, and public exports. |
+| Phase 4 | Generator Core                        | In Progress | Step 3 completed generation plan types, empty-plan helper, tests, and public exports. |
 | Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                    |
@@ -31,7 +31,109 @@ Add entries in reverse chronological order.
 
 ### 2026-06-28
 
-Phase 4 Step 2 changes:
+Phase 4 Step 3 changes:
+
+- Completed Phase 4 Step 3: Define Generation Plan Model.
+- Added `GenerationPlan` and supporting plan types in `packages/generator`.
+- Added base template, feature ID, dependency map, script map, env var, template file reference, generated file definition, package patch, and resolved feature types.
+- Added `createEmptyGenerationPlan(config)` to create an initial plan with the provided config, `baseTemplate: "next"`, and empty contribution arrays/maps.
+- Re-exported generation plan types and helper from `@launchkit/generator`.
+- Added Vitest coverage for the empty plan helper.
+- Did not implement `generateProject`, feature resolution, feature registry logic, `package.json` merging, template loading, real templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/src/generation-plan.ts`
+- `packages/generator/src/generation-plan.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+Generation plan types/helpers added:
+
+- `BaseTemplateId`
+- `FeatureId`
+- `DependencyMap`
+- `ScriptMap`
+- `EnvVarDefinition`
+- `TemplateFileReference`
+- `GeneratedFileDefinition`
+- `PackageJsonPatch`
+- `ResolvedFeature`
+- `GenerationPlan`
+- `createEmptyGenerationPlan()`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-04/step-3.md
+rg --files packages/generator packages/schema context .agents/prompts/phase-04
+sed -n '1,260p' context/project-overview.md
+sed -n '261,674p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '321,930p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1066p' context/build-plan.md
+sed -n '1,416p' context/ui-rules.md
+sed -n '1,240p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,220p' packages/schema/src/index.ts
+sed -n '1,240p' packages/schema/src/config.ts
+sed -n '1,220p' packages/schema/src/defaults.ts
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,220p' packages/generator/src/file-tree.ts
+git status --short
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/generation-plan.ts packages/generator/src/generation-plan.test.ts
+find packages -maxdepth 3 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 21 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 21 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- `createEmptyGenerationPlan()` intentionally does not resolve selected features or infer file/template/package contributions yet.
+- Plan file paths remain string fields in this step; path validation continues to live in the Step 2 file-tree helpers.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-3.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 4 when prompted: begin feature registry definitions without implementing template loading, file merging, website integration, or CLI functionality.
+
+Previous Phase 4 Step 2 changes:
+
+Changes:
 
 - Completed Phase 4 Step 2: Define Generated File Tree Model.
 - Added `GeneratedFile` and `GeneratedProject` types in `packages/generator`.
