@@ -4,17 +4,17 @@ import {
   type LaunchKitConfig,
 } from "@launchkit/schema";
 
-import { mergeEnvVars, renderEnvExample } from "./env";
-import { createGeneratedFile, createGeneratedProject, type GeneratedProject } from "./file-tree";
-import { getEnabledFeatures } from "./features/registry";
+import { mergeEnvVars, renderEnvExample } from "./env.js";
+import { createGeneratedFile, createGeneratedProject, type GeneratedProject } from "./file-tree.js";
+import { getEnabledFeatures } from "./features/registry.js";
 import {
   createEmptyGenerationPlan,
   type EnvVarDefinition,
   type GenerationPlan,
   type PackageJsonPatch,
-} from "./generation-plan";
-import { mergePackageJsonPatches } from "./package-json";
-import type { TemplateContext, TemplateLoader } from "./template-loader";
+} from "./generation-plan.js";
+import { mergePackageJsonPatches } from "./package-json.js";
+import type { TemplateContext, TemplateLoader } from "./template-loader.js";
 
 export type GenerateProjectOptions = {
   templateLoader?: TemplateLoader;

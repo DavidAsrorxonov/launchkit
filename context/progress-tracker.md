@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 4 Step 9 complete
-Primary focus: Generator foundation has expanded Vitest coverage, including new __tests__ hardening coverage for Phase 4 modules and pipeline output safety
+Current phase: Phase 4 complete
+Primary focus: Generator core checkpoint is complete; Phase 5 template implementation is ready to start
 ```
 
 ## Phase Progress
@@ -18,8 +18,8 @@ Primary focus: Generator foundation has expanded Vitest coverage, including new 
 | Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined.                                        |
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | In Progress | Step 9 expanded generator Vitest coverage for Phase 4 modules, full MVP plan/output safety, feature metadata, binary/text preservation, and edge cases. |
-| Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                                                                    |
+| Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
+| Phase 5 | Template Implementation               | Ready       | Ready to add base and feature templates next.                                                           |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
@@ -30,6 +30,80 @@ Primary focus: Generator foundation has expanded Vitest coverage, including new 
 Add entries in reverse chronological order.
 
 ### 2026-06-28
+
+Phase 4 Step 10 changes:
+
+- Completed Phase 4 Step 10: Phase 4 Checkpoint.
+- Reviewed all Phase 4 prompt requirements and confirmed the generator core scope is complete.
+- Confirmed generator tests live under `packages/generator/src/__tests__/`, matching the schema package test folder structure.
+- Confirmed generator source imports `@launchkit/schema` directly for config validation and compatibility checks.
+- Confirmed generator has no references to `apps/web`.
+- Confirmed generator test tooling uses Vitest and has no `node:test`, Jest, or Mocha references.
+- Found and fixed a built-package ESM issue where Node could not load generated `dist` files because TypeScript emitted extensionless relative imports.
+- Switched schema and generator TypeScript package builds to NodeNext module and module resolution.
+- Updated schema and generator production relative imports/exports to use `.js` specifiers so built ESM output is Node-loadable.
+- Verified the built generator package can be imported from Node and can run `generateProject(getGeneratorDefaultConfig())`.
+- Did not add real Next.js templates, real feature templates, zip adapters, filesystem adapters, website UI, CLI functionality, or dependency installation.
+
+Files changed:
+
+- `packages/schema/tsconfig.json`
+- `packages/schema/src/index.ts`
+- `packages/schema/src/compatibility.ts`
+- `packages/schema/src/config.ts`
+- `packages/schema/src/defaults.ts`
+- `packages/schema/src/metadata.ts`
+- `packages/generator/tsconfig.json`
+- `packages/generator/src/index.ts`
+- `packages/generator/src/env.ts`
+- `packages/generator/src/package-json.ts`
+- `packages/generator/src/template-loader.ts`
+- `packages/generator/src/features/definitions.ts`
+- `packages/generator/src/features/registry.ts`
+- `packages/generator/src/generate-project.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+node -e "import('./packages/generator/dist/index.js').then(async (m) => { const p = await m.generateProject(m.getGeneratorDefaultConfig()); console.log(JSON.stringify({ name: p.name, packageManager: p.packageManager, files: p.files.map((f) => f.path) })); })"
+```
+
+Verification:
+
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] Built generator package imported successfully through Node ESM.
+- [x] Built generator package generated the placeholder files `package.json`, `.env.example`, and `README.md`.
+
+Verification result:
+
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 87 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+- The direct Node import smoke check passed with output files `package.json`, `.env.example`, and `README.md`.
+
+Notes:
+
+- Phase 4 generator core is complete.
+- The generator package remains template-adapter agnostic and only emits the Step 8 placeholder file tree.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-10.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 5 Step 1 when prompted and begin real template implementation within that phase scope.
 
 Phase 4 Step 9 changes:
 

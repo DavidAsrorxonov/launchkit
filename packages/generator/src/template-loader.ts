@@ -1,4 +1,4 @@
-import { normalizeGeneratedPath } from "./file-tree";
+import { normalizeGeneratedPath } from "./file-tree.js";
 
 export type TemplateContext = {
   projectName: string;

@@ -1,4 +1,4 @@
-import type { EnvVarDefinition } from "./generation-plan";
+import type { EnvVarDefinition } from "./generation-plan.js";
 
 export class EnvVarMergeConflictError extends Error {
   constructor(message: string) {

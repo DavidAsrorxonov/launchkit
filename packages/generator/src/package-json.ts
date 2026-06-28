@@ -2,7 +2,7 @@ import type {
   DependencyMap,
   PackageJsonPatch,
   ScriptMap,
-} from "./generation-plan";
+} from "./generation-plan.js";
 
 export class PackageJsonMergeConflictError extends Error {
   constructor(message: string) {

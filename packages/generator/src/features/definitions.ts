@@ -6,7 +6,7 @@ import type {
   GeneratedFileDefinition,
   PackageJsonPatch,
   TemplateFileReference,
-} from "../generation-plan";
+} from "../generation-plan.js";
 
 export type FeatureDefinition = {
   id: FeatureId;

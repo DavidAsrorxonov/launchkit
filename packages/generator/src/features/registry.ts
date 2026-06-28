@@ -1,6 +1,6 @@
 import type { LaunchKitConfig } from "@launchkit/schema";
 
-import type { FeatureId } from "../generation-plan";
+import type { FeatureId } from "../generation-plan.js";
 import {
   authjsCredentialsFeature,
   dockerPostgresFeature,
@@ -11,7 +11,7 @@ import {
   shadcnFeature,
   tailwindFeature,
   type FeatureDefinition,
-} from "./definitions";
+} from "./definitions.js";
 
 export class UnknownFeatureError extends Error {
   constructor(public readonly id: string) {
