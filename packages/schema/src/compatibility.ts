@@ -1,4 +1,4 @@
-import type { LaunchKitConfig } from "./config";
+import type { LaunchKitConfig } from "./config.js";
 
 export type CompatibilityIssue = {
   code: string;

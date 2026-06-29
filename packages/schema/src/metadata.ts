@@ -10,7 +10,7 @@ import type {
   RouterOption,
   StylingOption,
   UiOption,
-} from "./options";
+} from "./options.js";
 
 export type OptionMetadata<TValue extends string = string> = {
   value: TValue;

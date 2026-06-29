@@ -1,78 +1,47 @@
-# Memory - Phase 3 Schema Tests
+# Memory - Phase 4 Generator Checkpoint
 
-Last updated: 2026-06-28 00:32 JST
+Last updated: 2026-06-28 23:33 JST
 
 ## What was built
 
-Completed Phase 3 Step 7: Add Schema Tests.
-
-Replaced the broad schema test file `packages/schema/src/index.test.ts` with focused Vitest suites under `packages/schema/src/__tests__/`:
-
-- `packages/schema/src/__tests__/options.test.ts`
-- `packages/schema/src/__tests__/config.test.ts`
-- `packages/schema/src/__tests__/defaults.test.ts`
-- `packages/schema/src/__tests__/metadata.test.ts`
-- `packages/schema/src/__tests__/compatibility.test.ts`
-
-Updated `context/progress-tracker.md` to mark Phase 3 Step 7 complete and to reference the new `__tests__` paths.
+- Completed Phase 4 Step 10 and updated `context/progress-tracker.md`.
+- Marked Phase 4 as complete and Phase 5 as ready.
+- Fixed built ESM package loading for `@launchkit/schema` and `@launchkit/generator`.
+- Updated schema and generator package TypeScript configs to use `NodeNext` module and module resolution.
+- Updated production relative imports/exports in schema and generator source to use `.js` specifiers.
+- Confirmed generator tests live under `packages/generator/src/__tests__/`, matching the schema package test folder structure.
 
 ## Decisions made
 
-Schema tests are organized by responsibility in `packages/schema/src/__tests__/`.
-
-No schema implementation behavior changed during Step 7. The existing schema, defaults, metadata, and compatibility APIs already matched the required behavior.
-
-Vitest discovery remains unchanged because `packages/schema/vitest.config.ts` already includes `src/**/*.test.ts`.
-
-Package build behavior remains unchanged because `packages/schema/tsconfig.json` already excludes `src/**/*.test.ts`.
+- Generator package tests should remain in `packages/generator/src/__tests__/`.
+- Schema and generator packages should emit Node-loadable ESM using NodeNext settings and explicit `.js` relative specifiers.
+- Phase 4 remains limited to the generator core foundation; real templates, adapters, UI, and CLI work stay out of scope until later phases.
 
 ## Problems solved
 
-Expanded test coverage for missing schema validation cases:
-
-- unknown UI option
-- unknown ORM option
-- unknown auth option
-- unknown Docker option
-- unknown package manager option
-- invalid project-name edge cases
-- unknown object keys
-- `shadcn/ui` compatibility issue when Tailwind is absent
-- typed `LaunchKitCompatibilityError` issue details
-
-Confirmed that moving tests into `src/__tests__/` does not break Vitest discovery or schema package typechecking.
-
-The known sandboxed Turbopack build failure still occurs when `npm run build` is run inside the sandbox because Next/Turbopack tries to create a worker process and bind a local port. Running the same command with elevated permissions passes.
+- Direct Node import of `packages/generator/dist/index.js` originally failed because emitted ESM used extensionless relative imports.
+- The failure was fixed by switching schema/generator builds to NodeNext and updating production relative import/export specifiers.
+- Workspace build fails inside the sandbox because Next/Turbopack cannot create or bind its worker process there; rerunning the same build outside the sandbox passes.
 
 ## Current state
 
-Working tree includes Phase 3 Step 7 test organization and tracker updates:
-
-- modified `context/progress-tracker.md`
-- deleted `packages/schema/src/index.test.ts`
-- added `packages/schema/src/__tests__/options.test.ts`
-- added `packages/schema/src/__tests__/config.test.ts`
-- added `packages/schema/src/__tests__/defaults.test.ts`
-- added `packages/schema/src/__tests__/metadata.test.ts`
-- added `packages/schema/src/__tests__/compatibility.test.ts`
-
-There is also an existing untracked prompt file: `.agents/prompts/phase-03/step-7.md`.
-
-Verification passed:
-
-- `npm run test -w packages/schema` with 72 tests across 5 files
-- `npm run typecheck -w packages/schema`
-- `npm run test`
-- `npm run typecheck`
-- `npm run lint`
-- `npm run build` after elevated rerun
+- Worktree was clean before saving this memory, except this new `memory.md` file.
+- `context/progress-tracker.md` records Phase 4 Step 10 completion and Phase 4 completion.
+- Verification passed:
+  - `npm run typecheck`
+  - `npm run test` with generator 87 tests and schema 72 tests
+  - `npm run lint`
+  - `npm run build` after elevated rerun outside the sandbox
+  - Direct Node smoke import of `packages/generator/dist/index.js`
+- The built generator smoke check generated placeholder files: `package.json`, `.env.example`, and `README.md`.
+- No Phase 5 templates, output adapters, website UI, or CLI features have been added.
 
 ## Next session starts with
 
-Proceed to Phase 4: build the reusable generator core when prompted.
-
-Start by reading `context/progress-tracker.md`, `context/project-overview.md`, `context/architecture.md`, `context/build-plan.md`, and the relevant Phase 4 prompt. Keep the next implementation scoped to generator core work unless the prompt says otherwise.
+- Start Phase 5 Step 1 when prompted.
+- Read `context/progress-tracker.md` and the relevant Phase 5 prompt before editing.
+- Keep Phase 5 work scoped to template implementation unless the prompt explicitly expands scope.
 
 ## Open questions
 
-None for Phase 3 Step 7.
+- None currently documented.

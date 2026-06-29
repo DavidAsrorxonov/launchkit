@@ -7,31 +7,1249 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 3 Step 8 complete
-Primary focus: Shared schema and compatibility contract verified; generator core ready to start
+Current phase: Phase 5 Step 1 complete
+Primary focus: Template package foundation is ready for the first real base template
 ```
 
 ## Phase Progress
 
-| Phase   | Name                                  | Status      | Notes                                                            |
-| ------- | ------------------------------------- | ----------- | ---------------------------------------------------------------- |
-| Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined. |
-| Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout. |
-| Phase 3 | Shared Schema and Compatibility Rules | Complete | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
-| Phase 4 | Generator Core                        | Ready | Next phase will build the reusable project generation engine.    |
-| Phase 5 | Template Implementation               | Not Started | Will add base and feature templates.                             |
-| Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                |
-| Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                    |
-| Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.             |
-| Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                            |
+| Phase   | Name                                  | Status      | Notes                                                                                                   |
+| ------- | ------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
+| Phase 1 | Product and Architecture Foundation   | In Progress | Project purpose, architecture, and build plan are being defined.                                        |
+| Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
+| Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
+| Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
+| Phase 5 | Template Implementation               | In Progress | Step 1 created and verified the @launchkit/templates package foundation, placeholder export, test, and tracked base/features directories. |
+| Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
+| Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
+| Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
+| Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
 ## Change Log
 
 Add entries in reverse chronological order.
 
+### 2026-06-29
+
+Phase 5 Step 1 changes:
+
+- Completed Phase 5 Step 1: Create Template Package Foundation.
+- Verified root workspace configuration still includes `apps/*` and `packages/*`.
+- Verified `packages/templates/package.json` is named `@launchkit/templates` and remains a private ESM workspace package.
+- Added the templates package `test` script using Vitest, consistent with tested workspace packages.
+- Aligned `packages/templates/tsconfig.json` with the built package pattern used by schema and generator by enabling `composite`, `NodeNext` module, `NodeNext` module resolution, and test exclusion.
+- Replaced the previous placeholder constant with the required `templatesPackageReady()` placeholder export.
+- Added a small Vitest coverage file under `packages/templates/src/__tests__/`.
+- Added `.gitkeep` placeholders so `packages/templates/base/` and `packages/templates/features/` are tracked before real templates are added.
+- Did not add real Next.js template files, feature templates, website UI, CLI functionality, or generator wiring to `@launchkit/templates`.
+
+Files changed:
+
+- `packages/templates/package.json`
+- `packages/templates/tsconfig.json`
+- `packages/templates/src/index.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `packages/templates/base/.gitkeep`
+- `packages/templates/features/.gitkeep`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-05/step-1.md
+git status --short
+rg --files packages
+rg --files context
+sed -n '1,260p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,380p' context/build-plan.md
+sed -n '381,760p' context/build-plan.md
+sed -n '761,1140p' context/build-plan.md
+sed -n '321,760p' context/architecture.md
+sed -n '761,1140p' context/architecture.md
+sed -n '261,620p' context/project-overview.md
+sed -n '1,360p' context/ui-rules.md
+sed -n '361,760p' context/ui-rules.md
+sed -n '241,520p' context/progress-tracker.md
+sed -n '1,220p' package.json
+sed -n '1,220p' tsconfig.base.json
+sed -n '1,220p' packages/templates/package.json
+sed -n '1,220p' packages/templates/tsconfig.json
+sed -n '1,120p' packages/templates/src/index.ts
+find packages/templates -maxdepth 3 -type d -print
+sed -n '1,220p' packages/schema/package.json
+sed -n '1,220p' packages/generator/package.json
+sed -n '1,220p' packages/shared/package.json
+find packages/templates/base packages/templates/features -maxdepth 2 -type f -print
+rg "templatesPackageReady|launchkitTemplatesPlaceholder" packages/templates packages -g '*.ts'
+sed -n '1,220p' packages/schema/tsconfig.json
+sed -n '1,220p' packages/generator/tsconfig.json
+sed -n '1,220p' packages/shared/tsconfig.json
+npm run typecheck -w @launchkit/templates
+npm test -w @launchkit/templates
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+npm run typecheck
+git status --short
+git diff --stat
+git diff -- packages/templates/package.json packages/templates/tsconfig.json packages/templates/src/index.ts packages/templates/src/__tests__/index.test.ts packages/templates/base/.gitkeep packages/templates/features/.gitkeep
+```
+
+Verification:
+
+- [x] `packages/templates` exists.
+- [x] `@launchkit/templates` package exists.
+- [x] `packages/templates/src/index.ts` exports `templatesPackageReady()`.
+- [x] `packages/templates/base/` exists and is tracked with `.gitkeep`.
+- [x] `packages/templates/features/` exists and is tracked with `.gitkeep`.
+- [x] Workspace configuration includes `apps/*` and `packages/*`.
+- [x] Templates package typecheck passed.
+- [x] Templates package tests passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed after the build regenerated Next generated types.
+
+Verification result:
+
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test -w @launchkit/templates` passed: templates package Vitest suite ran 1 test.
+- `npm run test` passed across workspaces: generator package ran 87 tests, schema package ran 72 tests, and templates package ran 1 test.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+- `npm run typecheck` initially failed before the successful build because `.next/types/validator.ts` could not find generated `./routes.js`. After the elevated build regenerated Next types, rerunning `npm run typecheck` passed across all workspaces.
+
+Notes:
+
+- This step added only the template package foundation and a readiness test.
+- Real template contents remain intentionally absent until Phase 5 Step 2 and later.
+- Existing untracked prompt directory `.agents/prompts/phase-05/` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Phase 5 Step 2: Create base Next.js template.
+
 ### 2026-06-28
 
+Phase 4 Step 10 changes:
+
+- Completed Phase 4 Step 10: Phase 4 Checkpoint.
+- Reviewed all Phase 4 prompt requirements and confirmed the generator core scope is complete.
+- Confirmed generator tests live under `packages/generator/src/__tests__/`, matching the schema package test folder structure.
+- Confirmed generator source imports `@launchkit/schema` directly for config validation and compatibility checks.
+- Confirmed generator has no references to `apps/web`.
+- Confirmed generator test tooling uses Vitest and has no `node:test`, Jest, or Mocha references.
+- Found and fixed a built-package ESM issue where Node could not load generated `dist` files because TypeScript emitted extensionless relative imports.
+- Switched schema and generator TypeScript package builds to NodeNext module and module resolution.
+- Updated schema and generator production relative imports/exports to use `.js` specifiers so built ESM output is Node-loadable.
+- Verified the built generator package can be imported from Node and can run `generateProject(getGeneratorDefaultConfig())`.
+- Did not add real Next.js templates, real feature templates, zip adapters, filesystem adapters, website UI, CLI functionality, or dependency installation.
+
+Files changed:
+
+- `packages/schema/tsconfig.json`
+- `packages/schema/src/index.ts`
+- `packages/schema/src/compatibility.ts`
+- `packages/schema/src/config.ts`
+- `packages/schema/src/defaults.ts`
+- `packages/schema/src/metadata.ts`
+- `packages/generator/tsconfig.json`
+- `packages/generator/src/index.ts`
+- `packages/generator/src/env.ts`
+- `packages/generator/src/package-json.ts`
+- `packages/generator/src/template-loader.ts`
+- `packages/generator/src/features/definitions.ts`
+- `packages/generator/src/features/registry.ts`
+- `packages/generator/src/generate-project.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+node -e "import('./packages/generator/dist/index.js').then(async (m) => { const p = await m.generateProject(m.getGeneratorDefaultConfig()); console.log(JSON.stringify({ name: p.name, packageManager: p.packageManager, files: p.files.map((f) => f.path) })); })"
+```
+
+Verification:
+
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] Built generator package imported successfully through Node ESM.
+- [x] Built generator package generated the placeholder files `package.json`, `.env.example`, and `README.md`.
+
+Verification result:
+
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 87 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+- The direct Node import smoke check passed with output files `package.json`, `.env.example`, and `README.md`.
+
+Notes:
+
+- Phase 4 generator core is complete.
+- The generator package remains template-adapter agnostic and only emits the Step 8 placeholder file tree.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-10.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 5 Step 1 when prompted and begin real template implementation within that phase scope.
+
+Phase 4 Step 9 changes:
+
+- Completed Phase 4 Step 9: Add Generator Tests.
+- Reviewed current generator tests and confirmed they use Vitest.
+- Confirmed no `node:test`, Jest, or Mocha usage exists in `packages/generator`.
+- Added new generator coverage in `packages/generator/src/__tests__/` to match the requested test folder preference.
+- Added full MVP plan coverage for resolved feature order.
+- Added feature definition metadata coverage for non-empty labels and descriptions.
+- Added file tree coverage for preserving text and binary contents.
+- Added generated project coverage for normalized safe file paths.
+- Added full MVP generated output coverage for merged Prisma package contributions and PostgreSQL/Auth.js env variables.
+- Added template-loader pipeline coverage for binary template files included through `generateProject()`.
+- Added edge coverage for empty `.env.example` rendering and undefined package metadata.
+- Follow-up: moved all generator test files into `packages/generator/src/__tests__/` to match the schema package test folder structure.
+- No Phase 4 bugs were found by the added tests.
+- Did not add real Next.js templates, real feature templates, zip adapters, filesystem adapters, website UI, CLI functionality, or new MVP options.
+
+Files changed:
+
+- `packages/generator/src/__tests__/env.test.ts`
+- `packages/generator/src/__tests__/feature-registry.test.ts`
+- `packages/generator/src/__tests__/file-tree.test.ts`
+- `packages/generator/src/__tests__/generate-project.test.ts`
+- `packages/generator/src/__tests__/generation-plan.test.ts`
+- `packages/generator/src/__tests__/index.test.ts`
+- `packages/generator/src/__tests__/package-json.test.ts`
+- `packages/generator/src/__tests__/phase-4-coverage.test.ts`
+- `packages/generator/src/__tests__/template-loader.test.ts`
+- `packages/generator/src/env.test.ts` moved to `packages/generator/src/__tests__/env.test.ts`
+- `packages/generator/src/features/registry.test.ts` moved to `packages/generator/src/__tests__/feature-registry.test.ts`
+- `packages/generator/src/file-tree.test.ts` moved to `packages/generator/src/__tests__/file-tree.test.ts`
+- `packages/generator/src/generate-project.test.ts` moved to `packages/generator/src/__tests__/generate-project.test.ts`
+- `packages/generator/src/generation-plan.test.ts` moved to `packages/generator/src/__tests__/generation-plan.test.ts`
+- `packages/generator/src/index.test.ts` moved to `packages/generator/src/__tests__/index.test.ts`
+- `packages/generator/src/package-json.test.ts` moved to `packages/generator/src/__tests__/package-json.test.ts`
+- `packages/generator/src/template-loader.test.ts` moved to `packages/generator/src/__tests__/template-loader.test.ts`
+- `context/progress-tracker.md`
+
+Test coverage added:
+
+- Feature definitions include labels and descriptions.
+- Full MVP config resolves `next`, `tailwind`, `shadcn`, `postgres`, `prisma`, `authjs-credentials`, and `docker-postgres` in plan order.
+- Generated files preserve text and binary contents.
+- Generated projects store normalized safe text and binary file paths.
+- Full MVP generated output contains only safe normalized paths.
+- Full MVP generated output includes Prisma package/scripts and required env vars.
+- Template-loaded binary files remain binary when included through `generateProject()`.
+- Empty env rendering is stable.
+- Undefined package metadata does not overwrite defined metadata.
+
+Commands run:
+
+```bash
+sed -n '1,280p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-04/step-9.md
+git status --short
+sed -n '1,420p' context/project-overview.md
+sed -n '1,520p' context/architecture.md
+sed -n '1,620p' context/build-plan.md
+sed -n '1,380p' context/ui-rules.md
+sed -n '421,900p' context/project-overview.md
+sed -n '521,1040p' context/architecture.md
+sed -n '621,1240p' context/build-plan.md
+sed -n '381,760p' context/ui-rules.md
+sed -n '1,220p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,300p' .agents/prompts/phase-04/step-3.md
+sed -n '1,340p' .agents/prompts/phase-04/step-4.md
+sed -n '1,340p' .agents/prompts/phase-04/step-5.md
+sed -n '1,320p' .agents/prompts/phase-04/step-6.md
+sed -n '1,300p' .agents/prompts/phase-04/step-7.md
+sed -n '1,280p' .agents/prompts/phase-04/step-8.md
+rg --files packages/generator/src
+rg "node:test|jest|mocha" packages/generator/src packages/generator/package.json
+sed -n '1,260p' packages/generator/src/file-tree.test.ts
+sed -n '1,260p' packages/generator/src/generation-plan.test.ts
+sed -n '1,320p' packages/generator/src/package-json.test.ts
+sed -n '1,320p' packages/generator/src/env.test.ts
+sed -n '1,320p' packages/generator/src/template-loader.test.ts
+sed -n '1,340p' packages/generator/src/generate-project.test.ts
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/__tests__/phase-4-coverage.test.ts
+git diff --stat
+find packages -maxdepth 4 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+sed -n '1,260p' packages/generator/src/__tests__/phase-4-coverage.test.ts
+sed -n '1,180p' context/progress-tracker.md
+rg --files packages/schema/src/__tests__ packages/generator/src
+sed -n '1,120p' packages/schema/src/__tests__/config.test.ts
+mv packages/generator/src/env.test.ts packages/generator/src/__tests__/env.test.ts
+mv packages/generator/src/file-tree.test.ts packages/generator/src/__tests__/file-tree.test.ts
+mv packages/generator/src/generation-plan.test.ts packages/generator/src/__tests__/generation-plan.test.ts
+mv packages/generator/src/package-json.test.ts packages/generator/src/__tests__/package-json.test.ts
+mv packages/generator/src/template-loader.test.ts packages/generator/src/__tests__/template-loader.test.ts
+mv packages/generator/src/generate-project.test.ts packages/generator/src/__tests__/generate-project.test.ts
+mv packages/generator/src/index.test.ts packages/generator/src/__tests__/index.test.ts
+mv packages/generator/src/features/registry.test.ts packages/generator/src/__tests__/feature-registry.test.ts
+rg "from \"\.\/|from './" packages/generator/src/__tests__
+npm run test -w packages/generator
+npm run typecheck -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 87 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 87 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces, including the generator package build.
+
+Notes:
+
+- All generator tests now live under `packages/generator/src/__tests__/`, matching the schema package test folder pattern.
+- New tests were added under `packages/generator/src/__tests__/` per the requested preference.
+- This step added coverage only; no generator behavior changes were needed.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-9.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to the next scoped Phase 4 step when prompted, keeping real templates, output adapters, website integration, and CLI work out of scope unless explicitly requested.
+
+Phase 4 Step 8 changes:
+
+- Completed Phase 4 Step 8: Create Generate Project Pipeline.
+- Added exported `createGenerationPlan(config)` pipeline helper.
+- Added exported `generateProject(config)` pipeline entry point.
+- Added `GenerateProjectOptions` with an optional `TemplateLoader` hook for future template-driven generation and tests.
+- Validated generator inputs with `parseLaunchKitConfig()` from `@launchkit/schema`.
+- Validated stack compatibility with `assertCompatibleConfig()` from `@launchkit/schema`.
+- Resolved selected features with `getEnabledFeatures()`.
+- Merged selected feature `packageJson` contributions with `mergePackageJsonPatches()`.
+- Merged selected feature env var contributions with `mergeEnvVars()`.
+- Rendered `.env.example` with `renderEnvExample()`.
+- Generated a minimal placeholder file tree containing `package.json`, `.env.example`, and `README.md`.
+- Reused the generated file tree helpers so generated paths are normalized and validated.
+- Re-exported the pipeline API from `@launchkit/generator`.
+- Did not add real Next.js templates, real feature templates, zip adapters, filesystem adapters, website UI, CLI functionality, or dependency installation.
+
+Files changed:
+
+- `packages/generator/src/generate-project.ts`
+- `packages/generator/src/generate-project.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+Generate project pipeline added:
+
+- `createGenerationPlan(config)`
+- `generateProject(config, options?)`
+- `GenerateProjectOptions`
+
+Pipeline behavior added:
+
+- Default config generates a `GeneratedProject`.
+- Generated project name and package manager mirror the validated config.
+- Generated `package.json` includes the project name, `private: true`, scripts, dependencies, and dev dependencies.
+- Prisma config contributes `@prisma/client`, `prisma`, `db:generate`, and `db:migrate`.
+- PostgreSQL config contributes `DATABASE_URL` to `.env.example`.
+- Auth.js credentials config contributes `AUTH_SECRET` to `.env.example`.
+- README includes the project name, selected feature labels, package-manager-specific setup commands, and early skeleton wording.
+- Invalid schema configs reject.
+- Incompatible configs reject with `LaunchKitCompatibilityError`.
+- Optional in-memory template loader files can be included without introducing real templates.
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-04/step-8.md
+git status --short
+sed -n '1,320p' context/project-overview.md
+sed -n '1,420p' context/architecture.md
+sed -n '1,520p' context/build-plan.md
+sed -n '1,320p' context/ui-rules.md
+sed -n '421,900p' context/architecture.md
+sed -n '521,1100p' context/build-plan.md
+sed -n '321,620p' context/ui-rules.md
+sed -n '321,760p' context/project-overview.md
+sed -n '1,220p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,300p' .agents/prompts/phase-04/step-3.md
+sed -n '1,340p' .agents/prompts/phase-04/step-4.md
+sed -n '1,340p' .agents/prompts/phase-04/step-5.md
+sed -n '1,320p' .agents/prompts/phase-04/step-6.md
+sed -n '1,300p' .agents/prompts/phase-04/step-7.md
+rg --files packages/generator/src packages/schema/src
+sed -n '1,260p' packages/schema/src/index.ts
+sed -n '1,300p' packages/schema/src/config.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+sed -n '1,240p' packages/schema/src/defaults.ts
+sed -n '1,260p' packages/generator/src/features/definitions.ts
+sed -n '1,260p' packages/generator/src/features/registry.ts
+sed -n '1,260p' packages/generator/src/generation-plan.ts
+sed -n '1,260p' packages/generator/src/package-json.ts
+sed -n '1,220p' packages/generator/src/env.ts
+sed -n '1,220p' packages/generator/src/file-tree.ts
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,260p' packages/generator/src/features/registry.test.ts
+sed -n '1,220p' packages/generator/tsconfig.json
+sed -n '1,260p' packages/schema/src/__tests__/compatibility.test.ts
+sed -n '1,260p' packages/schema/src/__tests__/config.test.ts
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/generate-project.ts packages/generator/src/generate-project.test.ts packages/generator/src/index.ts
+find packages -maxdepth 4 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+sed -n '1,280p' packages/generator/src/generate-project.ts
+sed -n '1,320p' packages/generator/src/generate-project.test.ts
+sed -n '1,180p' context/progress-tracker.md
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 78 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 78 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces, including the generator package build.
+
+Notes:
+
+- `generateProject()` currently produces a pipeline skeleton, not a runnable Next.js app.
+- The generated `README.md` intentionally says this is an early LaunchKit skeleton until real templates are implemented.
+- `package.json` only includes merged feature scripts and does not add a base `dev` script yet because real app templates are not part of this step.
+- `.env.example` is empty when no selected features contribute env vars.
+- The optional template loader hook is present for future wiring and tests, but no filesystem template loading or real templates were added.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-8.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to the next Phase 4 step when prompted: continue the next scoped generator utility without adding real templates, website integration, output adapters, or CLI functionality unless explicitly requested.
+
+Phase 4 Step 7 changes:
+
+- Completed Phase 4 Step 7: Create Template Loader Interface.
+- Added `TemplateContext`, `TemplateFile`, and `TemplateLoader` public types.
+- Added `applyTemplatePlaceholders()` for simple `{{projectName}}` and `{{packageName}}` replacement.
+- Added `createInMemoryTemplateLoader()` for testing and future pipeline integration.
+- Added `TemplateNotFoundError` for unknown in-memory template IDs.
+- Applied placeholders to text file contents and template target paths.
+- Reused `normalizeGeneratedPath()` so unsafe template target paths are rejected consistently.
+- Preserved binary template contents by returning copied `Uint8Array` values.
+- Re-exported template loader types and helpers from `@launchkit/generator`.
+- Did not add real Next.js templates, feature templates, filesystem template loading, output adapters, website UI, CLI functionality, or the full `generateProject` pipeline.
+
+Files changed:
+
+- `packages/generator/src/template-loader.ts`
+- `packages/generator/src/template-loader.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+Template loader interface added:
+
+- `TemplateContext`
+- `TemplateFile`
+- `TemplateLoader`
+- `TemplateNotFoundError`
+- `applyTemplatePlaceholders()`
+- `createInMemoryTemplateLoader()`
+
+Placeholder and path behavior added:
+
+- Known placeholders `{{projectName}}` and `{{packageName}}` are replaced.
+- Repeated and multiple known placeholders are replaced.
+- Unknown placeholders are left unchanged.
+- Context objects are not mutated.
+- Target path placeholders are supported.
+- Target paths are normalized and validated with the generated file path helper.
+- Unsafe target paths throw `InvalidGeneratedPathError`.
+- Unknown template IDs throw `TemplateNotFoundError`.
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-04/step-7.md
+git status --short
+sed -n '1,260p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,320p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '321,760p' context/architecture.md
+sed -n '321,760p' context/build-plan.md
+sed -n '261,520p' context/ui-rules.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '761,1160p' context/architecture.md
+sed -n '761,1180p' context/build-plan.md
+sed -n '1,220p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,300p' .agents/prompts/phase-04/step-3.md
+sed -n '1,340p' .agents/prompts/phase-04/step-4.md
+sed -n '1,340p' .agents/prompts/phase-04/step-5.md
+sed -n '1,320p' .agents/prompts/phase-04/step-6.md
+rg --files packages/generator/src packages/schema/src packages/templates
+sed -n '1,240p' packages/generator/src/file-tree.ts
+sed -n '1,260p' packages/generator/src/generation-plan.ts
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,260p' packages/generator/src/env.ts
+sed -n '1,300p' packages/generator/src/env.test.ts
+sed -n '1,220p' packages/generator/src/file-tree.test.ts
+sed -n '1,220p' packages/generator/package.json
+sed -n '1,220p' package.json
+sed -n '1,260p' packages/generator/src/package-json.ts
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/template-loader.ts packages/generator/src/template-loader.test.ts
+sed -n '1,180p' context/progress-tracker.md
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 67 tests successfully.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 67 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces, including the generator package build.
+
+Notes:
+
+- The in-memory loader is intentionally for tests and future pipeline wiring only.
+- Template source paths are retained as template references; generated target paths are the path-safety boundary for this step.
+- Placeholder logic is intentionally simple and does not support conditionals, loops, embedded JavaScript, or arbitrary placeholder evaluation.
+- Real templates under `packages/templates/base/` and `packages/templates/features/` are still not implemented.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-7.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 8 when prompted: continue the next scoped generator utility without implementing the full generation pipeline, website integration, or CLI functionality.
+
+Phase 4 Step 6 changes:
+
+- Completed Phase 4 Step 6: Create Env Var Merge Utility.
+- Added `mergeEnvVars()` for deterministic environment variable definition merging.
+- Added `EnvVarMergeConflictError` for conflicting env var values.
+- Added `renderEnvExample()` for simple `.env.example` output.
+- Added merge behavior for duplicate env vars with the same value, first-description preference, later-description fallback when the first is missing, required-flag promotion, first-appearance ordering, and input immutability.
+- Added `.env.example` rendering behavior for comments, quoted values, escaped quotes, preserved order, trailing newline, and placeholder secret values.
+- Re-exported env helpers and conflict error from `@launchkit/generator`.
+- Did not implement `generateProject`, the full generation pipeline, template loading, file output adapters, real templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/src/env.ts`
+- `packages/generator/src/env.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+Env var merge utility added:
+
+- `mergeEnvVars()`
+- `EnvVarMergeConflictError`
+- `renderEnvExample()`
+
+Conflict behavior added:
+
+- Duplicate env var with a different value throws.
+- Duplicate env var with the same value merges.
+- Duplicate env var with different descriptions keeps the first description.
+- Duplicate env var promotes `required` to `true` when any definition is required.
+
+Commands run:
+
+```bash
+sed -n '1,340p' context/progress-tracker.md
+sed -n '1,340p' .agents/prompts/phase-04/step-6.md
+rg --files packages/generator packages/templates packages/schema context .agents/prompts/phase-04
+sed -n '1,240p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,280p' .agents/prompts/phase-04/step-3.md
+sed -n '1,340p' .agents/prompts/phase-04/step-5.md
+sed -n '1,220p' packages/generator/src/index.ts
+git status --short
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/env.ts packages/generator/src/env.test.ts
+find packages -maxdepth 4 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 57 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 57 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- `mergeEnvVars()` returns new env var definitions and does not mutate input arrays.
+- `renderEnvExample()` only renders provided values; it does not generate real secrets.
+- The env utility is not wired into a generation pipeline yet.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-6.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 7 when prompted: continue the next scoped generator utility without implementing the full generation pipeline, website integration, or CLI functionality.
+
+Previous Phase 4 Step 5 changes:
+
 Changes:
+
+- Completed Phase 4 Step 5: Create Package.json Merge Utility.
+- Extended `PackageJsonPatch` with package metadata fields: `name`, `version`, `private`, and `type`.
+- Added `mergePackageJsonPatches()` for merging metadata, scripts, dependencies, and dev dependencies.
+- Added `PackageJsonMergeConflictError` for conflicting package patch values.
+- Added conflict detection for dependency version conflicts, dev dependency version conflicts, script command conflicts, and package metadata conflicts.
+- Added Vitest coverage for empty patch lists, successful dependency/dev dependency/script/metadata merges, duplicate identical values, conflict cases, and input immutability.
+- Re-exported the package merge helper and conflict error from `@launchkit/generator`.
+- Did not implement `generateProject`, the full generation pipeline, template loading, file output adapters, real templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/src/package-json.ts`
+- `packages/generator/src/package-json.test.ts`
+- `packages/generator/src/generation-plan.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+package.json merge utility added:
+
+- `mergePackageJsonPatches()`
+- `PackageJsonMergeConflictError`
+
+Conflict behavior added:
+
+- Duplicate dependency with different versions throws.
+- Duplicate dev dependency with different versions throws.
+- Duplicate script with different commands throws.
+- Duplicate metadata field with different defined values throws.
+- Duplicate identical values are accepted.
+- `undefined` metadata fields are ignored.
+
+Commands run:
+
+```bash
+sed -n '1,320p' context/progress-tracker.md
+sed -n '1,320p' .agents/prompts/phase-04/step-5.md
+rg --files packages/generator packages/templates packages/schema context .agents/prompts/phase-04
+sed -n '321,760p' context/progress-tracker.md
+sed -n '761,1400p' context/progress-tracker.md
+sed -n '1,674p' context/project-overview.md
+sed -n '1,465p' context/architecture.md
+sed -n '466,930p' context/architecture.md
+sed -n '1,533p' context/build-plan.md
+sed -n '534,1066p' context/build-plan.md
+sed -n '1,416p' context/ui-rules.md
+sed -n '1,320p' .agents/prompts/phase-04/step-4.md
+sed -n '1,260p' packages/generator/src/generation-plan.ts
+sed -n '1,260p' packages/generator/src/features/definitions.ts
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/generation-plan.ts packages/generator/src/package-json.ts packages/generator/src/package-json.test.ts
+find packages -maxdepth 4 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- Initial `npm run typecheck -w packages/generator` and `npm run build -w packages/generator` failed on an internal map typing issue in `package-json.ts`; this was fixed by typing the merged map as `Record<string, string>`.
+- `npm run typecheck -w packages/generator` passed after the fix.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 44 tests successfully.
+- `npm run build -w packages/generator` passed after the fix.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 44 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- `mergePackageJsonPatches()` returns a new patch and does not mutate input patches.
+- `PackageJsonPatch` remains the shared package patch type used by the generation plan and feature definitions.
+- The package merge utility is not wired into a generation pipeline yet.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-5.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 6 when prompted: continue the next scoped generator utility without implementing the full generation pipeline, website integration, or CLI functionality.
+
+Previous Phase 4 Step 4 changes:
+
+Changes:
+
+- Completed Phase 4 Step 4: Create Feature Definition And Registry.
+- Added declarative `FeatureDefinition` model in `packages/generator`.
+- Added MVP feature definitions for `next`, `tailwind`, `shadcn`, `postgres`, `prisma`, `authjs-credentials`, and `docker-postgres`.
+- Added lightweight feature contributions for Prisma package dependencies/dev dependencies/scripts, PostgreSQL `DATABASE_URL`, Auth.js `AUTH_SECRET`, feature requirements, and Auth.js implementation note.
+- Added `featureRegistry`, `getFeatureDefinition()`, and `getEnabledFeatures(config)`.
+- Added `UnknownFeatureError` for predictable runtime lookup failures.
+- Re-exported feature definitions and registry helpers from `@launchkit/generator`.
+- Added Vitest coverage for registry completeness, lookup behavior, unknown feature handling, default enabled features, conditional feature enablement, and Prisma package contributions.
+- Did not implement `generateProject`, the full generation pipeline, template loading, actual file creation from templates, `package.json` merge utility, env var merge utility, real templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/src/features/definitions.ts`
+- `packages/generator/src/features/registry.ts`
+- `packages/generator/src/features/registry.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+Feature definitions added:
+
+- `next`
+- `tailwind`
+- `shadcn`
+- `postgres`
+- `prisma`
+- `authjs-credentials`
+- `docker-postgres`
+
+Registry helpers added:
+
+- `featureRegistry`
+- `getFeatureDefinition()`
+- `getEnabledFeatures()`
+- `UnknownFeatureError`
+
+Commands run:
+
+```bash
+sed -n '1,280p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-04/step-4.md
+rg --files packages/generator packages/schema context .agents/prompts/phase-04
+sed -n '281,620p' .agents/prompts/phase-04/step-4.md
+sed -n '281,760p' context/progress-tracker.md
+wc -l context/project-overview.md context/architecture.md context/build-plan.md context/ui-rules.md context/progress-tracker.md .agents/prompts/phase-04/step-1.md .agents/prompts/phase-04/step-2.md .agents/prompts/phase-04/step-3.md
+sed -n '761,1308p' context/progress-tracker.md
+sed -n '1,674p' context/project-overview.md
+sed -n '1,465p' context/architecture.md
+sed -n '466,930p' context/architecture.md
+sed -n '1,533p' context/build-plan.md
+sed -n '534,1066p' context/build-plan.md
+sed -n '1,416p' context/ui-rules.md
+sed -n '1,261p' .agents/prompts/phase-04/step-3.md
+sed -n '1,240p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,260p' packages/generator/src/generation-plan.ts
+sed -n '1,240p' packages/schema/src/defaults.ts
+git status --short
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/features/definitions.ts packages/generator/src/features/registry.ts packages/generator/src/features/registry.test.ts
+find packages -maxdepth 4 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 32 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 32 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- `getEnabledFeatures(config)` always includes `next` and `tailwind`, then conditionally includes the remaining MVP features from config selections.
+- The feature registry intentionally does not perform compatibility validation; `@launchkit/schema` remains the source of compatibility rules.
+- Feature definitions are declarative only and do not include `apply()` behavior.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-4.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 5 when prompted: begin template-loading structure without implementing the full generation pipeline, website integration, or CLI functionality.
+
+Previous Phase 4 Step 3 changes:
+
+Changes:
+
+- Completed Phase 4 Step 3: Define Generation Plan Model.
+- Added `GenerationPlan` and supporting plan types in `packages/generator`.
+- Added base template, feature ID, dependency map, script map, env var, template file reference, generated file definition, package patch, and resolved feature types.
+- Added `createEmptyGenerationPlan(config)` to create an initial plan with the provided config, `baseTemplate: "next"`, and empty contribution arrays/maps.
+- Re-exported generation plan types and helper from `@launchkit/generator`.
+- Added Vitest coverage for the empty plan helper.
+- Did not implement `generateProject`, feature resolution, feature registry logic, `package.json` merging, template loading, real templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/src/generation-plan.ts`
+- `packages/generator/src/generation-plan.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+Generation plan types/helpers added:
+
+- `BaseTemplateId`
+- `FeatureId`
+- `DependencyMap`
+- `ScriptMap`
+- `EnvVarDefinition`
+- `TemplateFileReference`
+- `GeneratedFileDefinition`
+- `PackageJsonPatch`
+- `ResolvedFeature`
+- `GenerationPlan`
+- `createEmptyGenerationPlan()`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-04/step-3.md
+rg --files packages/generator packages/schema context .agents/prompts/phase-04
+sed -n '1,260p' context/project-overview.md
+sed -n '261,674p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '321,930p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1066p' context/build-plan.md
+sed -n '1,416p' context/ui-rules.md
+sed -n '1,240p' .agents/prompts/phase-04/step-1.md
+sed -n '1,260p' .agents/prompts/phase-04/step-2.md
+sed -n '1,220p' packages/schema/src/index.ts
+sed -n '1,240p' packages/schema/src/config.ts
+sed -n '1,220p' packages/schema/src/defaults.ts
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,220p' packages/generator/src/file-tree.ts
+git status --short
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/generation-plan.ts packages/generator/src/generation-plan.test.ts
+find packages -maxdepth 3 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 21 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 21 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- `createEmptyGenerationPlan()` intentionally does not resolve selected features or infer file/template/package contributions yet.
+- Plan file paths remain string fields in this step; path validation continues to live in the Step 2 file-tree helpers.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-3.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 4 when prompted: begin feature registry definitions without implementing template loading, file merging, website integration, or CLI functionality.
+
+Previous Phase 4 Step 2 changes:
+
+Changes:
+
+- Completed Phase 4 Step 2: Define Generated File Tree Model.
+- Added `GeneratedFile` and `GeneratedProject` types in `packages/generator`.
+- Added `InvalidGeneratedPathError` for clearly named invalid generated path failures.
+- Added `normalizeGeneratedPath()` with POSIX-style internal path normalization and validation.
+- Added `createGeneratedFile()` and `createGeneratedProject()` helpers.
+- Re-exported file tree types and helpers from `@launchkit/generator`.
+- Added Vitest coverage for valid root paths, valid nested paths, Windows-style backslash normalization, leading slash rejection, parent directory segment rejection, empty segment rejection, empty/current-directory path rejection, generated file creation, generated project creation, and invalid project file failure.
+- Did not implement `generateProject`, generation planning, feature registry logic, `package.json` merging, template loading, real templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/src/file-tree.ts`
+- `packages/generator/src/file-tree.test.ts`
+- `packages/generator/src/index.ts`
+- `context/progress-tracker.md`
+
+File tree types/helpers added:
+
+- `GeneratedFile`
+- `GeneratedProject`
+- `InvalidGeneratedPathError`
+- `normalizeGeneratedPath()`
+- `createGeneratedFile()`
+- `createGeneratedProject()`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-04/step-2.md
+rg --files
+wc -l context/project-overview.md context/architecture.md context/build-plan.md context/ui-rules.md .agents/prompts/phase-04/step-1.md packages/generator/src/index.ts packages/generator/src/index.test.ts packages/generator/package.json packages/generator/tsconfig.json
+sed -n '1,260p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '261,674p' context/project-overview.md
+sed -n '321,930p' context/architecture.md
+sed -n '361,1066p' context/build-plan.md
+sed -n '1,416p' context/ui-rules.md
+sed -n '1,220p' .agents/prompts/phase-04/step-1.md
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,220p' packages/generator/src/index.test.ts
+sed -n '1,220p' packages/generator/package.json
+sed -n '1,220p' packages/schema/src/options.ts
+git status --short
+sed -n '1,220p' packages/generator/tsconfig.json
+sed -n '1,220p' packages/generator/vitest.config.ts
+sed -n '1,260p' package.json
+sed -n '1,220p' tsconfig.base.json
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff -- packages/generator/src/index.ts packages/generator/src/file-tree.ts packages/generator/src/file-tree.test.ts
+find packages -maxdepth 3 -type f -path '*dist*' -o -name '*.tsbuildinfo'
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 13 tests successfully.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 13 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- Generated paths are stored internally with POSIX-style `/` separators.
+- Windows-style backslashes are normalized to `/`, while Windows absolute paths such as `C:\...` are rejected.
+- Paths containing `.`, `..`, empty segments, leading slashes, and blank values are rejected.
+- Existing untracked prompt file `.agents/prompts/phase-04/step-2.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 3 when prompted: begin the generation plan model without adding templates, website integration, or CLI functionality.
+
+Previous Phase 4 Step 1 changes:
+
+Changes:
+
+- Completed Phase 4 Step 1: Create Generator Package Foundation.
+- Reviewed `packages/generator` structure and confirmed required `package.json`, `tsconfig.json`, and `src/index.ts` are present.
+- Added the generator package Vitest script and package-level Vitest config.
+- Added a minimal generator package test using Vitest.
+- Replaced the old placeholder export with `generatorPackageReady()`.
+- Added `getGeneratorDefaultConfig()` as a lightweight package-boundary import from `@launchkit/schema`.
+- Added a TypeScript project reference from `@launchkit/generator` to `@launchkit/schema` so generator builds can compile cleanly against the schema package from a fresh checkout.
+- Added `noEmitOnError` to prevent partial generated output after failed generator builds.
+- Confirmed `@launchkit/generator` does not import from `apps/web` or `packages/cli`.
+- Did not implement `generateProject`, file tree logic, feature registry logic, package merging, template loading, templates, website UI, or CLI functionality.
+
+Files changed:
+
+- `packages/generator/package.json`
+- `packages/generator/tsconfig.json`
+- `packages/generator/vitest.config.ts`
+- `packages/generator/src/index.ts`
+- `packages/generator/src/index.test.ts`
+- `packages/schema/tsconfig.json`
+- `context/progress-tracker.md`
+
+Generator foundation exports:
+
+- `generatorPackageReady()`
+- `getGeneratorDefaultConfig()`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-04/step-1.md
+rg --files
+sed -n '1,280p' context/project-overview.md
+sed -n '1,520p' context/architecture.md
+sed -n '1,560p' context/build-plan.md
+sed -n '1,420p' context/ui-rules.md
+sed -n '1,260p' package.json
+sed -n '1,240p' packages/generator/package.json
+sed -n '1,220p' packages/generator/tsconfig.json
+sed -n '1,220p' packages/generator/src/index.ts
+wc -l context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md context/progress-tracker.md
+sed -n '1,240p' packages/schema/package.json
+sed -n '1,220p' packages/schema/tsconfig.json
+sed -n '1,220p' packages/schema/vitest.config.ts
+sed -n '1,220p' packages/schema/src/index.ts
+sed -n '1,220p' packages/schema/src/defaults.ts
+sed -n '1,200p' packages/templates/package.json
+sed -n '1,200p' packages/shared/package.json
+rg "node:test|node --test|vitest|@launchkit/generator|@launchkit/schema|apps/web|packages/cli" packages/generator packages/schema package.json -g '!dist'
+git status --short
+sed -n '281,760p' context/project-overview.md
+sed -n '521,980p' context/architecture.md
+sed -n '561,1120p' context/build-plan.md
+sed -n '421,720p' context/ui-rules.md
+sed -n '221,1040p' context/progress-tracker.md
+sed -n '1,220p' tsconfig.base.json
+find packages -maxdepth 3 -type d -name dist -print
+find packages/schema -maxdepth 3 -type f -path '*dist*' -print
+npm run typecheck -w packages/generator
+npm run test -w packages/generator
+rg "apps/web|packages/cli|node:test|node --test" packages/generator -g '!dist'
+npm run build -w packages/schema
+npm run build -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+sed -n '1,80p' packages/schema/src/index.js
+find packages/schema/src -maxdepth 1 -type f | sort
+find packages/schema/dist -maxdepth 1 -type f | sort
+git ls-files packages/schema/src
+npm run build -w packages/schema -- --showConfig
+find packages/schema/src -maxdepth 1 -type f | sort
+npx tsc --build packages/schema/tsconfig.json packages/generator/tsconfig.json --dry
+npx tsc --build packages/schema/tsconfig.json packages/generator/tsconfig.json --noEmit
+npx tsc --build packages/schema/tsconfig.json packages/generator/tsconfig.json --clean --dry
+npx tsc -p packages/generator/tsconfig.json --noEmit
+npm run typecheck -w packages/generator
+npm run build -w packages/generator
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+git diff -- packages/generator/package.json packages/generator/tsconfig.json packages/generator/src/index.ts packages/generator/vitest.config.ts packages/generator/src/index.test.ts
+find packages/generator -maxdepth 3 -type f | sort
+```
+
+Verification:
+
+- [x] Generator package typecheck passed
+- [x] Generator package tests passed
+- [x] Generator package build passed
+- [x] Workspace typecheck passed
+- [x] Workspace tests passed
+- [x] Workspace lint passed
+- [x] Workspace build passed after rerunning outside the sandbox
+
+Verification result:
+
+- `npm run typecheck -w packages/generator` passed.
+- `npm run test -w packages/generator` passed: generator package Vitest suite ran 2 tests successfully.
+- `npm run build -w packages/generator` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package Vitest suite ran 2 tests and schema package Vitest suite ran 72 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- `packages/schema/tsconfig.json` now enables `composite` so it can be referenced by the generator package.
+- `packages/generator/tsconfig.json` references `../schema`, while the generator build script uses TypeScript build mode for dependency ordering.
+- The generator package keeps a no-emission typecheck script with `tsc -p tsconfig.json --noEmit`.
+- An exploratory `tsc --build ... --noEmit` check failed because TypeScript build mode does not allow disabling emit for the referenced schema project; the final package scripts avoid that mode.
+- The first failed generator build emitted temporary schema `.js` and `.d.ts` files under `packages/schema/src`; those generated artifacts were removed.
+- Existing untracked prompt directory `.agents/prompts/phase-04/` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Proceed to Phase 4 Step 2 when prompted: begin the generator core model work without adding templates or website integration yet.
+
+Previous Phase 3 Step 8 changes:
 
 - Completed Phase 3 Step 8: Verify Phase 3 Completion.
 - Reviewed the Phase 3 completion checklist against `packages/schema`.
@@ -919,10 +2137,10 @@ Use this section for general implementation notes.
 
 ## Blockers
 
-| Date | Blocker | Status | Resolution |
-| ---- | ------- | ------ | ---------- |
+| Date       | Blocker                                                                                                          | Status   | Resolution                                                                                    |
+| ---------- | ---------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------- |
 | 2026-06-27 | `packages/generator/tsconfig.json` has invalid `ignoreDeprecations: "6.0"` for the installed TypeScript version. | Resolved | The setting is no longer present in the current checkout; workspace typecheck and build pass. |
-| 2026-06-27 | `packages/schema/tsconfig.json` has invalid `ignoreDeprecations: "6.0"` for the installed TypeScript version. | Resolved | Removed the invalid setting; schema package typecheck now passes. |
+| 2026-06-27 | `packages/schema/tsconfig.json` has invalid `ignoreDeprecations: "6.0"` for the installed TypeScript version.    | Resolved | Removed the invalid setting; schema package typecheck now passes.                             |
 
 ## Open Questions
 
@@ -955,21 +2173,21 @@ Update this list as development progresses.
 
 ## Verification History
 
-| Date | Command | Result | Notes |
-| ---- | ------- | ------ | ----- |
-| 2026-06-27 | `npm run build` | Passed | Passed outside the sandbox after the known Turbopack process/port restriction blocked the sandboxed run. |
-| 2026-06-27 | `npm run lint` | Passed | Workspace lint completed successfully. |
-| 2026-06-27 | `npm run test` | Passed | Vitest ran the schema package suite: 11 tests passed. |
-| 2026-06-27 | `npm run typecheck` | Passed | All workspaces typechecked successfully. |
-| 2026-06-27 | `npm run test -w packages/schema` | Passed | Schema package Vitest suite ran 11 tests successfully. |
-| 2026-06-27 | `npm run typecheck -w packages/schema` | Passed | Schema package typechecked successfully with option exports. |
-| 2026-06-27 | `npm test` | Passed | Vitest ran the schema package test suite successfully. |
-| 2026-06-27 | `npm run lint` | Passed | Workspace lint completed successfully. |
-| 2026-06-27 | `npm run typecheck -w packages/schema` | Passed | Schema package typechecked successfully after removing invalid `ignoreDeprecations`. |
-| 2026-06-27 | `npm run typecheck` | Failed | Schema passed; workspace blocked by invalid `ignoreDeprecations: "6.0"` in `packages/generator/tsconfig.json`. |
-| 2026-06-27 | `npm run build` | Failed | Web app built outside sandbox; workspace build failed at generator TypeScript config. |
-| 2026-06-27 | `npm run typecheck` | Failed | Blocked by invalid `ignoreDeprecations: "6.0"` in `packages/schema/tsconfig.json`. |
-| 2026-06-27 | `npm run build` | Failed | Web app built outside sandbox; workspace build failed at schema TypeScript config. |
+| Date       | Command                                | Result | Notes                                                                                                          |
+| ---------- | -------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| 2026-06-27 | `npm run build`                        | Passed | Passed outside the sandbox after the known Turbopack process/port restriction blocked the sandboxed run.       |
+| 2026-06-27 | `npm run lint`                         | Passed | Workspace lint completed successfully.                                                                         |
+| 2026-06-27 | `npm run test`                         | Passed | Vitest ran the schema package suite: 11 tests passed.                                                          |
+| 2026-06-27 | `npm run typecheck`                    | Passed | All workspaces typechecked successfully.                                                                       |
+| 2026-06-27 | `npm run test -w packages/schema`      | Passed | Schema package Vitest suite ran 11 tests successfully.                                                         |
+| 2026-06-27 | `npm run typecheck -w packages/schema` | Passed | Schema package typechecked successfully with option exports.                                                   |
+| 2026-06-27 | `npm test`                             | Passed | Vitest ran the schema package test suite successfully.                                                         |
+| 2026-06-27 | `npm run lint`                         | Passed | Workspace lint completed successfully.                                                                         |
+| 2026-06-27 | `npm run typecheck -w packages/schema` | Passed | Schema package typechecked successfully after removing invalid `ignoreDeprecations`.                           |
+| 2026-06-27 | `npm run typecheck`                    | Failed | Schema passed; workspace blocked by invalid `ignoreDeprecations: "6.0"` in `packages/generator/tsconfig.json`. |
+| 2026-06-27 | `npm run build`                        | Failed | Web app built outside sandbox; workspace build failed at generator TypeScript config.                          |
+| 2026-06-27 | `npm run typecheck`                    | Failed | Blocked by invalid `ignoreDeprecations: "6.0"` in `packages/schema/tsconfig.json`.                             |
+| 2026-06-27 | `npm run build`                        | Failed | Web app built outside sandbox; workspace build failed at schema TypeScript config.                             |
 
 ## Release Notes Draft
 

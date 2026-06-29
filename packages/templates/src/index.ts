@@ -1,1 +1,3 @@
-export const launchkitTemplatesPlaceholder = "launchkit-templates";
+export function templatesPackageReady() {
+  return true;
+}

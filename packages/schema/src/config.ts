@@ -12,7 +12,7 @@ import {
   routerOptions,
   stylingOptions,
   uiOptions,
-} from "./options";
+} from "./options.js";
 
 const projectNameSchema = z
   .string()
