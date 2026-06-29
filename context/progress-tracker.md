@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 5 Step 1 complete
-Primary focus: Template package foundation is ready for the first real base template
+Current phase: Phase 5 Step 2 complete
+Primary focus: Base Next.js template exists and is ready for Tailwind template work
 ```
 
 ## Phase Progress
@@ -19,7 +19,7 @@ Primary focus: Template package foundation is ready for the first real base temp
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
-| Phase 5 | Template Implementation               | In Progress | Step 1 created and verified the @launchkit/templates package foundation, placeholder export, test, and tracked base/features directories. |
+| Phase 5 | Template Implementation               | In Progress | Step 2 created and verified the base Next.js App Router template with no src directory and no optional feature files. |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
@@ -30,6 +30,115 @@ Primary focus: Template package foundation is ready for the first real base temp
 Add entries in reverse chronological order.
 
 ### 2026-06-29
+
+Phase 5 Step 2 changes:
+
+- Completed Phase 5 Step 2: Create Base Next.js Template.
+- Created `packages/templates/base/next/` as the base generated project template directory.
+- Added minimal App Router files: `app/layout.tsx`, `app/page.tsx`, and `app/globals.css`.
+- Added generated project config files: `package.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `.gitignore`, and `README.md`.
+- Added tracked empty `components/` and `lib/` directories with `.gitkeep`.
+- Added the minimal `baseNextTemplateId` export from `@launchkit/templates`.
+- Expanded templates package tests to verify the base template required files, exported template id, absence of a `src/` directory, and supported placeholder usage.
+- Did not add Tailwind-specific template files beyond the base placeholder `postcss.config.mjs`, shadcn/ui files, PostgreSQL files, Prisma files, Auth.js files, Docker files, website UI, CLI functionality, or generator wiring to `@launchkit/templates`.
+
+Files changed:
+
+- `packages/templates/base/next/app/layout.tsx`
+- `packages/templates/base/next/app/page.tsx`
+- `packages/templates/base/next/app/globals.css`
+- `packages/templates/base/next/components/.gitkeep`
+- `packages/templates/base/next/lib/.gitkeep`
+- `packages/templates/base/next/package.json`
+- `packages/templates/base/next/tsconfig.json`
+- `packages/templates/base/next/next.config.ts`
+- `packages/templates/base/next/postcss.config.mjs`
+- `packages/templates/base/next/.gitignore`
+- `packages/templates/base/next/README.md`
+- `packages/templates/src/index.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-05/step-2.md
+sed -n '281,560p' .agents/prompts/phase-05/step-2.md
+git status --short
+rg --files packages/templates
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '1,360p' context/architecture.md
+sed -n '361,760p' context/architecture.md
+sed -n '761,1140p' context/architecture.md
+sed -n '1,420p' context/build-plan.md
+sed -n '421,840p' context/build-plan.md
+sed -n '841,1220p' context/build-plan.md
+sed -n '1,420p' context/ui-rules.md
+sed -n '1,160p' packages/templates/src/__tests__/index.test.ts
+sed -n '1,120p' packages/templates/src/index.ts
+sed -n '1,220p' packages/templates/package.json
+find packages/templates -maxdepth 4 -print
+sed -n '1,220p' apps/web/package.json
+sed -n '1,220p' apps/web/tsconfig.json
+sed -n '1,120p' apps/web/next.config.ts
+sed -n '1,160p' apps/web/postcss.config.mjs
+sed -n '1,260p' packages/generator/src/template-loader.ts
+mkdir -p packages/templates/base/next/app packages/templates/base/next/components packages/templates/base/next/lib
+npm run typecheck -w @launchkit/templates
+npm test -w @launchkit/templates
+npm run typecheck
+npm run test
+npm run lint
+find packages/templates/base/next -maxdepth 2 -print
+npm run build
+npm run build
+git status --short
+git diff --stat
+git diff -- packages/templates/src/index.ts packages/templates/src/__tests__/index.test.ts
+```
+
+Verification:
+
+- [x] `packages/templates/base/next/` exists.
+- [x] Base template includes `app/layout.tsx`.
+- [x] Base template includes `app/page.tsx`.
+- [x] Base template includes `app/globals.css`.
+- [x] Base template includes generated project config files.
+- [x] Base template does not include a `src/` folder.
+- [x] No optional feature files were added.
+- [x] Templates package typecheck passed.
+- [x] Templates package tests passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+
+Verification result:
+
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test -w @launchkit/templates` passed: templates package Vitest suite ran 5 tests.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 87 tests, schema package ran 72 tests, and templates package ran 5 tests.
+- `npm run lint` passed.
+- `find packages/templates/base/next -maxdepth 2 -print` confirmed the base template contains `app/`, `components/`, and `lib/` with no `src/` directory.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- The base template uses only `{{projectName}}` and `{{packageName}}`, which are the placeholders supported by the Phase 4 template loader.
+- `postcss.config.mjs` is present as a base config placeholder but does not add Tailwind yet.
+- Real Tailwind, shadcn/ui, PostgreSQL, Prisma, Auth.js, Docker, website integration, and CLI work remain for later scoped steps.
+- Existing untracked prompt file `.agents/prompts/phase-05/step-2.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Phase 5 Step 3: Create Tailwind template.
 
 Phase 5 Step 1 changes:
 
