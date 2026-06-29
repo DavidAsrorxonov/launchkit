@@ -33,7 +33,21 @@ describe("generation pipeline", () => {
       private: true,
       scripts: {},
       dependencies: {},
-      devDependencies: {},
+      devDependencies: {
+        "@tailwindcss/postcss": "^4",
+        tailwindcss: "^4",
+      },
+    });
+  });
+
+  it("includes Tailwind dependencies for the default MVP config", async () => {
+    const project = await generateProject(defaultLaunchKitConfig);
+
+    expect(readJsonFile(project, "package.json")).toMatchObject({
+      devDependencies: {
+        "@tailwindcss/postcss": "^4",
+        tailwindcss: "^4",
+      },
     });
   });
 
@@ -112,6 +126,21 @@ describe("generation pipeline", () => {
       "authjs-credentials",
     ]);
     expect(plan.packageJson.dependencies).toEqual({ "@prisma/client": "latest" });
+    expect(plan.packageJson.devDependencies).toMatchObject({
+      "@tailwindcss/postcss": "^4",
+      tailwindcss: "^4",
+      prisma: "latest",
+    });
+    expect(plan.templateFiles).toEqual([
+      {
+        sourcePath: "features/tailwind/app/globals.css",
+        targetPath: "app/globals.css",
+      },
+      {
+        sourcePath: "features/tailwind/postcss.config.mjs",
+        targetPath: "postcss.config.mjs",
+      },
+    ]);
     expect(plan.env.map((envVar) => envVar.name)).toEqual(["DATABASE_URL", "AUTH_SECRET"]);
   });
 

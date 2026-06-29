@@ -91,7 +91,9 @@ describe("Phase 4 generator coverage", () => {
         "@prisma/client": "latest",
       },
       devDependencies: {
+        "@tailwindcss/postcss": "^4",
         prisma: "latest",
+        tailwindcss: "^4",
       },
       scripts: {
         "db:generate": "prisma generate",

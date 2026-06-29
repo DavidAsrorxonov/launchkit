@@ -33,6 +33,22 @@ export const tailwindFeature: FeatureDefinition = {
   id: "tailwind",
   label: "Tailwind CSS",
   description: "Utility-first styling system.",
+  packageJson: {
+    devDependencies: {
+      "@tailwindcss/postcss": "^4",
+      tailwindcss: "^4",
+    },
+  },
+  templateFiles: [
+    {
+      sourcePath: "features/tailwind/app/globals.css",
+      targetPath: "app/globals.css",
+    },
+    {
+      sourcePath: "features/tailwind/postcss.config.mjs",
+      targetPath: "postcss.config.mjs",
+    },
+  ],
   isEnabled: () => true,
 };
 

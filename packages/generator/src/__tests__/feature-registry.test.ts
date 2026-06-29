@@ -44,6 +44,27 @@ describe("feature registry", () => {
     );
   });
 
+  it("describes the required Tailwind package and file contributions", () => {
+    expect(getFeatureDefinition("tailwind")).toMatchObject({
+      packageJson: {
+        devDependencies: {
+          "@tailwindcss/postcss": "^4",
+          tailwindcss: "^4",
+        },
+      },
+      templateFiles: [
+        {
+          sourcePath: "features/tailwind/app/globals.css",
+          targetPath: "app/globals.css",
+        },
+        {
+          sourcePath: "features/tailwind/postcss.config.mjs",
+          targetPath: "postcss.config.mjs",
+        },
+      ],
+    });
+  });
+
   it("enables shadcn/ui when selected", () => {
     expect(
       getEnabledFeatures({ ...defaultLaunchKitConfig, ui: "shadcn" }).map((feature) => feature.id),
