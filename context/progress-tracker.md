@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 4 complete
-Primary focus: Generator core checkpoint is complete; Phase 5 template implementation is ready to start
+Current phase: Phase 5 Step 1 complete
+Primary focus: Template package foundation is ready for the first real base template
 ```
 
 ## Phase Progress
@@ -19,7 +19,7 @@ Primary focus: Generator core checkpoint is complete; Phase 5 template implement
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
-| Phase 5 | Template Implementation               | Ready       | Ready to add base and feature templates next.                                                           |
+| Phase 5 | Template Implementation               | In Progress | Step 1 created and verified the @launchkit/templates package foundation, placeholder export, test, and tracked base/features directories. |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
@@ -28,6 +28,114 @@ Primary focus: Generator core checkpoint is complete; Phase 5 template implement
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-06-29
+
+Phase 5 Step 1 changes:
+
+- Completed Phase 5 Step 1: Create Template Package Foundation.
+- Verified root workspace configuration still includes `apps/*` and `packages/*`.
+- Verified `packages/templates/package.json` is named `@launchkit/templates` and remains a private ESM workspace package.
+- Added the templates package `test` script using Vitest, consistent with tested workspace packages.
+- Aligned `packages/templates/tsconfig.json` with the built package pattern used by schema and generator by enabling `composite`, `NodeNext` module, `NodeNext` module resolution, and test exclusion.
+- Replaced the previous placeholder constant with the required `templatesPackageReady()` placeholder export.
+- Added a small Vitest coverage file under `packages/templates/src/__tests__/`.
+- Added `.gitkeep` placeholders so `packages/templates/base/` and `packages/templates/features/` are tracked before real templates are added.
+- Did not add real Next.js template files, feature templates, website UI, CLI functionality, or generator wiring to `@launchkit/templates`.
+
+Files changed:
+
+- `packages/templates/package.json`
+- `packages/templates/tsconfig.json`
+- `packages/templates/src/index.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `packages/templates/base/.gitkeep`
+- `packages/templates/features/.gitkeep`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-05/step-1.md
+git status --short
+rg --files packages
+rg --files context
+sed -n '1,260p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,380p' context/build-plan.md
+sed -n '381,760p' context/build-plan.md
+sed -n '761,1140p' context/build-plan.md
+sed -n '321,760p' context/architecture.md
+sed -n '761,1140p' context/architecture.md
+sed -n '261,620p' context/project-overview.md
+sed -n '1,360p' context/ui-rules.md
+sed -n '361,760p' context/ui-rules.md
+sed -n '241,520p' context/progress-tracker.md
+sed -n '1,220p' package.json
+sed -n '1,220p' tsconfig.base.json
+sed -n '1,220p' packages/templates/package.json
+sed -n '1,220p' packages/templates/tsconfig.json
+sed -n '1,120p' packages/templates/src/index.ts
+find packages/templates -maxdepth 3 -type d -print
+sed -n '1,220p' packages/schema/package.json
+sed -n '1,220p' packages/generator/package.json
+sed -n '1,220p' packages/shared/package.json
+find packages/templates/base packages/templates/features -maxdepth 2 -type f -print
+rg "templatesPackageReady|launchkitTemplatesPlaceholder" packages/templates packages -g '*.ts'
+sed -n '1,220p' packages/schema/tsconfig.json
+sed -n '1,220p' packages/generator/tsconfig.json
+sed -n '1,220p' packages/shared/tsconfig.json
+npm run typecheck -w @launchkit/templates
+npm test -w @launchkit/templates
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+npm run typecheck
+git status --short
+git diff --stat
+git diff -- packages/templates/package.json packages/templates/tsconfig.json packages/templates/src/index.ts packages/templates/src/__tests__/index.test.ts packages/templates/base/.gitkeep packages/templates/features/.gitkeep
+```
+
+Verification:
+
+- [x] `packages/templates` exists.
+- [x] `@launchkit/templates` package exists.
+- [x] `packages/templates/src/index.ts` exports `templatesPackageReady()`.
+- [x] `packages/templates/base/` exists and is tracked with `.gitkeep`.
+- [x] `packages/templates/features/` exists and is tracked with `.gitkeep`.
+- [x] Workspace configuration includes `apps/*` and `packages/*`.
+- [x] Templates package typecheck passed.
+- [x] Templates package tests passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed after the build regenerated Next generated types.
+
+Verification result:
+
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test -w @launchkit/templates` passed: templates package Vitest suite ran 1 test.
+- `npm run test` passed across workspaces: generator package ran 87 tests, schema package ran 72 tests, and templates package ran 1 test.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+- `npm run typecheck` initially failed before the successful build because `.next/types/validator.ts` could not find generated `./routes.js`. After the elevated build regenerated Next types, rerunning `npm run typecheck` passed across all workspaces.
+
+Notes:
+
+- This step added only the template package foundation and a readiness test.
+- Real template contents remain intentionally absent until Phase 5 Step 2 and later.
+- Existing untracked prompt directory `.agents/prompts/phase-05/` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Phase 5 Step 2: Create base Next.js template.
 
 ### 2026-06-28
 
