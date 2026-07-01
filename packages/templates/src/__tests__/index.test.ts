@@ -3,7 +3,12 @@ import { readdir, readFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { baseNextTemplateId, tailwindTemplateId, templatesPackageReady } from "../index";
+import {
+  baseNextTemplateId,
+  shadcnTemplateId,
+  tailwindTemplateId,
+  templatesPackageReady,
+} from "../index";
 
 const templatesRoot = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -11,6 +16,7 @@ const templatesRoot = join(
   "..",
 );
 const baseNextTemplateRoot = join(templatesRoot, "base", "next");
+const shadcnTemplateRoot = join(templatesRoot, "features", "shadcn");
 const tailwindTemplateRoot = join(templatesRoot, "features", "tailwind");
 
 const requiredBaseNextTemplateFiles = [
@@ -32,6 +38,13 @@ const requiredTailwindTemplateFiles = [
   "postcss.config.mjs",
 ];
 
+const requiredShadcnTemplateFiles = [
+  "components.json",
+  "components/ui/button.tsx",
+  "lib/utils.ts",
+  "app/globals.css",
+];
+
 describe("@launchkit/templates package foundation", () => {
   it("exports a readiness placeholder", () => {
     expect(templatesPackageReady()).toBe(true);
@@ -43,6 +56,10 @@ describe("@launchkit/templates package foundation", () => {
 
   it("exports the Tailwind template id", () => {
     expect(tailwindTemplateId).toBe("tailwind");
+  });
+
+  it("exports the shadcn/ui template id", () => {
+    expect(shadcnTemplateId).toBe("shadcn");
   });
 });
 
@@ -74,6 +91,101 @@ describe("base Next.js template", () => {
         if (!["{{projectName}}", "{{packageName}}"].includes(placeholder[0])) {
           unsupportedPlaceholders.add(
             `${relative(baseNextTemplateRoot, filePath)}: ${placeholder[0]}`,
+          );
+        }
+      }
+    }
+
+    expect([...unsupportedPlaceholders]).toEqual([]);
+  });
+});
+
+describe("shadcn/ui feature template", () => {
+  it("includes the required shadcn/ui files", async () => {
+    await expect(
+      Promise.all(
+        requiredShadcnTemplateFiles.map(async (filePath) => {
+          await readFile(join(shadcnTemplateRoot, filePath));
+        }),
+      ),
+    ).resolves.toHaveLength(requiredShadcnTemplateFiles.length);
+  });
+
+  it("configures shadcn/ui for a no-src App Router project", async () => {
+    const componentsJson = JSON.parse(
+      await readFile(join(shadcnTemplateRoot, "components.json"), "utf8"),
+    ) as {
+      aliases: Record<string, string>;
+      tailwind: { css: string; config: string; cssVariables: boolean };
+    };
+
+    expect(componentsJson.tailwind).toMatchObject({
+      css: "app/globals.css",
+      config: "",
+      cssVariables: true,
+    });
+    expect(componentsJson.aliases).toMatchObject({
+      components: "@/components",
+      utils: "@/lib/utils",
+      ui: "@/components/ui",
+      lib: "@/lib",
+      hooks: "@/hooks",
+    });
+  });
+
+  it("includes the cn helper and button exports", async () => {
+    await expect(readFile(join(shadcnTemplateRoot, "lib/utils.ts"), "utf8")).resolves.toContain(
+      "export function cn(",
+    );
+
+    const button = await readFile(
+      join(shadcnTemplateRoot, "components/ui/button.tsx"),
+      "utf8",
+    );
+
+    expect(button).toContain('from "class-variance-authority"');
+    expect(button).toContain('from "@/lib/utils"');
+    expect(button).toContain("export { Button, buttonVariants }");
+  });
+
+  it("includes Tailwind v4 shadcn token CSS", async () => {
+    const css = await readFile(join(shadcnTemplateRoot, "app/globals.css"), "utf8");
+
+    expect(css).toContain('@import "tailwindcss";');
+    expect(css).toContain("@custom-variant dark");
+    expect(css).toContain("@theme inline");
+    expect(css).toContain("--color-primary: var(--primary);");
+    expect(css).toContain("--radius-lg: var(--radius);");
+  });
+
+  it("does not add backend feature files", async () => {
+    const templateFiles = (await listTemplateFiles(shadcnTemplateRoot)).map((filePath) =>
+      relative(shadcnTemplateRoot, filePath),
+    );
+
+    expect([...templateFiles].sort()).toEqual([...requiredShadcnTemplateFiles].sort());
+    expect(templateFiles).not.toContain("prisma/schema.prisma");
+    expect(templateFiles).not.toContain("lib/db.ts");
+    expect(templateFiles).not.toContain("docker-compose.yml");
+  });
+
+  it("does not include a src directory", async () => {
+    const entries = await readdir(shadcnTemplateRoot, { withFileTypes: true });
+
+    expect(entries.some((entry) => entry.isDirectory() && entry.name === "src")).toBe(false);
+  });
+
+  it("uses only supported template placeholders", async () => {
+    const templateFiles = await listTemplateFiles(shadcnTemplateRoot);
+    const unsupportedPlaceholders = new Set<string>();
+
+    for (const filePath of templateFiles) {
+      const contents = await readFile(filePath, "utf8");
+
+      for (const placeholder of contents.matchAll(/{{[^}]+}}/g)) {
+        if (!["{{projectName}}", "{{packageName}}"].includes(placeholder[0])) {
+          unsupportedPlaceholders.add(
+            `${relative(shadcnTemplateRoot, filePath)}: ${placeholder[0]}`,
           );
         }
       }

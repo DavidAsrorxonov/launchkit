@@ -89,6 +89,9 @@ describe("Phase 4 generator coverage", () => {
       name: "full-stack-demo",
       dependencies: {
         "@prisma/client": "latest",
+        "class-variance-authority": "^0.7.1",
+        clsx: "^2.1.1",
+        "tailwind-merge": "^3.6.0",
       },
       devDependencies: {
         "@tailwindcss/postcss": "^4",

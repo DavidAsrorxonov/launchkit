@@ -144,6 +144,101 @@ describe("generation pipeline", () => {
     expect(plan.env.map((envVar) => envVar.name)).toEqual(["DATABASE_URL", "AUTH_SECRET"]);
   });
 
+  it("adds shadcn/ui dependencies and template files only when selected", () => {
+    const defaultPlan = createGenerationPlan(defaultLaunchKitConfig);
+    const shadcnPlan = createGenerationPlan({
+      ...defaultLaunchKitConfig,
+      ui: "shadcn",
+    });
+
+    expect(defaultPlan.packageJson.dependencies).toEqual({});
+    expect(defaultPlan.templateFiles.map((file) => file.sourcePath)).not.toContain(
+      "features/shadcn/components.json",
+    );
+    expect(shadcnPlan.packageJson.dependencies).toMatchObject({
+      "class-variance-authority": "^0.7.1",
+      clsx: "^2.1.1",
+      "tailwind-merge": "^3.6.0",
+    });
+    expect(shadcnPlan.templateFiles.map((file) => file.targetPath)).toEqual([
+      "app/globals.css",
+      "postcss.config.mjs",
+      "components.json",
+      "lib/utils.ts",
+      "components/ui/button.tsx",
+      "app/globals.css",
+    ]);
+  });
+
+  it("loads selected feature template files by default when a template loader is provided", async () => {
+    const loader = createInMemoryTemplateLoader({
+      "features/tailwind/app/globals.css": [
+        {
+          sourcePath: "features/tailwind/app/globals.css",
+          targetPath: "app/globals.css",
+          contents: "tailwind",
+        },
+      ],
+      "features/tailwind/postcss.config.mjs": [
+        {
+          sourcePath: "features/tailwind/postcss.config.mjs",
+          targetPath: "postcss.config.mjs",
+          contents: "postcss",
+        },
+      ],
+      "features/shadcn/components.json": [
+        {
+          sourcePath: "features/shadcn/components.json",
+          targetPath: "components.json",
+          contents: "{}",
+        },
+      ],
+      "features/shadcn/lib/utils.ts": [
+        {
+          sourcePath: "features/shadcn/lib/utils.ts",
+          targetPath: "lib/utils.ts",
+          contents: "utils",
+        },
+      ],
+      "features/shadcn/components/ui/button.tsx": [
+        {
+          sourcePath: "features/shadcn/components/ui/button.tsx",
+          targetPath: "components/ui/button.tsx",
+          contents: "button",
+        },
+      ],
+      "features/shadcn/app/globals.css": [
+        {
+          sourcePath: "features/shadcn/app/globals.css",
+          targetPath: "app/globals.css",
+          contents: "shadcn",
+        },
+      ],
+    });
+
+    const defaultProject = await generateProject(defaultLaunchKitConfig, {
+      templateLoader: loader,
+    });
+    const shadcnProject = await generateProject(
+      {
+        ...defaultLaunchKitConfig,
+        ui: "shadcn",
+      },
+      {
+        templateLoader: loader,
+      },
+    );
+
+    expect(defaultProject.files.map((file) => file.path)).not.toContain("components.json");
+    expect(defaultProject.files.map((file) => file.path)).not.toContain("lib/utils.ts");
+    expect(defaultProject.files.map((file) => file.path)).not.toContain(
+      "components/ui/button.tsx",
+    );
+    expect(shadcnProject.files.map((file) => file.path)).toEqual(
+      expect.arrayContaining(["components.json", "lib/utils.ts", "components/ui/button.tsx"]),
+    );
+  });
+
   it("can include files loaded through the template loader interface", async () => {
     const loader = createInMemoryTemplateLoader({
       "base/skeleton": [

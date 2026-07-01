@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 5 Step 3 complete
-Primary focus: Tailwind feature template and metadata are ready for shadcn/ui template work
+Current phase: Phase 5 Step 4 complete
+Primary focus: shadcn/ui feature template and metadata are ready for PostgreSQL template work
 ```
 
 ## Phase Progress
@@ -19,7 +19,7 @@ Primary focus: Tailwind feature template and metadata are ready for shadcn/ui te
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
-| Phase 5 | Template Implementation               | In Progress | Step 3 created and verified Tailwind v4 feature files, dependency metadata, and template file references while keeping shadcn/backend features separate. |
+| Phase 5 | Template Implementation               | In Progress | Step 4 created and verified shadcn/ui feature files, dependency metadata, CSS tokens, and selected-feature template loading behavior. |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
@@ -28,6 +28,137 @@ Primary focus: Tailwind feature template and metadata are ready for shadcn/ui te
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-01
+
+Phase 5 Step 4 changes:
+
+- Completed Phase 5 Step 4: Create shadcn/ui Template.
+- Created `packages/templates/features/shadcn/` as the optional shadcn/ui feature template directory.
+- Added `components.json` configured for no-`src` Next.js App Router projects.
+- Added the standard `cn()` helper at `packages/templates/features/shadcn/lib/utils.ts`.
+- Added a minimal shadcn-compatible `Button` component at `packages/templates/features/shadcn/components/ui/button.tsx`.
+- Added Tailwind v4-compatible shadcn CSS tokens at `packages/templates/features/shadcn/app/globals.css`.
+- Added the minimal `shadcnTemplateId` export from `@launchkit/templates`.
+- Updated the generator shadcn feature definition to contribute `class-variance-authority`, `clsx`, and `tailwind-merge`.
+- Updated the generator shadcn feature definition to reference the shadcn template files.
+- Updated generator template loading so a provided `TemplateLoader` uses selected feature `templateFiles` by default when explicit `templateIds` are not supplied.
+- Verified schema compatibility already includes `shadcn/ui requires Tailwind CSS`, so no schema changes were needed.
+- Expanded templates package tests to verify shadcn files, no-`src` aliases, button/helper exports, Tailwind v4 token CSS, no backend files, and supported placeholders.
+- Expanded generator tests to verify shadcn dependency and template-file contributions, and that shadcn files are loaded only when `ui: "shadcn"` is selected.
+- Did not add PostgreSQL, Prisma, Auth.js, Docker, website UI, CLI functionality, zip adapters, filesystem adapters, or filesystem template loading.
+
+Files changed:
+
+- `packages/templates/features/shadcn/components.json`
+- `packages/templates/features/shadcn/lib/utils.ts`
+- `packages/templates/features/shadcn/components/ui/button.tsx`
+- `packages/templates/features/shadcn/app/globals.css`
+- `packages/templates/src/index.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `packages/generator/src/features/definitions.ts`
+- `packages/generator/src/generate-project.ts`
+- `packages/generator/src/__tests__/feature-registry.test.ts`
+- `packages/generator/src/__tests__/generate-project.test.ts`
+- `packages/generator/src/__tests__/phase-4-coverage.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,360p' .agents/prompts/phase-05/step-4.md
+git status --short
+rg --files packages/templates packages/generator/src
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '1,380p' context/ui-rules.md
+sed -n '381,760p' context/ui-rules.md
+sed -n '1,380p' context/architecture.md
+sed -n '381,760p' context/architecture.md
+sed -n '1,260p' apps/web/components.json
+rg --files apps/web | sort
+sed -n '1,260p' apps/web/app/globals.css
+sed -n '1,160p' apps/web/lib/utils.ts
+sed -n '1,280p' packages/schema/src/compatibility.ts
+sed -n '1,260p' packages/schema/src/__tests__/compatibility.test.ts
+sed -n '1,220p' packages/generator/src/features/definitions.ts
+sed -n '1,260p' packages/generator/src/__tests__/feature-registry.test.ts
+sed -n '1,240p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,260p' packages/templates/src/__tests__/index.test.ts
+sed -n '1,160p' packages/templates/src/index.ts
+sed -n '1,200p' packages/templates/features/tailwind/app/globals.css
+mkdir -p packages/templates/features/shadcn/app packages/templates/features/shadcn/components/ui packages/templates/features/shadcn/lib
+npm run typecheck -w @launchkit/templates
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/generator
+npm test -w @launchkit/generator
+npm test -w @launchkit/schema
+npm test -w @launchkit/templates
+npm run typecheck
+npm run test
+npm run lint
+find packages/templates/features/shadcn -maxdepth 4 -type f -print
+npm run build
+npm run build
+git status --short
+git diff --stat
+git diff -- packages/generator/src/features/definitions.ts packages/generator/src/generate-project.ts packages/generator/src/__tests__/feature-registry.test.ts packages/generator/src/__tests__/generate-project.test.ts packages/generator/src/__tests__/phase-4-coverage.test.ts packages/templates/src/index.ts packages/templates/src/__tests__/index.test.ts
+```
+
+Verification:
+
+- [x] shadcn template files exist.
+- [x] `components.json` exists and is configured for no-`src` App Router projects.
+- [x] `lib/utils.ts` exists and exports `cn()`.
+- [x] `components/ui/button.tsx` exists and exports `Button` and `buttonVariants`.
+- [x] shadcn CSS tokens are present and Tailwind v4-compatible.
+- [x] shadcn dependency contributions are present.
+- [x] shadcn template files are referenced in generator feature metadata.
+- [x] Generated project output with a provided template loader includes shadcn files only when `ui: "shadcn"` is selected.
+- [x] Generated project output with `ui: "none"` does not include shadcn files.
+- [x] Backend feature files were not added.
+- [x] No `src/` folder was introduced.
+- [x] Templates package typecheck passed.
+- [x] Templates package tests passed.
+- [x] Generator package typecheck passed.
+- [x] Generator package tests passed.
+- [x] Schema package tests passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+
+Verification result:
+
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test -w @launchkit/templates` passed after making file-order assertions deterministic: templates package Vitest suite ran 20 tests.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm test -w @launchkit/generator` passed: generator package Vitest suite ran 92 tests.
+- `npm test -w @launchkit/schema` passed: schema package Vitest suite ran 72 tests.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 92 tests, schema package ran 72 tests, and templates package ran 20 tests.
+- `npm run lint` passed.
+- `find packages/templates/features/shadcn -maxdepth 4 -type f -print` confirmed only `app/globals.css`, `components/ui/button.tsx`, `lib/utils.ts`, and `components.json` were added under the shadcn feature template.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- The shadcn `Button` avoids Radix `Slot`, so no Radix dependency was added.
+- `lucide-react` was not added because no generated shadcn file imports icons in this step.
+- The generator still does not implement filesystem template loading; this step uses existing `TemplateLoader` support and selected feature `templateFiles` metadata.
+- Existing untracked prompt file `.agents/prompts/phase-05/step-4.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Phase 5 Step 5: Create PostgreSQL template.
 
 ### 2026-06-29
 

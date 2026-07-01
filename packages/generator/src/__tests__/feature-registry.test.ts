@@ -71,6 +71,36 @@ describe("feature registry", () => {
     ).toContain("shadcn");
   });
 
+  it("describes the required shadcn/ui package and file contributions", () => {
+    expect(getFeatureDefinition("shadcn")).toMatchObject({
+      packageJson: {
+        dependencies: {
+          "class-variance-authority": "^0.7.1",
+          clsx: "^2.1.1",
+          "tailwind-merge": "^3.6.0",
+        },
+      },
+      templateFiles: [
+        {
+          sourcePath: "features/shadcn/components.json",
+          targetPath: "components.json",
+        },
+        {
+          sourcePath: "features/shadcn/lib/utils.ts",
+          targetPath: "lib/utils.ts",
+        },
+        {
+          sourcePath: "features/shadcn/components/ui/button.tsx",
+          targetPath: "components/ui/button.tsx",
+        },
+        {
+          sourcePath: "features/shadcn/app/globals.css",
+          targetPath: "app/globals.css",
+        },
+      ],
+    });
+  });
+
   it("enables PostgreSQL when selected", () => {
     expect(
       getEnabledFeatures({ ...defaultLaunchKitConfig, database: "postgres" }).map(

@@ -79,13 +79,19 @@ async function loadTemplateFiles(
   plan: GenerationPlan,
   options: GenerateProjectOptions,
 ) {
-  if (!options.templateLoader || !options.templateIds || options.templateIds.length === 0) {
+  if (!options.templateLoader) {
+    return [];
+  }
+
+  const templateIds = options.templateIds ?? plan.templateFiles.map((file) => file.sourcePath);
+
+  if (templateIds.length === 0) {
     return [];
   }
 
   const context = createTemplateContext(plan);
   const groups = await Promise.all(
-    options.templateIds.map((templateId) =>
+    templateIds.map((templateId) =>
       options.templateLoader?.loadTemplateFiles({
         templateId,
         context,
