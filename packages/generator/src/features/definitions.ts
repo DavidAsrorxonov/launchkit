@@ -92,10 +92,17 @@ export const postgresFeature: FeatureDefinition = {
   env: [
     {
       name: "DATABASE_URL",
-      value: "postgresql://postgres:postgres@localhost:5432/my_app",
+      value: "postgresql://postgres:postgres@localhost:5432/{{packageName}}",
       description: "PostgreSQL connection string.",
       required: true,
     },
+  ],
+  notes: [
+    "This project expects a PostgreSQL database.",
+    "`DATABASE_URL` must be configured before running database-backed code.",
+    "The local PostgreSQL connection string in `.env.example` is a development default only.",
+    "Docker Compose support is optional and belongs to the Docker PostgreSQL feature.",
+    "Prisma setup is optional and belongs to the Prisma feature.",
   ],
   isEnabled: (config) => config.database === "postgres",
 };

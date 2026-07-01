@@ -109,6 +109,35 @@ describe("feature registry", () => {
     ).toContain("postgres");
   });
 
+  it("does not enable PostgreSQL when no database is selected", () => {
+    expect(
+      getEnabledFeatures({ ...defaultLaunchKitConfig, database: "none" }).map(
+        (feature) => feature.id,
+      ),
+    ).not.toContain("postgres");
+  });
+
+  it("describes the PostgreSQL env contribution and README notes", () => {
+    expect(getFeatureDefinition("postgres")).toMatchObject({
+      env: [
+        {
+          name: "DATABASE_URL",
+          value: "postgresql://postgres:postgres@localhost:5432/{{packageName}}",
+          description: "PostgreSQL connection string.",
+          required: true,
+        },
+      ],
+      notes: expect.arrayContaining([
+        "This project expects a PostgreSQL database.",
+        "`DATABASE_URL` must be configured before running database-backed code.",
+        "The local PostgreSQL connection string in `.env.example` is a development default only.",
+        "Docker Compose support is optional and belongs to the Docker PostgreSQL feature.",
+        "Prisma setup is optional and belongs to the Prisma feature.",
+      ]),
+    });
+    expect(getFeatureDefinition("postgres").packageJson).toBeUndefined();
+  });
+
   it("enables Prisma when selected", () => {
     expect(
       getEnabledFeatures({ ...defaultLaunchKitConfig, orm: "prisma" }).map((feature) => feature.id),

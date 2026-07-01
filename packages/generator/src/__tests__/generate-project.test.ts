@@ -72,12 +72,53 @@ describe("generation pipeline", () => {
   it("includes DATABASE_URL when PostgreSQL is selected", async () => {
     const project = await generateProject({
       ...defaultLaunchKitConfig,
+      name: "database-demo",
       database: "postgres",
     });
 
     expect(readTextFile(project, ".env.example")).toContain(
-      'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/my_app"',
+      'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/database-demo"',
     );
+  });
+
+  it("does not include DATABASE_URL when PostgreSQL is not selected", async () => {
+    const project = await generateProject({
+      ...defaultLaunchKitConfig,
+      database: "none",
+    });
+
+    expect(readTextFile(project, ".env.example")).not.toContain("DATABASE_URL=");
+  });
+
+  it("includes PostgreSQL README guidance only when PostgreSQL is selected", async () => {
+    const defaultProject = await generateProject(defaultLaunchKitConfig);
+    const postgresProject = await generateProject({
+      ...defaultLaunchKitConfig,
+      database: "postgres",
+    });
+    const defaultReadme = readTextFile(defaultProject, "README.md");
+    const postgresReadme = readTextFile(postgresProject, "README.md");
+
+    expect(defaultReadme).not.toContain("This project expects a PostgreSQL database.");
+    expect(postgresReadme).toContain("This project expects a PostgreSQL database.");
+    expect(postgresReadme).toContain("`DATABASE_URL` must be configured");
+    expect(postgresReadme).toContain("development default only");
+    expect(postgresReadme).toContain("Docker Compose support is optional");
+    expect(postgresReadme).toContain("Prisma setup is optional");
+  });
+
+  it("does not add Prisma, Auth.js, or Docker files for PostgreSQL alone", async () => {
+    const project = await generateProject({
+      ...defaultLaunchKitConfig,
+      database: "postgres",
+    });
+    const paths = project.files.map((file) => file.path);
+
+    expect(paths).not.toContain("prisma/schema.prisma");
+    expect(paths).not.toContain("lib/db.ts");
+    expect(paths).not.toContain("app/api/auth/[...nextauth]/route.ts");
+    expect(paths).not.toContain("docker-compose.yml");
+    expect(paths.some((path) => path.startsWith("src/"))).toBe(false);
   });
 
   it("includes AUTH_SECRET when Auth.js credentials are selected", async () => {
@@ -142,6 +183,9 @@ describe("generation pipeline", () => {
       },
     ]);
     expect(plan.env.map((envVar) => envVar.name)).toEqual(["DATABASE_URL", "AUTH_SECRET"]);
+    expect(plan.env.find((envVar) => envVar.name === "DATABASE_URL")?.value).toBe(
+      "postgresql://postgres:postgres@localhost:5432/my-app",
+    );
   });
 
   it("adds shadcn/ui dependencies and template files only when selected", () => {

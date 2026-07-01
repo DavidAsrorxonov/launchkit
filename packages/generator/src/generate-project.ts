@@ -14,7 +14,11 @@ import {
   type PackageJsonPatch,
 } from "./generation-plan.js";
 import { mergePackageJsonPatches } from "./package-json.js";
-import type { TemplateContext, TemplateLoader } from "./template-loader.js";
+import {
+  applyTemplatePlaceholders,
+  type TemplateContext,
+  type TemplateLoader,
+} from "./template-loader.js";
 
 export type GenerateProjectOptions = {
   templateLoader?: TemplateLoader;
@@ -31,7 +35,14 @@ export function createGenerationPlan(config: LaunchKitConfig): GenerationPlan {
     createBasePackageJsonPatch(parsedConfig.name),
     ...features.map((feature) => feature.packageJson ?? {}),
   ]);
-  const env = mergeEnvVars(features.map((feature) => feature.env ?? []));
+  const context = {
+    projectName: parsedConfig.name,
+    packageName: packageJson.name ?? parsedConfig.name,
+  };
+  const env = mergeEnvVars(features.map((feature) => feature.env ?? [])).map((envVar) => ({
+    ...envVar,
+    value: applyTemplatePlaceholders(envVar.value, context),
+  }));
 
   return {
     ...plan,

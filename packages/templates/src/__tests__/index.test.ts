@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   baseNextTemplateId,
+  postgresTemplateId,
   shadcnTemplateId,
   tailwindTemplateId,
   templatesPackageReady,
@@ -16,6 +17,7 @@ const templatesRoot = join(
   "..",
 );
 const baseNextTemplateRoot = join(templatesRoot, "base", "next");
+const postgresTemplateRoot = join(templatesRoot, "features", "postgres");
 const shadcnTemplateRoot = join(templatesRoot, "features", "shadcn");
 const tailwindTemplateRoot = join(templatesRoot, "features", "tailwind");
 
@@ -38,6 +40,11 @@ const requiredTailwindTemplateFiles = [
   "postcss.config.mjs",
 ];
 
+const requiredPostgresTemplateFiles = [
+  ".env.example",
+  "README.md",
+];
+
 const requiredShadcnTemplateFiles = [
   "components.json",
   "components/ui/button.tsx",
@@ -56,6 +63,10 @@ describe("@launchkit/templates package foundation", () => {
 
   it("exports the Tailwind template id", () => {
     expect(tailwindTemplateId).toBe("tailwind");
+  });
+
+  it("exports the PostgreSQL template id", () => {
+    expect(postgresTemplateId).toBe("postgres");
   });
 
   it("exports the shadcn/ui template id", () => {
@@ -186,6 +197,73 @@ describe("shadcn/ui feature template", () => {
         if (!["{{projectName}}", "{{packageName}}"].includes(placeholder[0])) {
           unsupportedPlaceholders.add(
             `${relative(shadcnTemplateRoot, filePath)}: ${placeholder[0]}`,
+          );
+        }
+      }
+    }
+
+    expect([...unsupportedPlaceholders]).toEqual([]);
+  });
+});
+
+describe("PostgreSQL feature template", () => {
+  it("includes the required PostgreSQL files", async () => {
+    await expect(
+      Promise.all(
+        requiredPostgresTemplateFiles.map(async (filePath) => {
+          await readFile(join(postgresTemplateRoot, filePath));
+        }),
+      ),
+    ).resolves.toHaveLength(requiredPostgresTemplateFiles.length);
+  });
+
+  it("includes the DATABASE_URL example with the package name placeholder", async () => {
+    await expect(
+      readFile(join(postgresTemplateRoot, ".env.example"), "utf8"),
+    ).resolves.toContain(
+      'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/{{packageName}}"',
+    );
+  });
+
+  it("includes concise PostgreSQL README guidance", async () => {
+    const readme = await readFile(join(postgresTemplateRoot, "README.md"), "utf8");
+
+    expect(readme).toContain("expects a PostgreSQL database");
+    expect(readme).toContain("Configure `DATABASE_URL`");
+    expect(readme).toContain("development default only");
+    expect(readme).toContain("Docker Compose support is optional");
+    expect(readme).toContain("Prisma setup is optional");
+  });
+
+  it("does not add Prisma, Auth.js, Docker, or source-directory files", async () => {
+    const templateFiles = (await listTemplateFiles(postgresTemplateRoot)).map((filePath) =>
+      relative(postgresTemplateRoot, filePath),
+    );
+
+    expect([...templateFiles].sort()).toEqual([...requiredPostgresTemplateFiles].sort());
+    expect(templateFiles).not.toContain("prisma/schema.prisma");
+    expect(templateFiles).not.toContain("lib/db.ts");
+    expect(templateFiles).not.toContain("app/api/auth/[...nextauth]/route.ts");
+    expect(templateFiles).not.toContain("docker-compose.yml");
+  });
+
+  it("does not include a src directory", async () => {
+    const entries = await readdir(postgresTemplateRoot, { withFileTypes: true });
+
+    expect(entries.some((entry) => entry.isDirectory() && entry.name === "src")).toBe(false);
+  });
+
+  it("uses only supported template placeholders", async () => {
+    const templateFiles = await listTemplateFiles(postgresTemplateRoot);
+    const unsupportedPlaceholders = new Set<string>();
+
+    for (const filePath of templateFiles) {
+      const contents = await readFile(filePath, "utf8");
+
+      for (const placeholder of contents.matchAll(/{{[^}]+}}/g)) {
+        if (!["{{projectName}}", "{{packageName}}"].includes(placeholder[0])) {
+          unsupportedPlaceholders.add(
+            `${relative(postgresTemplateRoot, filePath)}: ${placeholder[0]}`,
           );
         }
       }

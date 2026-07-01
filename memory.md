@@ -1,46 +1,56 @@
-# Memory - Phase 4 Generator Checkpoint
+# Memory - Phase 5 Templates Through shadcn/ui
 
-Last updated: 2026-06-28 23:33 JST
+Last updated: 2026-07-01 18:40 JST
 
 ## What was built
 
-- Completed Phase 4 Step 10 and updated `context/progress-tracker.md`.
-- Marked Phase 4 as complete and Phase 5 as ready.
-- Fixed built ESM package loading for `@launchkit/schema` and `@launchkit/generator`.
-- Updated schema and generator package TypeScript configs to use `NodeNext` module and module resolution.
-- Updated production relative imports/exports in schema and generator source to use `.js` specifiers.
-- Confirmed generator tests live under `packages/generator/src/__tests__/`, matching the schema package test folder structure.
+- Completed Phase 5 Step 4 and updated `context/progress-tracker.md`.
+- Added optional shadcn/ui template files:
+  - `packages/templates/features/shadcn/components.json`
+  - `packages/templates/features/shadcn/lib/utils.ts`
+  - `packages/templates/features/shadcn/components/ui/button.tsx`
+  - `packages/templates/features/shadcn/app/globals.css`
+- Added `shadcnTemplateId` from `@launchkit/templates`.
+- Updated generator shadcn feature metadata to contribute `class-variance-authority`, `clsx`, and `tailwind-merge`.
+- Updated generator shadcn feature metadata to reference `components.json`, `lib/utils.ts`, `components/ui/button.tsx`, and shadcn `app/globals.css`.
+- Updated generator template loading so a provided `TemplateLoader` uses selected feature `templateFiles` when explicit `templateIds` are not supplied.
+- Added tests covering shadcn template files, no-`src` aliases, `cn()` helper, `Button` exports, Tailwind v4 token CSS, no backend files, and selected-feature template loading.
 
 ## Decisions made
 
-- Generator package tests should remain in `packages/generator/src/__tests__/`.
-- Schema and generator packages should emit Node-loadable ESM using NodeNext settings and explicit `.js` relative specifiers.
-- Phase 4 remains limited to the generator core foundation; real templates, adapters, UI, and CLI work stay out of scope until later phases.
+- shadcn templates use Tailwind v4-compatible CSS tokens.
+- The generated shadcn `Button` avoids Radix `Slot`, so no Radix dependency is added.
+- `lucide-react` is not added yet because no generated shadcn file imports icons.
+- Filesystem template loading is still not implemented; feature files are represented through existing `templateFiles` metadata and optional `TemplateLoader` support.
+- Backend templates remain separate and must start at Phase 5 Step 5.
 
 ## Problems solved
 
-- Direct Node import of `packages/generator/dist/index.js` originally failed because emitted ESM used extensionless relative imports.
-- The failure was fixed by switching schema/generator builds to NodeNext and updating production relative import/export specifiers.
-- Workspace build fails inside the sandbox because Next/Turbopack cannot create or bind its worker process there; rerunning the same build outside the sandbox passes.
+- Confirmed schema compatibility already enforces `shadcn/ui requires Tailwind CSS`; no schema change was needed.
+- Fixed a nondeterministic template test assertion by sorting expected and actual file lists.
+- The workspace build still fails inside the sandbox because Next/Turbopack cannot bind its worker process there; rerunning the same build outside the sandbox passes.
 
 ## Current state
 
-- Worktree was clean before saving this memory, except this new `memory.md` file.
-- `context/progress-tracker.md` records Phase 4 Step 10 completion and Phase 4 completion.
+- Progress tracker says Phase 5 Step 4 is complete and Phase 5 Step 5 is next.
 - Verification passed:
+  - `npm run typecheck -w @launchkit/templates`
+  - `npm test -w @launchkit/templates` with 20 tests
+  - `npm run typecheck -w @launchkit/generator`
+  - `npm test -w @launchkit/generator` with 92 tests
+  - `npm test -w @launchkit/schema` with 72 tests
   - `npm run typecheck`
-  - `npm run test` with generator 87 tests and schema 72 tests
+  - `npm run test`
   - `npm run lint`
   - `npm run build` after elevated rerun outside the sandbox
-  - Direct Node smoke import of `packages/generator/dist/index.js`
-- The built generator smoke check generated placeholder files: `package.json`, `.env.example`, and `README.md`.
-- No Phase 5 templates, output adapters, website UI, or CLI features have been added.
+- Current `git status --short` showed only untracked `.agents/prompts/phase-05/step-5.md` before saving this memory.
+- No PostgreSQL, Prisma, Auth.js, Docker, website UI, CLI functionality, zip adapters, filesystem adapters, or filesystem template loading has been added.
 
 ## Next session starts with
 
-- Start Phase 5 Step 1 when prompted.
-- Read `context/progress-tracker.md` and the relevant Phase 5 prompt before editing.
-- Keep Phase 5 work scoped to template implementation unless the prompt explicitly expands scope.
+- Read `context/progress-tracker.md`.
+- Implement `.agents/prompts/phase-05/step-5.md`: Create PostgreSQL template.
+- Keep the work scoped to PostgreSQL template files and metadata unless the prompt explicitly expands scope.
 
 ## Open questions
 

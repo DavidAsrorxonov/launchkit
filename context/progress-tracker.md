@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 5 Step 4 complete
-Primary focus: shadcn/ui feature template and metadata are ready for PostgreSQL template work
+Current phase: Phase 5 Step 5 complete
+Primary focus: PostgreSQL template contributions are ready for Prisma template work
 ```
 
 ## Phase Progress
@@ -19,7 +19,7 @@ Primary focus: shadcn/ui feature template and metadata are ready for PostgreSQL 
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
-| Phase 5 | Template Implementation               | In Progress | Step 4 created and verified shadcn/ui feature files, dependency metadata, CSS tokens, and selected-feature template loading behavior. |
+| Phase 5 | Template Implementation               | In Progress | Step 5 created and verified PostgreSQL env and README contributions without adding Prisma, Auth.js, or Docker files. |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
@@ -30,6 +30,142 @@ Primary focus: shadcn/ui feature template and metadata are ready for PostgreSQL 
 Add entries in reverse chronological order.
 
 ### 2026-07-01
+
+Phase 5 Step 5 changes:
+
+- Completed Phase 5 Step 5: Create PostgreSQL Template.
+- Created `packages/templates/features/postgres/` as the optional PostgreSQL feature template directory.
+- Added `packages/templates/features/postgres/.env.example` with the PostgreSQL `DATABASE_URL` example using the supported `{{packageName}}` placeholder.
+- Added `packages/templates/features/postgres/README.md` with concise PostgreSQL setup guidance.
+- Added the minimal `postgresTemplateId` export from `@launchkit/templates`.
+- Updated the generator PostgreSQL feature definition to contribute `DATABASE_URL`.
+- Updated generator env planning so feature env values support the same `{{projectName}}` and `{{packageName}}` placeholders used by templates.
+- Updated the generator PostgreSQL feature definition to contribute README notes explaining the database expectation, `DATABASE_URL`, development default connection string, and the separation of Docker Compose and Prisma support.
+- Confirmed no PostgreSQL client dependency is added because this step does not add code that imports one.
+- Confirmed Prisma, Auth.js, Docker Compose, website UI, CLI functionality, zip adapters, filesystem adapters, and filesystem template loading were not added.
+
+Files changed:
+
+- `packages/templates/features/postgres/.env.example`
+- `packages/templates/features/postgres/README.md`
+- `packages/templates/src/index.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `packages/generator/src/features/definitions.ts`
+- `packages/generator/src/generate-project.ts`
+- `packages/generator/src/__tests__/feature-registry.test.ts`
+- `packages/generator/src/__tests__/generate-project.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-05/step-5.md
+git status --short
+rg --files
+find context -maxdepth 1 -type f -print | sort
+sed -n '1,260p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/architecture.md
+sed -n '261,620p' context/build-plan.md
+sed -n '261,620p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '621,980p' context/build-plan.md
+sed -n '621,980p' context/project-overview.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '1,220p' packages/generator/src/features/definitions.ts
+sed -n '1,260p' packages/generator/src/generation-plan.ts
+sed -n '1,360p' packages/generator/src/generate-project.ts
+sed -n '1,260p' packages/generator/src/env.ts
+sed -n '1,260p' packages/templates/src/index.ts
+sed -n '1,360p' packages/generator/src/__tests__/feature-registry.test.ts
+sed -n '1,360p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,360p' packages/templates/src/__tests__/index.test.ts
+sed -n '1,260p' packages/generator/src/__tests__/phase-4-coverage.test.ts
+sed -n '1,220p' packages/generator/src/features/registry.ts
+sed -n '1,240p' packages/generator/src/template-loader.ts
+find packages/templates/features -maxdepth 4 -type f -print | sort
+sed -n '1,240p' packages/schema/src/compatibility.ts
+sed -n '1,280p' packages/generator/src/file-tree.ts
+sed -n '1,240p' packages/generator/src/__tests__/env.test.ts
+sed -n '1,260p' packages/generator/src/__tests__/generation-plan.test.ts
+sed -n '1,280p' packages/schema/src/__tests__/compatibility.test.ts
+npm run typecheck -w @launchkit/templates
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/generator
+npm test -w @launchkit/generator
+npm test -w @launchkit/schema
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff --stat
+find packages/templates/features/postgres -maxdepth 3 -type f -print | sort
+git diff -- packages/generator/src/features/definitions.ts packages/generator/src/generate-project.ts packages/generator/src/__tests__/feature-registry.test.ts packages/generator/src/__tests__/generate-project.test.ts packages/templates/src/index.ts packages/templates/src/__tests__/index.test.ts
+```
+
+Verification:
+
+- [x] PostgreSQL feature template directory exists.
+- [x] PostgreSQL `.env.example` exists.
+- [x] PostgreSQL `.env.example` includes `DATABASE_URL`.
+- [x] PostgreSQL `.env.example` uses the supported `{{packageName}}` placeholder.
+- [x] PostgreSQL README guidance exists.
+- [x] PostgreSQL README guidance explains the project expects PostgreSQL.
+- [x] PostgreSQL README guidance explains `DATABASE_URL` must be configured.
+- [x] PostgreSQL README guidance says the local connection string is only a development default.
+- [x] PostgreSQL README guidance keeps Docker Compose support in the Docker PostgreSQL feature.
+- [x] PostgreSQL README guidance keeps Prisma setup in the Prisma feature.
+- [x] PostgreSQL feature is enabled when `database: "postgres"` is selected.
+- [x] PostgreSQL feature is not enabled when `database: "none"` is selected.
+- [x] Generated project output includes `DATABASE_URL` when PostgreSQL is selected.
+- [x] Generated project output does not include `DATABASE_URL` when PostgreSQL is not selected.
+- [x] Generated PostgreSQL `DATABASE_URL` resolves `{{packageName}}` to the generated package name.
+- [x] PostgreSQL feature does not add package dependencies.
+- [x] Prisma files were not added.
+- [x] Auth.js files were not added.
+- [x] Docker Compose files were not added.
+- [x] No `src/` folder was introduced.
+- [x] Templates package typecheck passed.
+- [x] Templates package tests passed.
+- [x] Generator package typecheck passed.
+- [x] Generator package tests passed.
+- [x] Schema package tests passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+
+Verification result:
+
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test -w @launchkit/templates` passed: templates package Vitest suite ran 27 tests.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm test -w @launchkit/generator` passed: generator package Vitest suite ran 97 tests.
+- `npm test -w @launchkit/schema` passed: schema package Vitest suite ran 72 tests.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 97 tests, schema package ran 72 tests, and templates package ran 27 tests.
+- `npm run lint` passed.
+- `find packages/templates/features/postgres -maxdepth 3 -type f -print | sort` confirmed only `.env.example` and `README.md` were added under the PostgreSQL feature template.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+
+Notes:
+
+- PostgreSQL README guidance is generated from feature notes to avoid copying duplicate `README.md` files into generated projects.
+- PostgreSQL env output is generated through the existing env merge utility and now applies supported template placeholders before rendering `.env.example`.
+- No direct PostgreSQL client dependency was added because this step does not add generated code that imports one.
+- Existing modified `memory.md` and untracked `.agents/prompts/phase-05/step-5.md` were left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Phase 5 Step 6: Create Prisma template.
 
 Phase 5 Step 4 changes:
 
