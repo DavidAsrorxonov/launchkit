@@ -100,7 +100,8 @@ describe("Phase 4 generator coverage", () => {
       },
       scripts: {
         "db:generate": "prisma generate",
-        "db:migrate": "prisma migrate dev",
+        "db:push": "prisma db push",
+        "db:studio": "prisma studio",
       },
     });
     expect(envExample).toContain("DATABASE_URL=");

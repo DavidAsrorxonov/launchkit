@@ -146,9 +146,32 @@ describe("generation pipeline", () => {
       },
       scripts: {
         "db:generate": "prisma generate",
-        "db:migrate": "prisma migrate dev",
+        "db:push": "prisma db push",
+        "db:studio": "prisma studio",
       },
     });
+    expect(readJsonFile(project, "package.json")).not.toHaveProperty(["scripts", "db:migrate"]);
+  });
+
+  it("includes Prisma README guidance only when Prisma is selected", async () => {
+    const postgresProject = await generateProject({
+      ...defaultLaunchKitConfig,
+      database: "postgres",
+      orm: "none",
+    });
+    const prismaProject = await generateProject({
+      ...defaultLaunchKitConfig,
+      database: "postgres",
+      orm: "prisma",
+    });
+    const postgresReadme = readTextFile(postgresProject, "README.md");
+    const prismaReadme = readTextFile(prismaProject, "README.md");
+
+    expect(postgresReadme).not.toContain("Prisma uses the PostgreSQL `DATABASE_URL`");
+    expect(prismaReadme).toContain("Prisma uses the PostgreSQL `DATABASE_URL`");
+    expect(prismaReadme).toContain("npm run db:generate");
+    expect(prismaReadme).toContain("npm run db:push");
+    expect(prismaReadme).toContain("npm run db:studio");
   });
 
   it("creates a generation plan with resolved features and merged contributions", () => {
@@ -180,6 +203,14 @@ describe("generation pipeline", () => {
       {
         sourcePath: "features/tailwind/postcss.config.mjs",
         targetPath: "postcss.config.mjs",
+      },
+      {
+        sourcePath: "features/prisma/prisma/schema.prisma",
+        targetPath: "prisma/schema.prisma",
+      },
+      {
+        sourcePath: "features/prisma/lib/db.ts",
+        targetPath: "lib/db.ts",
       },
     ]);
     expect(plan.env.map((envVar) => envVar.name)).toEqual(["DATABASE_URL", "AUTH_SECRET"]);
@@ -258,6 +289,20 @@ describe("generation pipeline", () => {
           contents: "shadcn",
         },
       ],
+      "features/prisma/prisma/schema.prisma": [
+        {
+          sourcePath: "features/prisma/prisma/schema.prisma",
+          targetPath: "prisma/schema.prisma",
+          contents: 'datasource db { provider = "postgresql" }',
+        },
+      ],
+      "features/prisma/lib/db.ts": [
+        {
+          sourcePath: "features/prisma/lib/db.ts",
+          targetPath: "lib/db.ts",
+          contents: 'import { PrismaClient } from "@prisma/client";',
+        },
+      ],
     });
 
     const defaultProject = await generateProject(defaultLaunchKitConfig, {
@@ -272,15 +317,80 @@ describe("generation pipeline", () => {
         templateLoader: loader,
       },
     );
+    const prismaProject = await generateProject(
+      {
+        ...defaultLaunchKitConfig,
+        database: "postgres",
+        orm: "prisma",
+      },
+      {
+        templateLoader: loader,
+      },
+    );
 
     expect(defaultProject.files.map((file) => file.path)).not.toContain("components.json");
     expect(defaultProject.files.map((file) => file.path)).not.toContain("lib/utils.ts");
     expect(defaultProject.files.map((file) => file.path)).not.toContain(
       "components/ui/button.tsx",
     );
+    expect(defaultProject.files.map((file) => file.path)).not.toContain("prisma/schema.prisma");
+    expect(defaultProject.files.map((file) => file.path)).not.toContain("lib/db.ts");
     expect(shadcnProject.files.map((file) => file.path)).toEqual(
       expect.arrayContaining(["components.json", "lib/utils.ts", "components/ui/button.tsx"]),
     );
+    expect(prismaProject.files.map((file) => file.path)).toEqual(
+      expect.arrayContaining(["prisma/schema.prisma", "lib/db.ts"]),
+    );
+    expect(readTextFile(prismaProject, "prisma/schema.prisma")).toContain("postgresql");
+    expect(readTextFile(prismaProject, "lib/db.ts")).toContain("PrismaClient");
+  });
+
+  it("does not add Auth.js, Docker, or source-directory files for Prisma", async () => {
+    const loader = createInMemoryTemplateLoader({
+      "features/tailwind/app/globals.css": [
+        {
+          sourcePath: "features/tailwind/app/globals.css",
+          targetPath: "app/globals.css",
+          contents: "tailwind",
+        },
+      ],
+      "features/tailwind/postcss.config.mjs": [
+        {
+          sourcePath: "features/tailwind/postcss.config.mjs",
+          targetPath: "postcss.config.mjs",
+          contents: "postcss",
+        },
+      ],
+      "features/prisma/prisma/schema.prisma": [
+        {
+          sourcePath: "features/prisma/prisma/schema.prisma",
+          targetPath: "prisma/schema.prisma",
+          contents: "schema",
+        },
+      ],
+      "features/prisma/lib/db.ts": [
+        {
+          sourcePath: "features/prisma/lib/db.ts",
+          targetPath: "lib/db.ts",
+          contents: "db",
+        },
+      ],
+    });
+    const project = await generateProject(
+      {
+        ...defaultLaunchKitConfig,
+        database: "postgres",
+        orm: "prisma",
+      },
+      { templateLoader: loader },
+    );
+    const paths = project.files.map((file) => file.path);
+
+    expect(paths).toEqual(expect.arrayContaining(["prisma/schema.prisma", "lib/db.ts"]));
+    expect(paths).not.toContain("app/api/auth/[...nextauth]/route.ts");
+    expect(paths).not.toContain("auth.ts");
+    expect(paths).not.toContain("docker-compose.yml");
+    expect(paths.some((path) => path.startsWith("src/"))).toBe(false);
   });
 
   it("can include files loaded through the template loader interface", async () => {

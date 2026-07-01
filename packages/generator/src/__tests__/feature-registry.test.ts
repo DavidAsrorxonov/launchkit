@@ -144,6 +144,12 @@ describe("feature registry", () => {
     ).toContain("prisma");
   });
 
+  it("does not enable Prisma when no ORM is selected", () => {
+    expect(
+      getEnabledFeatures({ ...defaultLaunchKitConfig, orm: "none" }).map((feature) => feature.id),
+    ).not.toContain("prisma");
+  });
+
   it("enables Auth.js credentials when selected", () => {
     expect(
       getEnabledFeatures({ ...defaultLaunchKitConfig, auth: "authjs-credentials" }).map(
@@ -161,17 +167,37 @@ describe("feature registry", () => {
   });
 
   it("describes the required Prisma package contributions", () => {
-    expect(getFeatureDefinition("prisma").packageJson).toEqual({
-      dependencies: {
-        "@prisma/client": "latest",
+    expect(getFeatureDefinition("prisma")).toMatchObject({
+      requires: ["postgres"],
+      packageJson: {
+        dependencies: {
+          "@prisma/client": "latest",
+        },
+        devDependencies: {
+          prisma: "latest",
+        },
+        scripts: {
+          "db:generate": "prisma generate",
+          "db:push": "prisma db push",
+          "db:studio": "prisma studio",
+        },
       },
-      devDependencies: {
-        prisma: "latest",
-      },
-      scripts: {
-        "db:generate": "prisma generate",
-        "db:migrate": "prisma migrate dev",
-      },
+      templateFiles: [
+        {
+          sourcePath: "features/prisma/prisma/schema.prisma",
+          targetPath: "prisma/schema.prisma",
+        },
+        {
+          sourcePath: "features/prisma/lib/db.ts",
+          targetPath: "lib/db.ts",
+        },
+      ],
+      notes: expect.arrayContaining([
+        "Prisma uses the PostgreSQL `DATABASE_URL` from `.env.example`.",
+        "Run `npm run db:generate` after installing dependencies to generate the Prisma client.",
+        "Run `npm run db:push` to sync the Prisma schema to your development database.",
+        "Run `npm run db:studio` to inspect data with Prisma Studio.",
+      ]),
     });
   });
 });

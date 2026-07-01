@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 5 Step 5 complete
-Primary focus: PostgreSQL template contributions are ready for Prisma template work
+Current phase: Phase 5 Step 6 complete
+Primary focus: Prisma template files and metadata are ready for Auth.js credentials template work
 ```
 
 ## Phase Progress
@@ -19,7 +19,7 @@ Primary focus: PostgreSQL template contributions are ready for Prisma template w
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
-| Phase 5 | Template Implementation               | In Progress | Step 5 created and verified PostgreSQL env and README contributions without adding Prisma, Auth.js, or Docker files. |
+| Phase 5 | Template Implementation               | In Progress | Step 6 created and verified Prisma schema, client helper, scripts, dependencies, template references, and README guidance without adding Auth.js or Docker files. |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
@@ -30,6 +30,143 @@ Primary focus: PostgreSQL template contributions are ready for Prisma template w
 Add entries in reverse chronological order.
 
 ### 2026-07-01
+
+Phase 5 Step 6 changes:
+
+- Completed Phase 5 Step 6: Create Prisma Template.
+- Created `packages/templates/features/prisma/` as the optional Prisma feature template directory.
+- Added `packages/templates/features/prisma/prisma/schema.prisma` with a PostgreSQL datasource using `env("DATABASE_URL")`, a Prisma client generator, and a generic `User` model.
+- Added `packages/templates/features/prisma/lib/db.ts` with a development-safe Prisma client singleton.
+- Added `packages/templates/features/prisma/README.md` with concise Prisma setup guidance.
+- Added the minimal `prismaTemplateId` export from `@launchkit/templates`.
+- Updated the generator Prisma feature definition to contribute `@prisma/client`, `prisma`, and the requested scripts: `db:generate`, `db:push`, and `db:studio`.
+- Updated the generator Prisma feature definition to reference `prisma/schema.prisma` and `lib/db.ts` template files.
+- Updated the generator Prisma feature definition to contribute README notes for `DATABASE_URL`, `npm run db:generate`, `npm run db:push`, and `npm run db:studio`.
+- Verified the existing schema compatibility rule already rejects Prisma without PostgreSQL with `Prisma requires PostgreSQL.`, so no schema changes were needed.
+- Confirmed Auth.js files, `AUTH_SECRET`, Docker Compose files, website UI, CLI functionality, zip adapters, filesystem adapters, and filesystem template loading were not added.
+
+Files changed:
+
+- `packages/templates/features/prisma/prisma/schema.prisma`
+- `packages/templates/features/prisma/lib/db.ts`
+- `packages/templates/features/prisma/README.md`
+- `packages/templates/src/index.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `packages/generator/src/features/definitions.ts`
+- `packages/generator/src/__tests__/feature-registry.test.ts`
+- `packages/generator/src/__tests__/generate-project.test.ts`
+- `packages/generator/src/__tests__/phase-4-coverage.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-05/step-6.md
+git status --short
+rg --files
+sed -n '261,520p' .agents/prompts/phase-05/step-6.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,320p' context/build-plan.md
+sed -n '1,320p' context/project-overview.md
+sed -n '321,760p' context/architecture.md
+sed -n '321,760p' context/build-plan.md
+sed -n '321,760p' context/project-overview.md
+sed -n '1,380p' context/ui-rules.md
+sed -n '761,1040p' context/build-plan.md
+sed -n '381,760p' context/ui-rules.md
+sed -n '1,260p' packages/generator/src/features/definitions.ts
+sed -n '1,360p' packages/generator/src/generate-project.ts
+sed -n '1,420p' packages/templates/src/__tests__/index.test.ts
+sed -n '1,420p' packages/generator/src/__tests__/feature-registry.test.ts
+sed -n '1,420p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,320p' packages/schema/src/__tests__/compatibility.test.ts
+sed -n '1,280p' packages/generator/src/__tests__/phase-4-coverage.test.ts
+sed -n '1,240p' packages/templates/src/index.ts
+find packages/templates/features -maxdepth 4 -type f -print | sort
+sed -n '1,240p' packages/generator/src/template-loader.ts
+npm run typecheck -w @launchkit/templates
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/generator
+npm test -w @launchkit/generator
+npm test -w @launchkit/schema
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff --stat
+find packages/templates/features/prisma -maxdepth 4 -type f -print | sort
+git diff -- packages/generator/src/features/definitions.ts packages/generator/src/__tests__/feature-registry.test.ts packages/generator/src/__tests__/generate-project.test.ts packages/generator/src/__tests__/phase-4-coverage.test.ts packages/templates/src/index.ts packages/templates/src/__tests__/index.test.ts
+git diff --check
+```
+
+Verification:
+
+- [x] Prisma feature template directory exists.
+- [x] `prisma/schema.prisma` exists.
+- [x] `prisma/schema.prisma` uses PostgreSQL and `env("DATABASE_URL")`.
+- [x] `prisma/schema.prisma` includes a Prisma client generator.
+- [x] `prisma/schema.prisma` includes a generic `User` starter model without Auth.js-specific models.
+- [x] `lib/db.ts` exists.
+- [x] `lib/db.ts` exports a Prisma client using a development-safe singleton pattern.
+- [x] Prisma README guidance exists.
+- [x] Prisma feature is enabled when `orm: "prisma"` is selected.
+- [x] Prisma feature is not enabled when `orm: "none"` is selected.
+- [x] Prisma dependencies are contributed.
+- [x] Prisma scripts `db:generate`, `db:push`, and `db:studio` are contributed.
+- [x] The old `db:migrate` Prisma script is not contributed by this step.
+- [x] Prisma template file references are included in the generation plan.
+- [x] Generated project output with a provided template loader includes `prisma/schema.prisma` when Prisma is selected.
+- [x] Generated project output with a provided template loader includes `lib/db.ts` when Prisma is selected.
+- [x] Generated project output with a provided template loader does not include Prisma files when Prisma is not selected.
+- [x] Generated README includes Prisma guidance when Prisma is selected.
+- [x] Generated README does not include Prisma guidance when Prisma is not selected.
+- [x] Prisma without PostgreSQL is rejected by existing compatibility validation with `Prisma requires PostgreSQL.`.
+- [x] Auth.js files were not added.
+- [x] `AUTH_SECRET` was not added by Prisma.
+- [x] Docker Compose files were not added.
+- [x] No `src/` folder was introduced.
+- [x] Templates package typecheck passed.
+- [x] Templates package tests passed.
+- [x] Generator package typecheck passed.
+- [x] Generator package tests passed.
+- [x] Schema package tests passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test -w @launchkit/templates` passed: templates package Vitest suite ran 35 tests.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm test -w @launchkit/generator` passed: generator package Vitest suite ran 100 tests.
+- `npm test -w @launchkit/schema` passed: schema package Vitest suite ran 72 tests.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 100 tests, schema package ran 72 tests, and templates package ran 35 tests.
+- `npm run lint` passed.
+- `find packages/templates/features/prisma -maxdepth 4 -type f -print | sort` confirmed only `README.md`, `lib/db.ts`, and `prisma/schema.prisma` were added under the Prisma feature template.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes:
+
+- Prisma root README guidance is generated from feature notes to avoid copying duplicate `README.md` files into generated projects.
+- Prisma feature files are wired through the existing selected-feature `templateFiles` mechanism and verified with the existing `TemplateLoader` path.
+- The existing schema compatibility tests already cover `database: "none"` with `orm: "prisma"`, so schema compatibility was not changed.
+- Existing untracked `.agents/prompts/phase-05/step-6.md` was left untouched.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Phase 5 Step 7: Create Auth.js credentials template.
 
 Phase 5 Step 5 changes:
 

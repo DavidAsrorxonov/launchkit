@@ -121,9 +121,26 @@ export const prismaFeature: FeatureDefinition = {
     },
     scripts: {
       "db:generate": "prisma generate",
-      "db:migrate": "prisma migrate dev",
+      "db:push": "prisma db push",
+      "db:studio": "prisma studio",
     },
   },
+  templateFiles: [
+    {
+      sourcePath: "features/prisma/prisma/schema.prisma",
+      targetPath: "prisma/schema.prisma",
+    },
+    {
+      sourcePath: "features/prisma/lib/db.ts",
+      targetPath: "lib/db.ts",
+    },
+  ],
+  notes: [
+    "Prisma uses the PostgreSQL `DATABASE_URL` from `.env.example`.",
+    "Run `npm run db:generate` after installing dependencies to generate the Prisma client.",
+    "Run `npm run db:push` to sync the Prisma schema to your development database.",
+    "Run `npm run db:studio` to inspect data with Prisma Studio.",
+  ],
   isEnabled: (config) => config.orm === "prisma",
 };
 

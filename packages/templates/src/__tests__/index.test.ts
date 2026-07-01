@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import {
   baseNextTemplateId,
   postgresTemplateId,
+  prismaTemplateId,
   shadcnTemplateId,
   tailwindTemplateId,
   templatesPackageReady,
@@ -18,6 +19,7 @@ const templatesRoot = join(
 );
 const baseNextTemplateRoot = join(templatesRoot, "base", "next");
 const postgresTemplateRoot = join(templatesRoot, "features", "postgres");
+const prismaTemplateRoot = join(templatesRoot, "features", "prisma");
 const shadcnTemplateRoot = join(templatesRoot, "features", "shadcn");
 const tailwindTemplateRoot = join(templatesRoot, "features", "tailwind");
 
@@ -45,6 +47,12 @@ const requiredPostgresTemplateFiles = [
   "README.md",
 ];
 
+const requiredPrismaTemplateFiles = [
+  "prisma/schema.prisma",
+  "lib/db.ts",
+  "README.md",
+];
+
 const requiredShadcnTemplateFiles = [
   "components.json",
   "components/ui/button.tsx",
@@ -67,6 +75,10 @@ describe("@launchkit/templates package foundation", () => {
 
   it("exports the PostgreSQL template id", () => {
     expect(postgresTemplateId).toBe("postgres");
+  });
+
+  it("exports the Prisma template id", () => {
+    expect(prismaTemplateId).toBe("prisma");
   });
 
   it("exports the shadcn/ui template id", () => {
@@ -264,6 +276,85 @@ describe("PostgreSQL feature template", () => {
         if (!["{{projectName}}", "{{packageName}}"].includes(placeholder[0])) {
           unsupportedPlaceholders.add(
             `${relative(postgresTemplateRoot, filePath)}: ${placeholder[0]}`,
+          );
+        }
+      }
+    }
+
+    expect([...unsupportedPlaceholders]).toEqual([]);
+  });
+});
+
+describe("Prisma feature template", () => {
+  it("includes the required Prisma files", async () => {
+    await expect(
+      Promise.all(
+        requiredPrismaTemplateFiles.map(async (filePath) => {
+          await readFile(join(prismaTemplateRoot, filePath));
+        }),
+      ),
+    ).resolves.toHaveLength(requiredPrismaTemplateFiles.length);
+  });
+
+  it("configures Prisma for PostgreSQL through DATABASE_URL", async () => {
+    const schema = await readFile(join(prismaTemplateRoot, "prisma/schema.prisma"), "utf8");
+
+    expect(schema).toContain('provider = "postgresql"');
+    expect(schema).toContain('url      = env("DATABASE_URL")');
+    expect(schema).toContain('provider = "prisma-client-js"');
+    expect(schema).toContain("model User");
+    expect(schema).not.toContain("Account");
+    expect(schema).not.toContain("Session");
+  });
+
+  it("includes a development-safe Prisma client helper", async () => {
+    const db = await readFile(join(prismaTemplateRoot, "lib/db.ts"), "utf8");
+
+    expect(db).toContain('import { PrismaClient } from "@prisma/client";');
+    expect(db).toContain("const globalForPrisma = globalThis as unknown as");
+    expect(db).toContain("export const db = globalForPrisma.prisma ?? new PrismaClient();");
+    expect(db).toContain('process.env.NODE_ENV !== "production"');
+    expect(db).toContain("globalForPrisma.prisma = db;");
+  });
+
+  it("includes concise Prisma README guidance", async () => {
+    const readme = await readFile(join(prismaTemplateRoot, "README.md"), "utf8");
+
+    expect(readme).toContain("uses Prisma with PostgreSQL");
+    expect(readme).toContain("npm run db:generate");
+    expect(readme).toContain("npm run db:push");
+    expect(readme).toContain("npm run db:studio");
+    expect(readme).toContain("Docker Compose and Auth.js setup are optional separate features.");
+  });
+
+  it("does not add Auth.js, Docker, or source-directory files", async () => {
+    const templateFiles = (await listTemplateFiles(prismaTemplateRoot)).map((filePath) =>
+      relative(prismaTemplateRoot, filePath),
+    );
+
+    expect([...templateFiles].sort()).toEqual([...requiredPrismaTemplateFiles].sort());
+    expect(templateFiles).not.toContain("app/api/auth/[...nextauth]/route.ts");
+    expect(templateFiles).not.toContain("auth.ts");
+    expect(templateFiles).not.toContain("docker-compose.yml");
+  });
+
+  it("does not include a src directory", async () => {
+    const entries = await readdir(prismaTemplateRoot, { withFileTypes: true });
+
+    expect(entries.some((entry) => entry.isDirectory() && entry.name === "src")).toBe(false);
+  });
+
+  it("uses only supported template placeholders", async () => {
+    const templateFiles = await listTemplateFiles(prismaTemplateRoot);
+    const unsupportedPlaceholders = new Set<string>();
+
+    for (const filePath of templateFiles) {
+      const contents = await readFile(filePath, "utf8");
+
+      for (const placeholder of contents.matchAll(/{{[^}]+}}/g)) {
+        if (!["{{projectName}}", "{{packageName}}"].includes(placeholder[0])) {
+          unsupportedPlaceholders.add(
+            `${relative(prismaTemplateRoot, filePath)}: ${placeholder[0]}`,
           );
         }
       }
