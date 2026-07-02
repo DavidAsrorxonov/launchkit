@@ -4,8 +4,10 @@ import { useMemo, useState } from "react";
 
 import { AuthStep } from "@/components/builder/steps/auth-step";
 import { DatabaseStep } from "@/components/builder/steps/database-step";
+import { ExtrasStep } from "@/components/builder/steps/extras-step";
 import { FrameworkStep } from "@/components/builder/steps/framework-step";
 import { OrmStep } from "@/components/builder/steps/orm-step";
+import { PreviewStep } from "@/components/builder/steps/preview-step";
 import { ProjectStep } from "@/components/builder/steps/project-step";
 import { StylingUiStep } from "@/components/builder/steps/styling-ui-step";
 import {
@@ -17,8 +19,10 @@ import { builderSteps } from "@/lib/builder/steps";
 import {
   validateAuthStep,
   validateDatabaseStep,
+  validateExtrasStep,
   validateFrameworkStep,
   validateOrmStep,
+  validatePreviewStep,
   validateProjectStep,
   validateStylingUiStep,
 } from "@/lib/builder/validation";
@@ -39,19 +43,25 @@ export function BuilderShell() {
   const databaseStepValidation = validateDatabaseStep(builderState.config);
   const ormStepValidation = validateOrmStep(builderState.config);
   const authStepValidation = validateAuthStep(builderState.config);
+  const extrasStepValidation = validateExtrasStep(builderState.config);
+  const previewStepValidation = validatePreviewStep(builderState.config);
   const isProjectStep = currentStep.id === "project";
   const isFrameworkStep = currentStep.id === "framework";
   const isStylingUiStep = currentStep.id === "styling-ui";
   const isDatabaseStep = currentStep.id === "database";
   const isOrmStep = currentStep.id === "orm";
   const isAuthStep = currentStep.id === "auth";
+  const isExtrasStep = currentStep.id === "extras";
+  const isPreviewStep = currentStep.id === "preview";
   const isNextDisabled =
     (isProjectStep && !projectStepValidation.isValid) ||
     (isFrameworkStep && !frameworkStepValidation.isValid) ||
     (isStylingUiStep && !stylingUiStepValidation.isValid) ||
     (isDatabaseStep && !databaseStepValidation.isValid) ||
     (isOrmStep && !ormStepValidation.isValid) ||
-    (isAuthStep && !authStepValidation.isValid);
+    (isAuthStep && !authStepValidation.isValid) ||
+    (isExtrasStep && !extrasStepValidation.isValid) ||
+    (isPreviewStep && !previewStepValidation.isValid);
 
   const selectedStack = useMemo(
     () => [
@@ -152,6 +162,19 @@ export function BuilderShell() {
                     config={builderState.config}
                     validation={authStepValidation}
                     onConfigChange={updateConfig}
+                  />
+                ) : null}
+                {isExtrasStep ? (
+                  <ExtrasStep
+                    config={builderState.config}
+                    validation={extrasStepValidation}
+                    onConfigChange={updateConfig}
+                  />
+                ) : null}
+                {isPreviewStep ? (
+                  <PreviewStep
+                    config={builderState.config}
+                    validation={previewStepValidation}
                   />
                 ) : null}
               </WizardStepPanel>

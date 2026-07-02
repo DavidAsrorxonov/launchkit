@@ -39,6 +39,16 @@ export type AuthStepValidation = {
   errors: Partial<Record<keyof LaunchKitConfig, string>>;
 };
 
+export type ExtrasStepValidation = {
+  isValid: boolean;
+  errors: Pick<ValidationErrors, "docker" | "database">;
+};
+
+export type PreviewStepValidation = {
+  isValid: boolean;
+  errors: ValidationErrors;
+};
+
 export function validateBuilderConfig(config: LaunchKitConfig): {
   isValid: boolean;
   errors: ValidationErrors;
@@ -161,5 +171,26 @@ export function validateOrmStep(config: LaunchKitConfig): OrmStepValidation {
 }
 
 export function validateAuthStep(config: LaunchKitConfig): AuthStepValidation {
+  return validateBuilderConfig(config);
+}
+
+export function validateExtrasStep(
+  config: LaunchKitConfig,
+): ExtrasStepValidation {
+  const validation = validateBuilderConfig(config);
+  const errors = {
+    docker: validation.errors.docker,
+    database: validation.errors.database,
+  };
+
+  return {
+    isValid: !errors.docker && !errors.database,
+    errors,
+  };
+}
+
+export function validatePreviewStep(
+  config: LaunchKitConfig,
+): PreviewStepValidation {
   return validateBuilderConfig(config);
 }

@@ -57,13 +57,13 @@ export const builderSteps = [
     id: "extras",
     label: "Extras",
     shortLabel: "Extras",
-    placeholder: "Extras step coming next.",
+    placeholder: "Choose optional extras.",
   },
   {
     id: "preview",
     label: "Preview",
     shortLabel: "Preview",
-    placeholder: "Preview step coming later.",
+    placeholder: "Inspect generated project details.",
   },
   {
     id: "download",

@@ -1,55 +1,58 @@
-# Memory - LaunchKit Phase 6 Website MVP
+# Memory - LaunchKit Phase 6 Website Wizard
 
-Last updated: 2026-07-02 22:42 JST
+Last updated: 2026-07-02 23:27 JST
 
 ## What was built
 
-- Completed Phase 6 Step 4: Styling and UI step.
-  - Added `apps/web/components/builder/steps/styling-ui-step.tsx`.
-  - Wired it into `apps/web/components/builder/builder-shell.tsx`.
-  - Extended `apps/web/lib/builder/validation.ts` to use schema compatibility checks.
-  - The step shows fixed Tailwind CSS and lets users choose `ui: "none"` or `ui: "shadcn"` from schema metadata.
-- Completed Phase 6 Step 5: Database step.
-  - Added `apps/web/components/builder/steps/database-step.tsx`.
-  - Wired it into `apps/web/components/builder/builder-shell.tsx`.
-  - Extended `apps/web/lib/builder/validation.ts` with database-step validation.
-  - The step lets users choose `database: "none"` or `database: "postgres"` from schema metadata.
-  - Switching database to `none` resets `orm: "prisma"` to `none` and `docker: "postgres"` to `none`, while leaving auth unchanged.
-- Updated `context/progress-tracker.md` after each completed step.
+Phase 6 Website MVP wizard is complete through Step 8, Extras.
+
+Completed recent steps:
+
+- Step 6 ORM: added `apps/web/components/builder/steps/orm-step.tsx`, wired `orm: "none" | "prisma"` into `builder-shell.tsx`, and added ORM validation in `apps/web/lib/builder/validation.ts`.
+- Step 7 Auth: added `apps/web/components/builder/steps/auth-step.tsx`, wired `auth: "none" | "authjs-credentials"` into `builder-shell.tsx`, and added Auth-step validation.
+- Step 8 Extras: added `apps/web/components/builder/steps/extras-step.tsx`, wired `docker: "none" | "postgres"` into `builder-shell.tsx`, added Extras-step validation, and updated `apps/web/lib/builder/steps.ts`.
+- `context/progress-tracker.md` is updated through Phase 6 Step 8 and says the next suggested step is Phase 6 Step 9: Create Preview step.
 
 ## Decisions made
 
-- Keep website wizard steps thin and schema-driven. UI uses `@launchkit/schema` metadata and compatibility helpers rather than duplicating option lists or compatibility rules.
-- Keep generator/API/download/CLI work out of current Phase 6 step work until the relevant later prompts.
-- Do not add a frontend component test stack yet because `apps/web` has no existing frontend/component test pattern.
-- Do not start or leave a dev server running; the developer will run it locally.
+- Website wizard steps use shared `@launchkit/schema` metadata and compatibility validation rather than duplicating compatibility rules in UI code.
+- UI may use local affordances to disable invalid options, such as Prisma or PostgreSQL Docker Compose requiring PostgreSQL.
+- Auth.js credentials is presented as a scaffold only and does not force database or ORM selections.
+- Database selection still owns narrow dependent resets: selecting no database resets Prisma ORM and PostgreSQL Docker Compose to none.
+- No generator logic, API route, zip creation, download flow, preview generation, or CLI functionality has been added to `apps/web` during these wizard option steps.
 
 ## Problems solved
 
-- The builder validation now maps schema compatibility issues to every field in each issue path. This lets a database-related compatibility issue be shown on the Database step even if the schema issue also involves ORM or Docker.
-- Repeated Next/Turbopack builds fail inside the sandbox because the worker process cannot bind a port. Elevated `npm run build -w apps/web` and elevated workspace `npm run build` pass.
+- Turbopack builds consistently fail inside the sandbox because worker process or port binding is not permitted. The same `npm run build -w apps/web` and root `npm run build` pass when rerun with elevated permissions.
+- `authMetadata` currently has no `recommended` property, so the Auth step guards optional recommended badge rendering instead of assuming the field exists.
+- Extras and ORM steps show the valid effective selection as `none` when PostgreSQL is unavailable, while still preventing invalid state updates.
 
 ## Current state
 
-- Phase 6 is in progress.
-- Phase 6 Step 5 is complete.
-- The tracker says the next step is Phase 6 Step 6: Create ORM step.
-- Latest verified commands passed:
+- Current tracker status: Phase 6 in progress; Extras step complete; Preview step next.
+- Modified/untracked working tree from the latest step includes:
+  - `apps/web/components/builder/steps/extras-step.tsx`
+  - `apps/web/components/builder/builder-shell.tsx`
+  - `apps/web/lib/builder/steps.ts`
+  - `apps/web/lib/builder/validation.ts`
+  - `context/progress-tracker.md`
+  - `.agents/prompts/phase-06/step-8.md` is untracked context input.
+- Verification for Step 8 passed:
   - `npm run typecheck -w apps/web`
   - `npm run lint -w apps/web`
-  - `npm run build -w apps/web` after elevated rerun
+  - `npm run build -w apps/web` outside sandbox
   - `npm run typecheck`
   - `npm run test`
   - `npm run lint`
-  - `npm run build` after elevated rerun
+  - `npm run build` outside sandbox
   - `git diff --check`
-- Current working tree note: `.agents/prompts/phase-06/step-6.md` is untracked and likely the next prompt to implement.
-- No local dev server is running.
+- No frontend component test setup exists in `apps/web`, so no new component test stack was added.
 
 ## Next session starts with
 
-Read `context/progress-tracker.md`, then implement `.agents/prompts/phase-06/step-6.md` for the ORM step. Stay inside the prompt scope: do not implement auth, extras, preview, download, API route, generator integration, or CLI work unless the prompt explicitly asks for it.
+Implement Phase 6 Step 9: Create Preview step. Start by reading `context/progress-tracker.md` and the Step 9 prompt in `.agents/prompts/phase-06/` if present. Keep the same boundaries: no API generate route, zip download behavior, or CLI unless the Step 9 prompt explicitly says otherwise.
 
 ## Open questions
 
-- No new open questions from this session.
+- The Preview step implementation details are not yet loaded. Need inspect the Step 9 prompt to determine whether preview is schema/metadata-derived only or whether it should use any existing generator preview helpers.
+- Decide whether to keep using the current manual selectable-row pattern or introduce shared option-row components after the Preview/Download steps, if duplication becomes painful.

@@ -8,7 +8,7 @@ Use this file to track development progress, changes made, decisions, notes, blo
 Project: LaunchKit
 Stage: Foundation setup
 Current phase: Phase 6 in progress
-Primary focus: Phase 6 Auth step is complete; Extras step is next
+Primary focus: Phase 6 Preview step is complete; Generate API route is next
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 Auth step is complete; Extras step is next
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | In Progress | Step 7 added the Auth step with Auth.js credentials scaffold selection; Extras step is next. |
+| Phase 6 | Website MVP                           | In Progress | Step 9 added the Preview step using generator plan data for package, script, env, and feature file details; Generate API route is next. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -30,6 +30,288 @@ Primary focus: Phase 6 Auth step is complete; Extras step is next
 Add entries in reverse chronological order.
 
 ### 2026-07-02
+
+Phase 6 Step 9 completed: Create Preview step
+
+Changes made:
+
+- Added the Preview step UI to the website wizard.
+- Added selected stack summary with metadata labels from `@launchkit/schema`.
+- Added dependency and dev dependency preview sections from `@launchkit/generator` `createGenerationPlan(config)`.
+- Added generated package script preview from generator plan data.
+- Added environment variable preview from generator plan data.
+- Environment variables show names, descriptions, and required state only; no real secret values are displayed.
+- Added generated file tree preview with compact monospace formatting.
+- File tree preview includes selected optional feature files from generator plan data.
+- File tree preview excludes unselected optional feature files.
+- File tree preview includes no `src/` paths.
+- Added Preview-step validation using the existing schema parsing and compatibility helper path.
+- Gated Next navigation on the Preview step when the full config is invalid.
+- Avoided full file content preview.
+- Added `@launchkit/generator` as an explicit `apps/web` dependency for the planning helper import.
+- Kept generator planning logic isolated in `apps/web/lib/builder/preview.ts`; UI components only render preview data.
+- Confirmed no generate/download API route was added.
+- Confirmed no zip download behavior was added.
+- Confirmed no CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/preview/dependency-list.tsx`
+- `apps/web/components/builder/preview/env-var-list.tsx`
+- `apps/web/components/builder/preview/file-tree-preview.tsx`
+- `apps/web/components/builder/preview/script-list.tsx`
+- `apps/web/components/builder/preview/stack-summary.tsx`
+- `apps/web/components/builder/steps/preview-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/preview.ts`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/lib/builder/validation.ts`
+- `apps/web/package.json`
+- `package-lock.json`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-06/step-9.md
+git status --short
+rg --files context | sort
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,260p' context/progress-tracker.md
+sed -n '261,700p' context/progress-tracker.md
+sed -n '1,280p' context/project-overview.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+rg --files apps/web/components/builder apps/web/lib/builder apps/web/app packages/generator/src packages/schema/src
+sed -n '1,420p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/builder/steps.ts
+sed -n '1,320p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' packages/generator/src/index.ts
+sed -n '1,360p' packages/generator/src/generation-plan.ts
+sed -n '1,380p' packages/generator/src/features/registry.ts
+sed -n '1,320p' packages/generator/src/generate-project.ts
+sed -n '1,460p' packages/generator/src/features/definitions.ts
+cat apps/web/package.json
+cat packages/generator/package.json
+sed -n '1,320p' packages/generator/src/template-loader.ts
+sed -n '1,320p' packages/generator/src/file-tree.ts
+sed -n '1,420p' packages/schema/src/metadata.ts
+sed -n '1,320p' packages/schema/src/config.ts
+sed -n '1,220p' apps/web/lib/builder/builder-state.ts
+sed -n '1,260p' apps/web/components/builder/wizard-step-panel.tsx
+sed -n '1,320p' apps/web/components/builder/steps/extras-step.tsx
+sed -n '1,320p' apps/web/components/builder/steps/auth-step.tsx
+sed -n '1,320p' apps/web/components/builder/steps/project-step.tsx
+sed -n '1,220p' apps/web/components/builder/wizard-navigation.tsx
+rg --files packages/templates | sort
+cat packages/templates/package.json
+sed -n '1,260p' packages/templates/src/index.ts
+ls package-lock.json
+sed -n '1,220p' package-lock.json
+find node_modules/@launchkit -maxdepth 1 -type l -o -type d -print
+ls -la node_modules/@launchkit
+rg 'node_modules\/\@launchkit\/(generator|schema|templates|shared)' package-lock.json
+sed -n '/node_modules\/\@launchkit\/generator/,+18p' package-lock.json
+find packages/templates/base/next -maxdepth 2 -type f | sort
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+rg '@launchkit/generator|app/api|createProjectZip|download|node:test|node --test|src/' apps/web
+npm run build
+git status --short
+git diff --stat
+git diff -- apps/web/lib/builder/preview.ts apps/web/components/builder/steps/preview-step.tsx apps/web/components/builder/builder-shell.tsx apps/web/lib/builder/validation.ts apps/web/package.json package-lock.json
+sed -n '1,120p' context/progress-tracker.md
+git diff --check
+git status --short
+git diff --stat
+sed -n '1,220p' context/progress-tracker.md
+lsof -nP -iTCP:3000 -sTCP:LISTEN
+npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3001
+npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3001
+```
+
+Verification:
+
+- [x] Preview step renders in the wizard.
+- [x] Selected stack summary includes project name, framework, language, router, project structure, styling, UI, database, ORM, auth, Docker, and package manager.
+- [x] Stack summary uses schema metadata labels when metadata exists.
+- [x] Dependencies come from `@launchkit/generator` plan data.
+- [x] Dev dependencies come from `@launchkit/generator` plan data.
+- [x] Scripts come from `@launchkit/generator` plan data.
+- [x] Environment variables come from `@launchkit/generator` plan data.
+- [x] Environment variable preview does not display real secrets.
+- [x] File tree preview shows selected optional feature files only.
+- [x] File tree preview includes no `src/` paths.
+- [x] Invalid schema or compatibility state shows a concise Preview-step error.
+- [x] Invalid schema or compatibility state prevents moving from Preview to Download.
+- [x] No full file content preview was added.
+- [x] No generate/download API route was added.
+- [x] No zip download behavior was added.
+- [x] No CLI functionality was added.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` passed across all workspaces when run with elevated permissions for the known Turbopack process/port restriction.
+- `lsof -nP -iTCP:3000 -sTCP:LISTEN` showed port 3000 was already in use by a local Node process.
+- `npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3001` failed in the sandbox because binding to `127.0.0.1:3001` was not permitted. The elevated rerun was rejected, so no dev server is running from this step.
+
+Notes/blockers:
+
+- The generator plan currently exposes selected feature file references, dependencies, dev dependencies, scripts, and environment variables, but it does not expose a base template file manifest. The Preview helper therefore keeps a small local list of MVP base Next.js file paths until the generator exports base template file references.
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; port 3000 was already occupied, the sandbox blocked port 3001, and the elevated rerun was rejected.
+
+Next suggested step:
+
+- Phase 6 Step 10: Build generate API route.
+
+Phase 6 Step 8 completed: Create extras step
+
+Changes made:
+
+- Added Extras step UI to the website wizard.
+- Added a Docker selector for `docker: "none"` and `docker: "postgres"`.
+- Used `@launchkit/schema` `dockerMetadata` for Docker option labels and descriptions.
+- Displayed `No Docker setup` and `PostgreSQL Docker Compose` as the two supported Docker choices.
+- Disabled PostgreSQL Docker Compose unless `database: "postgres"` is selected.
+- Shows the disabled reason `Requires PostgreSQL` when Docker PostgreSQL is unavailable.
+- Shows `No Docker setup` as the effective selection when PostgreSQL is not selected.
+- Connected Docker selection to shared builder config state.
+- Guarded Docker state updates so PostgreSQL Docker Compose cannot be selected without PostgreSQL.
+- Docker changes preserve database, ORM, auth, UI, and all other builder config values.
+- Added Extras-step validation using the existing schema parsing and compatibility helper path.
+- Gated Next navigation on the Extras step when an invalid `database: "none"` plus `docker: "postgres"` config is present.
+- Added a concise note that Docker Compose is for local PostgreSQL development and README plus `.env.example` are included by default.
+- Confirmed unsupported extras are not exposed.
+- Confirmed no preview, download, API route, generator logic, or CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/extras-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,300p' .agents/prompts/phase-06/step-8.md
+rg --files context apps/web packages/schema/src .agents/prompts/phase-06
+sed -n '301,620p' .agents/prompts/phase-06/step-8.md
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,280p' context/project-overview.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+sed -n '1,380p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,280p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/components/builder/steps/database-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/orm-step.tsx
+sed -n '1,240p' apps/web/lib/builder/steps.ts
+sed -n '1,340p' packages/schema/src/metadata.ts
+sed -n '1,220p' packages/schema/src/options.ts
+sed -n '1,240p' packages/schema/src/compatibility.ts
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+rg '@launchkit/generator|app/api|createProjectZip|download|preview|Redis|Sentry|analytics|Stripe|Clerk|node:test|node --test' apps/web
+git diff --check
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build -w apps/web
+npm run build
+git diff -- apps/web/components/builder/builder-shell.tsx apps/web/components/builder/steps/extras-step.tsx apps/web/lib/builder/steps.ts apps/web/lib/builder/validation.ts
+git status --short
+git diff --stat
+```
+
+Verification:
+
+- [x] Extras step renders in the wizard.
+- [x] Docker selector supports `none` and `postgres`.
+- [x] Docker options come from schema metadata.
+- [x] Docker PostgreSQL is disabled when `database !== "postgres"`.
+- [x] Docker PostgreSQL disabled state shows `Requires PostgreSQL`.
+- [x] No Docker setup is shown as selected when PostgreSQL is not selected.
+- [x] Selecting Docker PostgreSQL updates `config.docker` only when PostgreSQL is selected.
+- [x] Selecting Docker PostgreSQL does not modify `config.database`.
+- [x] Selecting no Docker sets `config.docker` to `"none"`.
+- [x] Docker updates preserve database, ORM, auth, UI, and other config values.
+- [x] Invalid Docker PostgreSQL without PostgreSQL uses schema compatibility validation and prevents Next on the Extras step.
+- [x] Unsupported extras are not rendered.
+- [x] No preview or download flow was implemented.
+- [x] No API route was added.
+- [x] No generator logic was added to `apps/web`.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` passed across all workspaces when run with elevated permissions for the known Turbopack process/port restriction.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 9: Create Preview step.
 
 Phase 6 Step 7 completed: Create Auth step
 
