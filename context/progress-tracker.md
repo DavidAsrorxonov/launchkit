@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 5 complete
-Primary focus: Phase 6 website wizard shell is ready to begin
+Current phase: Phase 6 in progress
+Primary focus: Phase 6 project step is ready to begin
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 website wizard shell is ready to begin
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | Ready       | Ready to create the website wizard shell, preview, and download flow without duplicating generator logic. |
+| Phase 6 | Website MVP                           | In Progress | Step 1 created the website wizard shell; ready to add the project step without duplicating generator logic. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -30,6 +30,121 @@ Primary focus: Phase 6 website wizard shell is ready to begin
 Add entries in reverse chronological order.
 
 ### 2026-07-02
+
+Phase 6 Step 1 completed: Create website wizard shell
+
+Changes made:
+
+- Created the LaunchKit builder home page in `apps/web/app/page.tsx`.
+- Added a client-side builder shell with current-step navigation state.
+- Added wizard progress, navigation, and placeholder step panel components.
+- Added shared wizard step definitions for all 9 MVP steps.
+- Added builder state initialization from `@launchkit/schema` `defaultLaunchKitConfig`.
+- Added a compact current-selection panel using the initialized builder config.
+- Updated app metadata from the default Create Next App copy to LaunchKit.
+- Added `@launchkit/schema` as an explicit `apps/web` workspace dependency and updated `package-lock.json`.
+- Confirmed no `@launchkit/generator` import, API route, zip download flow, CLI work, or individual wizard step forms were added.
+
+Files changed:
+
+- `apps/web/app/page.tsx`
+- `apps/web/app/layout.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/components/builder/wizard-progress.tsx`
+- `apps/web/components/builder/wizard-navigation.tsx`
+- `apps/web/components/builder/wizard-step-panel.tsx`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/lib/builder/builder-state.ts`
+- `apps/web/package.json`
+- `package-lock.json`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,360p' .agents/prompts/phase-06/step-1.md
+rg --files apps/web
+cat apps/web/package.json
+cat package.json
+sed -n '1,260p' context/project-overview.md
+sed -n '1,260p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '1,220p' apps/web/app/page.tsx
+sed -n '1,260p' apps/web/app/globals.css
+sed -n '1,220p' packages/schema/src/index.ts
+cat packages/schema/package.json
+sed -n '1,220p' packages/schema/src/defaults.ts
+sed -n '1,260p' packages/schema/src/config.ts
+cat apps/web/tsconfig.json
+sed -n '1,220p' apps/web/app/layout.tsx
+sed -n '1,160p' apps/web/lib/utils.ts
+rg '"@launchkit/schema"|workspace:' package-lock.json package.json apps packages
+sed -n '261,620p' context/project-overview.md
+sed -n '261,620p' context/architecture.md
+sed -n '261,620p' context/build-plan.md
+sed -n '261,620p' context/ui-rules.md
+mkdir -p apps/web/components/builder apps/web/lib/builder
+npm install --package-lock-only
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+git status --short
+git diff --stat
+git diff -- apps/web/app/page.tsx apps/web/app/layout.tsx apps/web/components/builder/builder-shell.tsx apps/web/components/builder/wizard-progress.tsx apps/web/components/builder/wizard-navigation.tsx apps/web/components/builder/wizard-step-panel.tsx apps/web/lib/builder/steps.ts apps/web/lib/builder/builder-state.ts apps/web/package.json package-lock.json
+npm run dev -- --hostname 127.0.0.1 --port 3000
+npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3000
+```
+
+Verification:
+
+- [x] Website home page renders the LaunchKit builder shell.
+- [x] Wizard defines all 9 planned steps: Project, Framework, Styling and UI, Database, ORM, Auth, Extras, Preview, Download.
+- [x] Step progress is visible.
+- [x] Back and Next navigation state is implemented.
+- [x] Back is disabled on the first step.
+- [x] Next is disabled on the last step.
+- [x] Placeholder content renders for each step.
+- [x] Builder config state initializes from `@launchkit/schema`.
+- [x] No generator logic was added to `apps/web`.
+- [x] No API route or download flow was implemented.
+- [x] No CLI functionality was added.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not left running because sandboxed localhost binding failed and the elevated dev-server rerun was not approved.
+
+Next suggested step:
+
+- Phase 6 Step 2: Create project step.
 
 Phase 5 Step 9 completed: Verify Phase 5 completion
 
