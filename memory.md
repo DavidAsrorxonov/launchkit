@@ -1,79 +1,79 @@
-# Memory - LaunchKit Phase 5 Complete
+# Memory - LaunchKit Phase 6 Step 3 Complete
 
-Last updated: 2026-07-02 13:02 JST
+Last updated: 2026-07-02 17:10 JST
 
 ## What was built
 
-- Completed Phase 5 Step 7: Auth.js credentials template.
-  - Added `packages/templates/features/authjs-credentials/auth.ts`.
-  - Added `packages/templates/features/authjs-credentials/app/api/auth/[...nextauth]/route.ts`.
-  - Added `packages/templates/features/authjs-credentials/README.md`.
-  - Added `authjsCredentialsTemplateId`.
-  - Auth.js credentials feature now contributes `next-auth`, `AUTH_SECRET`, template file references, and generated README notes.
-  - Tests cover Auth.js feature selection, generated files, env/dependency contributions, README warnings, and compatibility.
-- Completed Phase 5 Step 8: Docker PostgreSQL template.
-  - Added `packages/templates/features/docker-postgres/docker-compose.yml`.
-  - Added `packages/templates/features/docker-postgres/README.md`.
-  - Added `dockerPostgresTemplateId`.
-  - Docker PostgreSQL feature now contributes `docker-compose.yml` and generated README notes without npm dependencies or env vars.
-  - Tests cover Docker feature selection, generated file output, README guidance, no dependency contribution, and separation from Prisma/Auth.js.
-- Completed Phase 5 Step 9: Phase 5 completion verification.
-  - Added `packages/generator/src/__tests__/phase-5-completion.test.ts`.
-  - Verified real `packages/templates` files compose through the generator template-loader interface for default, shadcn, PostgreSQL, PostgreSQL + Prisma, Auth.js credentials, PostgreSQL + Docker, and full MVP selections.
-  - Updated `context/progress-tracker.md`: Phase 5 is now `Complete`; Phase 6 is `Ready`.
-- Small in-scope fixes from Step 9 verification:
-  - `generateProject` now loads the base `base/next` template when a `TemplateLoader` is provided.
-  - Generated files are merged by normalized path so later generated files override duplicate template paths predictably.
-  - Base Next.js package metadata is now contributed declaratively by `nextFeature`: Next, React, React DOM, TypeScript, app scripts, and version.
-  - Generated `package.json` now renders `version`.
-  - Generated README no longer says real templates will be added later.
+- Completed Phase 6 Step 1: website wizard shell.
+  - Added the LaunchKit builder home page in `apps/web/app/page.tsx`.
+  - Added builder shell, wizard progress, navigation, and reusable step panel components under `apps/web/components/builder/`.
+  - Added shared builder step definitions and initial builder state under `apps/web/lib/builder/`.
+  - Initialized builder config from `@launchkit/schema` `defaultLaunchKitConfig`.
+  - Added `@launchkit/schema` as an explicit `apps/web` dependency.
+- Completed Phase 6 Step 2: Project step.
+  - Added `apps/web/components/builder/steps/project-step.tsx`.
+  - Added project name input connected to shared builder config state.
+  - Added project name validation through `@launchkit/schema` `LaunchKitConfigSchema`.
+  - Added inline validation feedback and Next-button gating for invalid project names.
+  - Added package manager selector using `@launchkit/schema` package manager metadata for `npm` and `pnpm`.
+  - Added builder config patch/update helpers and `apps/web/lib/builder/validation.ts`.
+- Completed Phase 6 Step 3: Framework step.
+  - Added `apps/web/components/builder/steps/framework-step.tsx`.
+  - Displayed fixed MVP generated-project foundation: Next.js, TypeScript, App Router, and no `src/` project structure.
+  - Used `@launchkit/schema` metadata for framework, language, router, and project structure labels/descriptions.
+  - Added framework-step validation through the existing schema-backed builder validation path.
+  - Gated Next only if the fixed framework config is somehow invalid.
+- Updated `context/progress-tracker.md`: Phase 6 is in progress and Phase 6 Step 4 is next.
 
 ## Decisions made
 
-- Phase 5 is complete only after verifying real template files compose through the existing injected `TemplateLoader`; no production filesystem template loader was added in this phase.
-- Keep Phase 6 as the next boundary. Do not start website UI, CLI work, new product options, or unsupported stacks before the Phase 6 prompt.
-- Keep Auth.js credentials scaffold intentionally non-production-complete. Developers must add real user lookup and secure password verification.
-- Keep Docker PostgreSQL as a local development helper only. It must require PostgreSQL and must not add npm dependencies or conflicting env vars.
-- Keep Prisma v7 setup from earlier work: `prisma.config.ts`, generated client output, ESM package type when Prisma is selected, and `@prisma/adapter-pg`.
+- Keep Phase 6 implementation step-scoped. Steps 1-3 did not implement styling/UI, database, ORM, auth, extras, preview, download, API route, zip behavior, or CLI functionality.
+- Keep all UI validation and option display tied to `@launchkit/schema` exports where available.
+- Keep generated-project foundation fixed for MVP: `framework: "next"`, `language: "typescript"`, `router: "app"`, `projectStructure: "no-src"`.
+- Do not expose unsupported framework/language/router/structure choices in the website.
+- Keep generator logic out of `apps/web`; no `@launchkit/generator` imports were added during these website UI steps.
+- Do not add a frontend component test stack yet because `apps/web` has no existing frontend test pattern or app test script.
 
 ## Problems solved
 
-- Step 9 verification found that generated projects with a template loader loaded feature templates but not the base Next.js template. Fixed by loading `base/${plan.baseTemplate}` before selected feature templates.
-- Step 9 verification found generated `package.json` lacked base Next/React/TypeScript metadata. Fixed by moving base package metadata into the declarative `nextFeature` contribution.
-- Step 9 verification found `version` was merged into the package patch but not rendered into generated `package.json`. Fixed renderer output.
-- The workspace build still fails inside the sandbox because Turbopack cannot create/bind a worker process. Rerunning `npm run build` with elevated permissions passes.
+- Builder state now has a narrow patch/update helper so steps can update shared config while preserving the rest of the selected stack.
+- Project-step navigation is blocked when schema validation rejects the project name.
+- Framework-step navigation validates the fixed schema fields without introducing interactive unsupported choices.
+- The known sandbox build issue remains: Next/Turbopack fails inside the sandbox because it cannot create/bind a worker process. Rerunning `npm run build` and app build commands with elevated permissions passes.
 
 ## Current state
 
-- `context/progress-tracker.md` says Phase 5 is complete and Phase 6 is ready.
-- Phase 5 template layers are implemented and verified:
-  - Base Next.js
-  - Tailwind
-  - shadcn/ui
-  - PostgreSQL
-  - Prisma
-  - Auth.js credentials
-  - Docker PostgreSQL
-- Verification passed:
-  - `npm run typecheck -w @launchkit/generator`
-  - `npm test -w @launchkit/generator` (111 tests)
-  - `npm run typecheck -w @launchkit/templates`
-  - `npm test -w @launchkit/templates` (51 tests)
-  - `npm run typecheck -w @launchkit/schema`
-  - `npm test -w @launchkit/schema` (73 tests)
-  - `npm run typecheck`
-  - `npm run test`
-  - `npm run lint`
-  - `git diff --check`
-  - `npm run build` passed when rerun outside the sandbox after the known Turbopack sandbox failure.
-- `rg "node:test|node --test" packages apps package.json` returned no matches.
-- At the time of saving, the latest tracker state and memory save should be treated as the handoff source of truth.
+- `context/progress-tracker.md` says:
+  - Current phase: Phase 6 in progress.
+  - Primary focus: Phase 6 styling and UI step is ready to begin.
+  - Phase 6 Step 3 is complete.
+- Implemented website wizard steps:
+  - Project step: project name and package manager.
+  - Framework step: fixed Next.js/TypeScript/App Router/no-src foundation.
+- Remaining Phase 6 wizard steps are still placeholders:
+  - Styling and UI
+  - Database
+  - ORM
+  - Auth
+  - Extras
+  - Preview
+  - Download
+- Verification recorded in the tracker:
+  - `npm run typecheck -w apps/web` passed.
+  - `npm run lint -w apps/web` passed.
+  - `npm run typecheck` passed.
+  - `npm run test` passed: generator 111 tests, schema 73 tests, templates 51 tests.
+  - `npm run lint` passed.
+  - `git diff --check` passed.
+  - `npm run build -w apps/web` and `npm run build` pass when rerun outside the sandbox after the known Turbopack sandbox failure.
+- No local dev server was left running; the user said they will run it themselves.
+- `git status --short` was clean at the time of this memory save.
 
 ## Next session starts with
 
-Run `/remember restore`, then read `context/progress-tracker.md` and the next Phase 6 prompt. Start Phase 6 Step 1: create the website wizard shell. Keep generator logic in `packages/generator`; the website should import shared schema/options and call generator APIs rather than duplicating generation rules.
+Run `/remember restore`, then read `context/progress-tracker.md` and the next Phase 6 prompt. Continue with Phase 6 Step 4: create the Styling and UI step. Keep the implementation inside `apps/web`, use `@launchkit/schema` metadata/options, and do not add generator/API/download/CLI behavior.
 
 ## Open questions
 
-- Phase 6 prompt is not yet loaded in this memory. Confirm the exact `.agents/prompts/phase-06/...` file before implementing.
-- Decide in Phase 6 whether the preview is computed directly from schema/feature metadata or via a lightweight generator preview path, while preserving the architecture boundary.
+- `.agents/prompts/phase-06/step-4.md` was not present at save time; only steps 1 through 3 existed under `.agents/prompts/phase-06/`. Confirm or add the exact Step 4 prompt before implementing.
+- Later Phase 6 still needs a decision on whether preview is computed directly from schema/feature metadata or via a lightweight generator preview path while preserving the architecture boundary.
