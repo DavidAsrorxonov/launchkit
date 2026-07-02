@@ -4,6 +4,7 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  authjsCredentialsTemplateId,
   baseNextTemplateId,
   postgresTemplateId,
   prismaTemplateId,
@@ -18,6 +19,7 @@ const templatesRoot = join(
   "..",
 );
 const baseNextTemplateRoot = join(templatesRoot, "base", "next");
+const authjsCredentialsTemplateRoot = join(templatesRoot, "features", "authjs-credentials");
 const postgresTemplateRoot = join(templatesRoot, "features", "postgres");
 const prismaTemplateRoot = join(templatesRoot, "features", "prisma");
 const shadcnTemplateRoot = join(templatesRoot, "features", "shadcn");
@@ -47,6 +49,12 @@ const requiredPostgresTemplateFiles = [
   "README.md",
 ];
 
+const requiredAuthjsCredentialsTemplateFiles = [
+  "auth.ts",
+  "app/api/auth/[...nextauth]/route.ts",
+  "README.md",
+];
+
 const requiredPrismaTemplateFiles = [
   "prisma/schema.prisma",
   "lib/db.ts",
@@ -68,6 +76,10 @@ describe("@launchkit/templates package foundation", () => {
 
   it("exports the base Next.js template id", () => {
     expect(baseNextTemplateId).toBe("next");
+  });
+
+  it("exports the Auth.js credentials template id", () => {
+    expect(authjsCredentialsTemplateId).toBe("authjs-credentials");
   });
 
   it("exports the Tailwind template id", () => {
@@ -115,6 +127,90 @@ describe("base Next.js template", () => {
         if (!["{{projectName}}", "{{packageName}}"].includes(placeholder[0])) {
           unsupportedPlaceholders.add(
             `${relative(baseNextTemplateRoot, filePath)}: ${placeholder[0]}`,
+          );
+        }
+      }
+    }
+
+    expect([...unsupportedPlaceholders]).toEqual([]);
+  });
+});
+
+describe("Auth.js credentials feature template", () => {
+  it("includes the required Auth.js credentials files", async () => {
+    await expect(
+      Promise.all(
+        requiredAuthjsCredentialsTemplateFiles.map(async (filePath) => {
+          await readFile(join(authjsCredentialsTemplateRoot, filePath));
+        }),
+      ),
+    ).resolves.toHaveLength(requiredAuthjsCredentialsTemplateFiles.length);
+  });
+
+  it("includes an Auth.js credentials scaffold", async () => {
+    const auth = await readFile(join(authjsCredentialsTemplateRoot, "auth.ts"), "utf8");
+
+    expect(auth).toContain('import NextAuth from "next-auth";');
+    expect(auth).toContain('import Credentials from "next-auth/providers/credentials";');
+    expect(auth).toContain("export const { handlers, signIn, signOut, auth } = NextAuth({");
+    expect(auth).toContain("async authorize(credentials)");
+    expect(auth).toContain("replace this with real user lookup and password verification");
+    expect(auth).toContain("Never compare plain text passwords");
+    expect(auth).toContain("return null;");
+    expect(auth).not.toContain("password123");
+  });
+
+  it("includes an App Router Auth.js route handler", async () => {
+    const route = await readFile(
+      join(authjsCredentialsTemplateRoot, "app/api/auth/[...nextauth]/route.ts"),
+      "utf8",
+    );
+
+    expect(route).toContain('import { handlers } from "@/auth";');
+    expect(route).toContain("export const { GET, POST } = handlers;");
+  });
+
+  it("includes concise Auth.js README guidance", async () => {
+    const readme = await readFile(join(authjsCredentialsTemplateRoot, "README.md"), "utf8");
+
+    expect(readme).toContain("Auth.js credentials scaffold");
+    expect(readme).toContain("Replace `AUTH_SECRET`");
+    expect(readme).toContain("placeholder and always rejects sign-ins");
+    expect(readme).toContain("real user lookup");
+    expect(readme).toContain("secure password hashing and verification");
+    expect(readme).toContain("not production-complete");
+    expect(readme).toContain("If Prisma is selected");
+  });
+
+  it("does not add Prisma, Docker, sign-in UI, or source-directory files", async () => {
+    const templateFiles = (await listTemplateFiles(authjsCredentialsTemplateRoot)).map((filePath) =>
+      relative(authjsCredentialsTemplateRoot, filePath),
+    );
+
+    expect([...templateFiles].sort()).toEqual([...requiredAuthjsCredentialsTemplateFiles].sort());
+    expect(templateFiles).not.toContain("prisma/schema.prisma");
+    expect(templateFiles).not.toContain("lib/db.ts");
+    expect(templateFiles).not.toContain("docker-compose.yml");
+    expect(templateFiles).not.toContain("app/auth/sign-in/page.tsx");
+  });
+
+  it("does not include a src directory", async () => {
+    const entries = await readdir(authjsCredentialsTemplateRoot, { withFileTypes: true });
+
+    expect(entries.some((entry) => entry.isDirectory() && entry.name === "src")).toBe(false);
+  });
+
+  it("uses only supported template placeholders", async () => {
+    const templateFiles = await listTemplateFiles(authjsCredentialsTemplateRoot);
+    const unsupportedPlaceholders = new Set<string>();
+
+    for (const filePath of templateFiles) {
+      const contents = await readFile(filePath, "utf8");
+
+      for (const placeholder of contents.matchAll(/{{[^}]+}}/g)) {
+        if (!["{{projectName}}", "{{packageName}}"].includes(placeholder[0])) {
+          unsupportedPlaceholders.add(
+            `${relative(authjsCredentialsTemplateRoot, filePath)}: ${placeholder[0]}`,
           );
         }
       }

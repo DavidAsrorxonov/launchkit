@@ -156,6 +156,11 @@ export const authjsCredentialsFeature: FeatureDefinition = {
   id: "authjs-credentials",
   label: "Auth.js credentials scaffold",
   description: "Credentials-ready Auth.js structure.",
+  packageJson: {
+    dependencies: {
+      "next-auth": "latest",
+    },
+  },
   env: [
     {
       name: "AUTH_SECRET",
@@ -164,7 +169,25 @@ export const authjsCredentialsFeature: FeatureDefinition = {
       required: true,
     },
   ],
-  notes: ["Real user lookup and password verification must be implemented by the developer."],
+  templateFiles: [
+    {
+      sourcePath: "features/authjs-credentials/auth.ts",
+      targetPath: "auth.ts",
+    },
+    {
+      sourcePath: "features/authjs-credentials/app/api/auth/[...nextauth]/route.ts",
+      targetPath: "app/api/auth/[...nextauth]/route.ts",
+    },
+  ],
+  notes: [
+    "Auth.js credentials scaffold was generated.",
+    "`AUTH_SECRET` must be replaced before using authentication.",
+    "The default `authorize` logic is a placeholder and always rejects sign-ins.",
+    "Real user lookup must be implemented by the developer.",
+    "Secure password hashing and verification must be implemented by the developer.",
+    "Credentials auth is intentionally not production-complete.",
+    "If Prisma is selected, `lib/db.ts` is available but auth logic still needs to be connected to a user model.",
+  ],
   isEnabled: (config) => config.auth === "authjs-credentials",
 };
 

@@ -94,6 +94,7 @@ describe("Phase 4 generator coverage", () => {
         "class-variance-authority": "^0.7.1",
         clsx: "^2.1.1",
         dotenv: "latest",
+        "next-auth": "latest",
         "tailwind-merge": "^3.6.0",
       },
       devDependencies: {

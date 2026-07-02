@@ -130,6 +130,39 @@ describe("generation pipeline", () => {
     expect(readTextFile(project, ".env.example")).toContain('AUTH_SECRET="replace-me"');
   });
 
+  it("includes Auth.js dependency and README guidance when credentials auth is selected", async () => {
+    const project = await generateProject({
+      ...defaultLaunchKitConfig,
+      auth: "authjs-credentials",
+    });
+    const packageJson = readJsonFile(project, "package.json");
+    const readme = readTextFile(project, "README.md");
+
+    expect(packageJson).toMatchObject({
+      dependencies: {
+        "next-auth": "latest",
+      },
+    });
+    expect(readme).toContain("Auth.js credentials scaffold was generated.");
+    expect(readme).toContain("`AUTH_SECRET` must be replaced");
+    expect(readme).toContain("placeholder and always rejects sign-ins");
+    expect(readme).toContain("Real user lookup must be implemented");
+    expect(readme).toContain("Secure password hashing and verification");
+    expect(readme).toContain("intentionally not production-complete");
+  });
+
+  it("does not include Auth.js dependency or README guidance when auth is none", async () => {
+    const project = await generateProject({
+      ...defaultLaunchKitConfig,
+      auth: "none",
+    });
+    const packageJson = readJsonFile(project, "package.json");
+    const readme = readTextFile(project, "README.md");
+
+    expect(packageJson).not.toHaveProperty(["dependencies", "next-auth"]);
+    expect(readme).not.toContain("Auth.js credentials scaffold was generated.");
+  });
+
   it("includes Prisma dependencies and scripts when Prisma is selected", async () => {
     const project = await generateProject({
       ...defaultLaunchKitConfig,
@@ -198,6 +231,7 @@ describe("generation pipeline", () => {
       "@prisma/adapter-pg": "latest",
       "@prisma/client": "latest",
       dotenv: "latest",
+      "next-auth": "latest",
     });
     expect(plan.packageJson.devDependencies).toMatchObject({
       "@tailwindcss/postcss": "^4",
@@ -224,6 +258,14 @@ describe("generation pipeline", () => {
       {
         sourcePath: "features/prisma/prisma.config.ts",
         targetPath: "prisma.config.ts",
+      },
+      {
+        sourcePath: "features/authjs-credentials/auth.ts",
+        targetPath: "auth.ts",
+      },
+      {
+        sourcePath: "features/authjs-credentials/app/api/auth/[...nextauth]/route.ts",
+        targetPath: "app/api/auth/[...nextauth]/route.ts",
       },
     ]);
     expect(plan.env.map((envVar) => envVar.name)).toEqual(["DATABASE_URL", "AUTH_SECRET"]);
@@ -323,6 +365,20 @@ describe("generation pipeline", () => {
           contents: 'datasource: { url: env("DATABASE_URL") }',
         },
       ],
+      "features/authjs-credentials/auth.ts": [
+        {
+          sourcePath: "features/authjs-credentials/auth.ts",
+          targetPath: "auth.ts",
+          contents: 'export const { handlers, signIn, signOut, auth } = NextAuth({});',
+        },
+      ],
+      "features/authjs-credentials/app/api/auth/[...nextauth]/route.ts": [
+        {
+          sourcePath: "features/authjs-credentials/app/api/auth/[...nextauth]/route.ts",
+          targetPath: "app/api/auth/[...nextauth]/route.ts",
+          contents: 'import { handlers } from "@/auth";',
+        },
+      ],
     });
 
     const defaultProject = await generateProject(defaultLaunchKitConfig, {
@@ -347,6 +403,15 @@ describe("generation pipeline", () => {
         templateLoader: loader,
       },
     );
+    const authProject = await generateProject(
+      {
+        ...defaultLaunchKitConfig,
+        auth: "authjs-credentials",
+      },
+      {
+        templateLoader: loader,
+      },
+    );
 
     expect(defaultProject.files.map((file) => file.path)).not.toContain("components.json");
     expect(defaultProject.files.map((file) => file.path)).not.toContain("lib/utils.ts");
@@ -356,6 +421,10 @@ describe("generation pipeline", () => {
     expect(defaultProject.files.map((file) => file.path)).not.toContain("prisma/schema.prisma");
     expect(defaultProject.files.map((file) => file.path)).not.toContain("lib/db.ts");
     expect(defaultProject.files.map((file) => file.path)).not.toContain("prisma.config.ts");
+    expect(defaultProject.files.map((file) => file.path)).not.toContain("auth.ts");
+    expect(defaultProject.files.map((file) => file.path)).not.toContain(
+      "app/api/auth/[...nextauth]/route.ts",
+    );
     expect(shadcnProject.files.map((file) => file.path)).toEqual(
       expect.arrayContaining(["components.json", "lib/utils.ts", "components/ui/button.tsx"]),
     );
@@ -365,6 +434,13 @@ describe("generation pipeline", () => {
     expect(readTextFile(prismaProject, "prisma/schema.prisma")).toContain("postgresql");
     expect(readTextFile(prismaProject, "lib/db.ts")).toContain("@prisma/adapter-pg");
     expect(readTextFile(prismaProject, "prisma.config.ts")).toContain("DATABASE_URL");
+    expect(authProject.files.map((file) => file.path)).toEqual(
+      expect.arrayContaining(["auth.ts", "app/api/auth/[...nextauth]/route.ts"]),
+    );
+    expect(readTextFile(authProject, "auth.ts")).toContain("handlers");
+    expect(readTextFile(authProject, "app/api/auth/[...nextauth]/route.ts")).toContain(
+      'from "@/auth"',
+    );
   });
 
   it("does not add Auth.js, Docker, or source-directory files for Prisma", async () => {

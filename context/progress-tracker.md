@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 5 Step 6 complete
-Primary focus: Prisma template files and metadata are ready for Auth.js credentials template work
+Current phase: Phase 5 Step 7 complete
+Primary focus: Auth.js credentials scaffold is ready for Docker PostgreSQL template work
 ```
 
 ## Phase Progress
@@ -19,7 +19,7 @@ Primary focus: Prisma template files and metadata are ready for Auth.js credenti
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
-| Phase 5 | Template Implementation               | In Progress | Step 6 created and verified Prisma schema, client helper, scripts, dependencies, template references, and README guidance without adding Auth.js or Docker files. |
+| Phase 5 | Template Implementation               | In Progress | Step 7 created and verified Auth.js credentials scaffold files, dependency/env contributions, README warnings, and compatibility coverage without adding Docker files. |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
@@ -28,6 +28,136 @@ Primary focus: Prisma template files and metadata are ready for Auth.js credenti
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-02
+
+Phase 5 Step 7 completed: Create Auth.js credentials template
+
+Changes made:
+
+- Created `packages/templates/features/authjs-credentials/` as the optional Auth.js credentials feature template directory.
+- Added `packages/templates/features/authjs-credentials/auth.ts` with an Auth.js App Router credentials scaffold.
+- Added `packages/templates/features/authjs-credentials/app/api/auth/[...nextauth]/route.ts` to re-export Auth.js route handlers from `@/auth`.
+- Added `packages/templates/features/authjs-credentials/README.md` with scaffold and production-readiness guidance.
+- Added the minimal `authjsCredentialsTemplateId` export from `@launchkit/templates`.
+- Updated the generator Auth.js credentials feature definition to contribute `next-auth`, `AUTH_SECRET`, template file references, and README notes.
+- Verified Auth.js credentials remains allowed without a database.
+- Verified Auth.js credentials with PostgreSQL and no Prisma remains allowed.
+- Verified Auth.js credentials with PostgreSQL and Prisma remains allowed.
+- Verified Auth.js credentials with Prisma and no PostgreSQL is rejected by the existing Prisma/PostgreSQL compatibility rule.
+- Confirmed Docker Compose files, sign-in UI pages, website UI, CLI functionality, and `src/` directories were not added.
+
+Files changed:
+
+- `packages/templates/features/authjs-credentials/auth.ts`
+- `packages/templates/features/authjs-credentials/app/api/auth/[...nextauth]/route.ts`
+- `packages/templates/features/authjs-credentials/README.md`
+- `packages/templates/src/index.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `packages/generator/src/features/definitions.ts`
+- `packages/generator/src/__tests__/feature-registry.test.ts`
+- `packages/generator/src/__tests__/generate-project.test.ts`
+- `packages/generator/src/__tests__/phase-4-coverage.test.ts`
+- `packages/schema/src/__tests__/compatibility.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-05/step-7.md
+git status --short
+sed -n '1,320p' packages/generator/src/features/definitions.ts
+sed -n '1,280p' packages/templates/src/index.ts
+sed -n '1,460p' packages/generator/src/__tests__/feature-registry.test.ts
+sed -n '1,520p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,440p' packages/templates/src/__tests__/index.test.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+sed -n '1,360p' packages/schema/src/__tests__/compatibility.test.ts
+sed -n '1,320p' packages/generator/src/generate-project.ts
+sed -n '1,260p' packages/generator/src/generation-plan.ts
+sed -n '1,240p' packages/generator/src/template-loader.ts
+find packages/templates/features -maxdepth 5 -type f -print | sort
+mkdir -p packages/templates/features/authjs-credentials/app/api/auth/'[...nextauth]'
+npm run typecheck -w @launchkit/templates
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/generator
+npm test -w @launchkit/generator
+npm test -w @launchkit/schema
+npm run typecheck
+npm run test
+npm run lint
+git diff --check
+npm run build
+npm run build
+git status --short
+git diff --stat
+find packages/templates/features/authjs-credentials -maxdepth 6 -type f -print | sort
+```
+
+Verification:
+
+- [x] Auth.js credentials feature template directory exists.
+- [x] `auth.ts` exists.
+- [x] `auth.ts` configures Auth.js for a Next.js App Router project.
+- [x] `auth.ts` uses a credentials provider.
+- [x] `auth.ts` exports Auth.js handlers and helpers.
+- [x] `auth.ts` contains a placeholder `authorize` implementation that returns `null`.
+- [x] `auth.ts` warns developers to implement real user lookup and password verification.
+- [x] `auth.ts` does not hardcode real users, passwords, or secrets.
+- [x] `app/api/auth/[...nextauth]/route.ts` exists.
+- [x] Auth.js credentials feature contributes `AUTH_SECRET="replace-me"`.
+- [x] Auth.js credentials feature contributes `next-auth`.
+- [x] Auth.js credentials feature contributes template references for `auth.ts` and the route handler.
+- [x] Generated project output with a provided template loader includes `auth.ts` when Auth.js credentials is selected.
+- [x] Generated project output with a provided template loader includes `app/api/auth/[...nextauth]/route.ts` when Auth.js credentials is selected.
+- [x] Generated project output includes `AUTH_SECRET` when Auth.js credentials is selected.
+- [x] Generated project output includes Auth.js README guidance when Auth.js credentials is selected.
+- [x] Generated project output does not include Auth.js files when `auth: "none"` is selected.
+- [x] Auth.js credentials without a database is allowed.
+- [x] Auth.js credentials with PostgreSQL and no Prisma is allowed.
+- [x] Auth.js credentials with PostgreSQL and Prisma is allowed.
+- [x] Auth.js credentials with Prisma and no PostgreSQL is rejected by compatibility validation.
+- [x] Docker Compose files were not added.
+- [x] Sign-in UI pages were not added.
+- [x] No `src/` folder was introduced.
+- [x] Templates package typecheck passed.
+- [x] Templates package tests passed.
+- [x] Generator package typecheck passed.
+- [x] Generator package tests passed.
+- [x] Schema package tests passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test -w @launchkit/templates` passed: templates package Vitest suite ran 44 tests.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm test -w @launchkit/generator` passed: generator package Vitest suite ran 104 tests.
+- `npm test -w @launchkit/schema` passed: schema package Vitest suite ran 73 tests.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 104 tests, schema package ran 73 tests, and templates package ran 44 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes:
+
+- Auth.js credentials is a scaffold only. The generated `authorize` implementation always rejects sign-ins until the developer adds real lookup and secure password verification.
+- Prisma integration remains separate. If Prisma is selected, generated projects include `lib/db.ts`, but Auth.js logic still needs to be connected to a user model by the developer.
+- Docker PostgreSQL remains separate for Phase 5 Step 8.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Phase 5 Step 8: Create Docker PostgreSQL template.
 
 ### 2026-07-01
 
