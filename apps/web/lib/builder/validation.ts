@@ -1,5 +1,6 @@
 import {
   LaunchKitConfigSchema,
+  validateCompatibility,
   type LaunchKitConfig,
 } from "@launchkit/schema";
 
@@ -18,23 +19,38 @@ export type FrameworkStepValidation = {
   >;
 };
 
+export type StylingUiStepValidation = {
+  isValid: boolean;
+  errors: Pick<ValidationErrors, "styling" | "ui">;
+};
+
 export function validateBuilderConfig(config: LaunchKitConfig): {
   isValid: boolean;
   errors: ValidationErrors;
 } {
   const result = LaunchKitConfigSchema.safeParse(config);
 
-  if (result.success) {
+  if (!result.success) {
+    const errors: ValidationErrors = {};
+
+    for (const issue of result.error.issues) {
+      const field = issue.path[0];
+
+      if (typeof field === "string" && !(field in errors)) {
+        errors[field as keyof LaunchKitConfig] = issue.message;
+      }
+    }
+
     return {
-      isValid: true,
-      errors: {},
+      isValid: false,
+      errors,
     };
   }
 
   const errors: ValidationErrors = {};
 
-  for (const issue of result.error.issues) {
-    const field = issue.path[0];
+  for (const issue of validateCompatibility(result.data)) {
+    const field = issue.path?.[0];
 
     if (typeof field === "string" && !(field in errors)) {
       errors[field as keyof LaunchKitConfig] = issue.message;
@@ -42,7 +58,7 @@ export function validateBuilderConfig(config: LaunchKitConfig): {
   }
 
   return {
-    isValid: false,
+    isValid: Object.keys(errors).length === 0,
     errors,
   };
 }
@@ -79,6 +95,21 @@ export function validateFrameworkStep(
       !errors.language &&
       !errors.router &&
       !errors.projectStructure,
+    errors,
+  };
+}
+
+export function validateStylingUiStep(
+  config: LaunchKitConfig,
+): StylingUiStepValidation {
+  const validation = validateBuilderConfig(config);
+  const errors = {
+    styling: validation.errors.styling,
+    ui: validation.errors.ui,
+  };
+
+  return {
+    isValid: !errors.styling && !errors.ui,
     errors,
   };
 }

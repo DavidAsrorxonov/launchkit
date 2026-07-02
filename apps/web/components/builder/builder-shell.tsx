@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { FrameworkStep } from "@/components/builder/steps/framework-step";
 import { ProjectStep } from "@/components/builder/steps/project-step";
+import { StylingUiStep } from "@/components/builder/steps/styling-ui-step";
 import {
   createInitialBuilderState,
   type BuilderConfigPatch,
@@ -13,6 +14,7 @@ import { builderSteps } from "@/lib/builder/steps";
 import {
   validateFrameworkStep,
   validateProjectStep,
+  validateStylingUiStep,
 } from "@/lib/builder/validation";
 import { WizardNavigation } from "./wizard-navigation";
 import { WizardProgress } from "./wizard-progress";
@@ -27,11 +29,14 @@ export function BuilderShell() {
   const isLastStep = currentStepIndex === builderSteps.length - 1;
   const projectStepValidation = validateProjectStep(builderState.config);
   const frameworkStepValidation = validateFrameworkStep(builderState.config);
+  const stylingUiStepValidation = validateStylingUiStep(builderState.config);
   const isProjectStep = currentStep.id === "project";
   const isFrameworkStep = currentStep.id === "framework";
+  const isStylingUiStep = currentStep.id === "styling-ui";
   const isNextDisabled =
     (isProjectStep && !projectStepValidation.isValid) ||
-    (isFrameworkStep && !frameworkStepValidation.isValid);
+    (isFrameworkStep && !frameworkStepValidation.isValid) ||
+    (isStylingUiStep && !stylingUiStepValidation.isValid);
 
   const selectedStack = useMemo(
     () => [
@@ -104,6 +109,13 @@ export function BuilderShell() {
                   <FrameworkStep
                     config={builderState.config}
                     validation={frameworkStepValidation}
+                  />
+                ) : null}
+                {isStylingUiStep ? (
+                  <StylingUiStep
+                    config={builderState.config}
+                    validation={stylingUiStepValidation}
+                    onConfigChange={updateConfig}
                   />
                 ) : null}
               </WizardStepPanel>

@@ -8,7 +8,7 @@ Use this file to track development progress, changes made, decisions, notes, blo
 Project: LaunchKit
 Stage: Foundation setup
 Current phase: Phase 6 in progress
-Primary focus: Phase 6 styling and UI step is ready to begin
+Primary focus: Phase 6 Styling and UI step is complete; Database step is next
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 styling and UI step is ready to begin
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | In Progress | Step 3 added the fixed Framework step; ready to add the Styling and UI step without duplicating generator logic. |
+| Phase 6 | Website MVP                           | In Progress | Step 4 added the fixed Tailwind summary and UI library selector; Database step is next. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -30,6 +30,129 @@ Primary focus: Phase 6 styling and UI step is ready to begin
 Add entries in reverse chronological order.
 
 ### 2026-07-02
+
+Phase 6 Step 4 completed: Create Styling and UI step
+
+Changes made:
+
+- Added Styling and UI step UI to the website wizard.
+- Displayed Tailwind CSS as the fixed MVP styling choice using `@launchkit/schema` styling metadata.
+- Added a UI library selector for `ui: "none"` and `ui: "shadcn"` using `@launchkit/schema` UI metadata.
+- Added the recommended indicator for shadcn/ui from schema metadata.
+- Connected UI library selection to shared builder config state.
+- Kept `config.styling` fixed as `"tailwind"` whenever the UI option changes.
+- Extended builder validation to include schema compatibility issues through `validateCompatibility()` from `@launchkit/schema`.
+- Gated Next navigation on the Styling and UI step only if styling/UI schema or compatibility validation fails.
+- Confirmed unsupported styling systems are not exposed.
+- Confirmed no `@launchkit/generator` import, API route, zip download flow, CLI work, or later step implementation was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/styling-ui-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-06/step-4.md
+rg --files
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1120p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '241,900p' context/progress-tracker.md
+sed -n '901,1600p' context/progress-tracker.md
+sed -n '1601,2300p' context/progress-tracker.md
+sed -n '2301,3000p' context/progress-tracker.md
+sed -n '3001,3700p' context/progress-tracker.md
+git status --short
+sed -n '1,320p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/components/builder/steps/framework-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/project-step.tsx
+sed -n '1,260p' apps/web/lib/builder/builder-state.ts
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/lib/builder/steps.ts
+sed -n '1,260p' apps/web/components/builder/wizard-step-panel.tsx
+sed -n '1,360p' packages/schema/src/metadata.ts
+sed -n '1,320p' packages/schema/src/config.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+cat apps/web/package.json
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+rg '@launchkit/generator|app/api|createProjectZip|download|CSS Modules|Sass|Styled Components|Panda CSS|UnoCSS|node:test|node --test' apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3000
+git status --short
+git diff --stat
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,240p' apps/web/components/builder/steps/styling-ui-step.tsx
+```
+
+Verification:
+
+- [x] Styling and UI step renders in the wizard.
+- [x] Tailwind CSS is displayed as the fixed styling choice.
+- [x] Tailwind styling metadata comes from `@launchkit/schema`.
+- [x] UI options are limited to `none` and `shadcn`.
+- [x] UI option metadata comes from `@launchkit/schema`.
+- [x] shadcn/ui recommended indicator is shown from metadata.
+- [x] Selecting a UI option updates `config.ui`.
+- [x] UI updates preserve all other builder config values.
+- [x] UI updates keep `config.styling` as `"tailwind"`.
+- [x] Styling/UI validation uses schema parsing and compatibility helpers.
+- [x] Valid `styling: "tailwind"` with `ui: "none"` or `ui: "shadcn"` can advance.
+- [x] Unsupported styling systems are not rendered.
+- [x] No generator logic was added to `apps/web`.
+- [x] No API route or download flow was implemented.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+- `npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3000` failed in the sandbox because binding to `127.0.0.1:3000` was not permitted. The elevated rerun was rejected because the user will run the dev server locally.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server is not running; the user said they will run it themselves.
+
+Next suggested step:
+
+- Phase 6 Step 5: Create database step.
 
 Phase 6 Step 3 completed: Create framework step
 
