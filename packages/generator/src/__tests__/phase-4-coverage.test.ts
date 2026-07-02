@@ -87,15 +87,32 @@ describe("Phase 4 generator coverage", () => {
 
     expect(packageJson).toMatchObject({
       name: "full-stack-demo",
+      type: "module",
       dependencies: {
+        "@prisma/adapter-pg": "latest",
         "@prisma/client": "latest",
+        "class-variance-authority": "^0.7.1",
+        clsx: "^2.1.1",
+        dotenv: "latest",
+        next: "16.2.9",
+        "next-auth": "latest",
+        react: "19.2.4",
+        "react-dom": "19.2.4",
+        "tailwind-merge": "^3.6.0",
       },
       devDependencies: {
+        "@tailwindcss/postcss": "^4",
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
         prisma: "latest",
+        tailwindcss: "^4",
+        typescript: "^5",
       },
       scripts: {
         "db:generate": "prisma generate",
-        "db:migrate": "prisma migrate dev",
+        "db:push": "prisma db push",
+        "db:studio": "prisma studio",
       },
     });
     expect(envExample).toContain("DATABASE_URL=");

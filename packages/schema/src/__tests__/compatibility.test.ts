@@ -73,6 +73,17 @@ describe("compatibility rules", () => {
     ).toEqual([]);
   });
 
+  it("allows Auth.js credentials with PostgreSQL and no Prisma", () => {
+    expect(
+      validateCompatibility({
+        ...defaultLaunchKitConfig,
+        auth: "authjs-credentials",
+        database: "postgres",
+        orm: "none",
+      }),
+    ).toEqual([]);
+  });
+
   it("allows Auth.js credentials with Prisma and PostgreSQL", () => {
     expect(
       validateCompatibility({
@@ -85,6 +96,18 @@ describe("compatibility rules", () => {
   });
 
   it("returns an issue for Auth.js credentials with Prisma but no PostgreSQL", () => {
+    expect(
+      validateCompatibility({
+        ...defaultLaunchKitConfig,
+        auth: "authjs-credentials",
+        database: "none",
+        orm: "prisma",
+      }),
+    ).toContainEqual({
+      code: "prisma_requires_postgresql",
+      message: "Prisma requires PostgreSQL.",
+      path: ["orm", "database"],
+    });
     expect(
       validateCompatibility({
         ...defaultLaunchKitConfig,
