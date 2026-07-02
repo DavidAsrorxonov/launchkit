@@ -8,7 +8,7 @@ Use this file to track development progress, changes made, decisions, notes, blo
 Project: LaunchKit
 Stage: Foundation setup
 Current phase: Phase 6 in progress
-Primary focus: Phase 6 ORM step is complete; Auth step is next
+Primary focus: Phase 6 Auth step is complete; Extras step is next
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 ORM step is complete; Auth step is next
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | In Progress | Step 6 added the ORM step with Prisma selection gated by PostgreSQL; Auth step is next. |
+| Phase 6 | Website MVP                           | In Progress | Step 7 added the Auth step with Auth.js credentials scaffold selection; Extras step is next. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -30,6 +30,129 @@ Primary focus: Phase 6 ORM step is complete; Auth step is next
 Add entries in reverse chronological order.
 
 ### 2026-07-02
+
+Phase 6 Step 7 completed: Create Auth step
+
+Changes made:
+
+- Added Auth step UI to the website wizard.
+- Added an auth selector for `auth: "none"` and `auth: "authjs-credentials"`.
+- Used `@launchkit/schema` `authMetadata` for auth option labels and descriptions.
+- Displayed `No auth` and `Auth.js credentials scaffold` as the two supported auth choices.
+- Added concise scaffold messaging for Auth.js credentials:
+  - communicates that it is scaffold only;
+  - tells users to connect it to their user model and password verification;
+  - avoids implying production-ready auth, complete user management, secure password verification, or a sign-in UI.
+- Connected auth selection to shared builder config state.
+- Auth changes preserve database, ORM, Docker, and all other builder config values.
+- Auth.js credentials can be selected without PostgreSQL.
+- Auth.js credentials can be selected with PostgreSQL and no ORM.
+- Auth.js credentials can be selected with PostgreSQL and Prisma.
+- Added Auth-step validation using the existing schema parsing and compatibility helper path.
+- Gated Next navigation on the Auth step when the full config is not schema-compatible.
+- Confirmed unsupported auth providers are not exposed.
+- Confirmed no Docker controls, preview, download, API route, generator logic, or CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/auth-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-06/step-7.md
+rg --files context apps/web packages/schema/src .agents/prompts/phase-06
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,280p' context/project-overview.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+sed -n '1,360p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/components/builder/steps/orm-step.tsx
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+sed -n '1,240p' apps/web/lib/builder/steps.ts
+sed -n '1,320p' packages/schema/src/metadata.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+sed -n '1,280p' packages/schema/src/config.ts
+git status --short
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+rg '@launchkit/generator|app/api|createProjectZip|download|Clerk|Supabase Auth|NextAuth provider|OAuth|docker|preview|node:test|node --test' apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build -w apps/web
+npm run build
+git diff -- apps/web/components/builder/builder-shell.tsx apps/web/components/builder/steps/auth-step.tsx apps/web/lib/builder/steps.ts apps/web/lib/builder/validation.ts
+git status --short
+git diff --stat
+```
+
+Verification:
+
+- [x] Auth step renders in the wizard.
+- [x] Auth selector supports `none` and `authjs-credentials`.
+- [x] Auth options come from schema metadata.
+- [x] Selecting Auth.js credentials updates `config.auth`.
+- [x] Selecting no auth updates `config.auth`.
+- [x] Auth updates preserve database, ORM, Docker, and other config values.
+- [x] Auth.js credentials can be selected without PostgreSQL.
+- [x] Auth.js credentials can be selected with PostgreSQL and no ORM.
+- [x] Auth.js credentials can be selected with PostgreSQL and Prisma.
+- [x] Auth.js credentials option includes concise scaffold messaging.
+- [x] Auth-step validation uses schema parsing and compatibility helpers.
+- [x] Incompatible full config state prevents Next on the Auth step.
+- [x] Unsupported auth providers are not rendered.
+- [x] No Docker controls were added.
+- [x] No preview or download flow was implemented.
+- [x] No API route was added.
+- [x] No generator logic was added to `apps/web`.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` initially failed because `authMetadata` has no `recommended` field in the current schema metadata. The Auth step was updated to guard the optional recommended badge. Rerunning passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` passed across all workspaces when run with elevated permissions for the known Turbopack process/port restriction.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 8: Create Extras step.
 
 Phase 6 Step 6 completed: Create ORM step
 

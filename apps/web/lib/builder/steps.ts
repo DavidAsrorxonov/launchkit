@@ -51,7 +51,7 @@ export const builderSteps = [
     id: "auth",
     label: "Auth",
     shortLabel: "Auth",
-    placeholder: "Auth step coming next.",
+    placeholder: "Choose auth scaffold.",
   },
   {
     id: "extras",

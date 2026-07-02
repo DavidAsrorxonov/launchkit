@@ -34,6 +34,11 @@ export type OrmStepValidation = {
   errors: Pick<ValidationErrors, "orm" | "database">;
 };
 
+export type AuthStepValidation = {
+  isValid: boolean;
+  errors: Partial<Record<keyof LaunchKitConfig, string>>;
+};
+
 export function validateBuilderConfig(config: LaunchKitConfig): {
   isValid: boolean;
   errors: ValidationErrors;
@@ -153,4 +158,8 @@ export function validateOrmStep(config: LaunchKitConfig): OrmStepValidation {
     isValid: !errors.orm && !errors.database,
     errors,
   };
+}
+
+export function validateAuthStep(config: LaunchKitConfig): AuthStepValidation {
+  return validateBuilderConfig(config);
 }
