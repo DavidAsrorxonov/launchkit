@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { FrameworkStep } from "@/components/builder/steps/framework-step";
 import { ProjectStep } from "@/components/builder/steps/project-step";
 import {
   createInitialBuilderState,
@@ -9,7 +10,10 @@ import {
   updateBuilderConfig,
 } from "@/lib/builder/builder-state";
 import { builderSteps } from "@/lib/builder/steps";
-import { validateProjectStep } from "@/lib/builder/validation";
+import {
+  validateFrameworkStep,
+  validateProjectStep,
+} from "@/lib/builder/validation";
 import { WizardNavigation } from "./wizard-navigation";
 import { WizardProgress } from "./wizard-progress";
 import { WizardStepPanel } from "./wizard-step-panel";
@@ -22,8 +26,12 @@ export function BuilderShell() {
   const isFirstStep = currentStepIndex === 0;
   const isLastStep = currentStepIndex === builderSteps.length - 1;
   const projectStepValidation = validateProjectStep(builderState.config);
+  const frameworkStepValidation = validateFrameworkStep(builderState.config);
   const isProjectStep = currentStep.id === "project";
-  const isNextDisabled = isProjectStep && !projectStepValidation.isValid;
+  const isFrameworkStep = currentStep.id === "framework";
+  const isNextDisabled =
+    (isProjectStep && !projectStepValidation.isValid) ||
+    (isFrameworkStep && !frameworkStepValidation.isValid);
 
   const selectedStack = useMemo(
     () => [
@@ -90,6 +98,12 @@ export function BuilderShell() {
                     config={builderState.config}
                     validation={projectStepValidation}
                     onConfigChange={updateConfig}
+                  />
+                ) : null}
+                {isFrameworkStep ? (
+                  <FrameworkStep
+                    config={builderState.config}
+                    validation={frameworkStepValidation}
                   />
                 ) : null}
               </WizardStepPanel>

@@ -8,7 +8,7 @@ Use this file to track development progress, changes made, decisions, notes, blo
 Project: LaunchKit
 Stage: Foundation setup
 Current phase: Phase 6 in progress
-Primary focus: Phase 6 framework step is ready to begin
+Primary focus: Phase 6 styling and UI step is ready to begin
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 framework step is ready to begin
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | In Progress | Step 2 added the Project step; ready to add the Framework step without duplicating generator logic. |
+| Phase 6 | Website MVP                           | In Progress | Step 3 added the fixed Framework step; ready to add the Styling and UI step without duplicating generator logic. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -30,6 +30,99 @@ Primary focus: Phase 6 framework step is ready to begin
 Add entries in reverse chronological order.
 
 ### 2026-07-02
+
+Phase 6 Step 3 completed: Create framework step
+
+Changes made:
+
+- Added Framework step UI for the fixed generated-project foundation.
+- Displayed the MVP framework stack: Next.js, TypeScript, App Router, and no `src/` project structure.
+- Used `@launchkit/schema` metadata for framework, language, router, and project structure labels/descriptions.
+- Added framework-step validation using `@launchkit/schema` through the existing builder config validation path.
+- Gated Next navigation only if the fixed framework config is somehow invalid.
+- Confirmed the default config remains `framework: "next"`, `language: "typescript"`, `router: "app"`, and `projectStructure: "no-src"`.
+- Confirmed unsupported framework, language, router, and structure choices are not exposed.
+- Confirmed no `@launchkit/generator` import, API route, zip download flow, CLI work, or later step implementation was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/framework-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,360p' .agents/prompts/phase-06/step-3.md
+git status --short
+rg --files apps/web/components apps/web/lib packages/schema/src
+sed -n '1,1040p' context/architecture.md
+sed -n '1,1120p' context/build-plan.md
+sed -n '1,760p' context/project-overview.md
+sed -n '1,520p' context/ui-rules.md
+sed -n '1,260p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+git status --short
+git diff --stat
+rg '@launchkit/generator|app/api|createProjectZip|node:test|node --test|React Router|Remix|Astro|Vue|Svelte|JavaScript|Pages Router|src/' apps/web
+git diff -- apps/web/components/builder apps/web/lib/builder
+```
+
+Verification:
+
+- [x] Framework step renders in the wizard.
+- [x] Framework step shows Next.js.
+- [x] Framework step shows TypeScript.
+- [x] Framework step shows App Router.
+- [x] Framework step shows no `src/` project structure.
+- [x] Framework step uses schema metadata.
+- [x] Unsupported framework/language/router/structure choices are not exposed.
+- [x] Current config remains valid according to `@launchkit/schema`.
+- [x] User can continue with the default config.
+- [x] No generator logic was added to `apps/web`.
+- [x] No API route or download flow was implemented.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 4: Create styling and UI step.
 
 Phase 6 Step 2 completed: Create project step
 

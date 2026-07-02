@@ -10,6 +10,14 @@ export type ProjectStepValidation = {
   errors: Pick<ValidationErrors, "name" | "packageManager">;
 };
 
+export type FrameworkStepValidation = {
+  isValid: boolean;
+  errors: Pick<
+    ValidationErrors,
+    "framework" | "language" | "router" | "projectStructure"
+  >;
+};
+
 export function validateBuilderConfig(config: LaunchKitConfig): {
   isValid: boolean;
   errors: ValidationErrors;
@@ -50,6 +58,27 @@ export function validateProjectStep(
 
   return {
     isValid: !errors.name && !errors.packageManager,
+    errors,
+  };
+}
+
+export function validateFrameworkStep(
+  config: LaunchKitConfig,
+): FrameworkStepValidation {
+  const validation = validateBuilderConfig(config);
+  const errors = {
+    framework: validation.errors.framework,
+    language: validation.errors.language,
+    router: validation.errors.router,
+    projectStructure: validation.errors.projectStructure,
+  };
+
+  return {
+    isValid:
+      !errors.framework &&
+      !errors.language &&
+      !errors.router &&
+      !errors.projectStructure,
     errors,
   };
 }
