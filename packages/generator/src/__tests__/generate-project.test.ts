@@ -30,12 +30,26 @@ describe("generation pipeline", () => {
 
     expect(readJsonFile(project, "package.json")).toMatchObject({
       name: "launchkit-demo",
+      version: "0.1.0",
       private: true,
-      scripts: {},
-      dependencies: {},
+      scripts: {
+        dev: "next dev",
+        build: "next build",
+        start: "next start",
+        typecheck: "tsc --noEmit",
+      },
+      dependencies: {
+        next: "16.2.9",
+        react: "19.2.4",
+        "react-dom": "19.2.4",
+      },
       devDependencies: {
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
         "@tailwindcss/postcss": "^4",
         tailwindcss: "^4",
+        typescript: "^5",
       },
     });
   });
@@ -270,11 +284,18 @@ describe("generation pipeline", () => {
       "@prisma/adapter-pg": "latest",
       "@prisma/client": "latest",
       dotenv: "latest",
+      next: "16.2.9",
       "next-auth": "latest",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
     });
     expect(plan.packageJson.devDependencies).toMatchObject({
       "@tailwindcss/postcss": "^4",
+      "@types/node": "^20",
+      "@types/react": "^19",
+      "@types/react-dom": "^19",
       tailwindcss: "^4",
+      typescript: "^5",
       prisma: "latest",
     });
     expect(plan.templateFiles).toEqual([
@@ -326,10 +347,18 @@ describe("generation pipeline", () => {
       "postgres",
       "docker-postgres",
     ]);
-    expect(plan.packageJson.dependencies).toEqual({});
+    expect(plan.packageJson.dependencies).toEqual({
+      next: "16.2.9",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    });
     expect(plan.packageJson.devDependencies).toEqual({
       "@tailwindcss/postcss": "^4",
+      "@types/node": "^20",
+      "@types/react": "^19",
+      "@types/react-dom": "^19",
       tailwindcss: "^4",
+      typescript: "^5",
     });
     expect(plan.templateFiles).toEqual([
       {
@@ -355,7 +384,12 @@ describe("generation pipeline", () => {
       ui: "shadcn",
     });
 
-    expect(defaultPlan.packageJson.dependencies).toEqual({});
+    expect(defaultPlan.packageJson.dependencies).toMatchObject({
+      next: "16.2.9",
+      react: "19.2.4",
+      "react-dom": "19.2.4",
+    });
+    expect(defaultPlan.packageJson.dependencies).not.toHaveProperty("class-variance-authority");
     expect(defaultPlan.templateFiles.map((file) => file.sourcePath)).not.toContain(
       "features/shadcn/components.json",
     );
@@ -376,6 +410,13 @@ describe("generation pipeline", () => {
 
   it("loads selected feature template files by default when a template loader is provided", async () => {
     const loader = createInMemoryTemplateLoader({
+      "base/next": [
+        {
+          sourcePath: "base/next/app/page.tsx",
+          targetPath: "app/page.tsx",
+          contents: "base page",
+        },
+      ],
       "features/tailwind/app/globals.css": [
         {
           sourcePath: "features/tailwind/app/globals.css",
@@ -539,6 +580,13 @@ describe("generation pipeline", () => {
 
   it("does not add Auth.js, Prisma, or source-directory files for Docker PostgreSQL", async () => {
     const loader = createInMemoryTemplateLoader({
+      "base/next": [
+        {
+          sourcePath: "base/next/app/page.tsx",
+          targetPath: "app/page.tsx",
+          contents: "base page",
+        },
+      ],
       "features/tailwind/app/globals.css": [
         {
           sourcePath: "features/tailwind/app/globals.css",
@@ -582,6 +630,13 @@ describe("generation pipeline", () => {
 
   it("does not add Auth.js, Docker, or source-directory files for Prisma", async () => {
     const loader = createInMemoryTemplateLoader({
+      "base/next": [
+        {
+          sourcePath: "base/next/app/page.tsx",
+          targetPath: "app/page.tsx",
+          contents: "base page",
+        },
+      ],
       "features/tailwind/app/globals.css": [
         {
           sourcePath: "features/tailwind/app/globals.css",

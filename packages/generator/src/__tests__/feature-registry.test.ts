@@ -24,6 +24,26 @@ describe("feature registry", () => {
       id: "next",
       label: "Next.js",
       description: "Base Next.js App Router project.",
+      packageJson: {
+        version: "0.1.0",
+        scripts: {
+          dev: "next dev",
+          build: "next build",
+          start: "next start",
+          typecheck: "tsc --noEmit",
+        },
+        dependencies: {
+          next: "16.2.9",
+          react: "19.2.4",
+          "react-dom": "19.2.4",
+        },
+        devDependencies: {
+          "@types/node": "^20",
+          "@types/react": "^19",
+          "@types/react-dom": "^19",
+          typescript: "^5",
+        },
+      },
     });
   });
 

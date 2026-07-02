@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 5 Step 8 complete
-Primary focus: Docker PostgreSQL template is ready for Phase 5 completion verification
+Current phase: Phase 5 complete
+Primary focus: Phase 6 website wizard shell is ready to begin
 ```
 
 ## Phase Progress
@@ -19,8 +19,8 @@ Primary focus: Docker PostgreSQL template is ready for Phase 5 completion verifi
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
-| Phase 5 | Template Implementation               | In Progress | Step 8 created and verified Docker PostgreSQL Compose files, README guidance, template references, and compatibility coverage without adding npm dependencies or Auth.js/Prisma behavior. |
-| Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
+| Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
+| Phase 6 | Website MVP                           | Ready       | Ready to create the website wizard shell, preview, and download flow without duplicating generator logic. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -30,6 +30,164 @@ Primary focus: Docker PostgreSQL template is ready for Phase 5 completion verifi
 Add entries in reverse chronological order.
 
 ### 2026-07-02
+
+Phase 5 Step 9 completed: Verify Phase 5 completion
+
+Changes made:
+
+- Verified template package foundation: `@launchkit/templates`, package files, base templates, and feature templates.
+- Verified base Next.js template files for App Router, TypeScript, no `src/` folder, and expected project files.
+- Verified Tailwind template files, Tailwind v4 PostCSS setup, and Tailwind dependency contributions.
+- Verified shadcn/ui template files, dependency contributions, token CSS, and opt-in behavior.
+- Verified PostgreSQL env contribution, README guidance, and that PostgreSQL alone does not add Prisma, Auth.js, or Docker files.
+- Verified Prisma template files, Prisma v7 setup, dependency/script contributions, README guidance, and PostgreSQL compatibility.
+- Verified Auth.js credentials template files, `AUTH_SECRET`, dependency contribution, scaffold warnings, and database-independent compatibility.
+- Verified Docker PostgreSQL template files, README guidance, PostgreSQL compatibility, and no npm dependency contribution.
+- Verified generator output for default, shadcn, PostgreSQL, PostgreSQL + Prisma, Auth.js credentials, PostgreSQL + Docker, and full compatible MVP stacks using real files from `packages/templates`.
+- Fixed base template integration so `generateProject` loads `base/next` when a template loader is provided.
+- Fixed generated file merging so later generated files override duplicate template paths predictably.
+- Fixed generated `package.json` to include base Next.js metadata: Next, React, React DOM, TypeScript, app scripts, and version.
+- Removed outdated generated README wording that said real templates would be added later.
+- Confirmed no `node:test` or Node built-in test runner usage exists in `packages/`, `apps/`, or root `package.json`.
+
+Files changed:
+
+- `packages/generator/src/features/definitions.ts`
+- `packages/generator/src/generate-project.ts`
+- `packages/generator/src/__tests__/feature-registry.test.ts`
+- `packages/generator/src/__tests__/generate-project.test.ts`
+- `packages/generator/src/__tests__/phase-4-coverage.test.ts`
+- `packages/generator/src/__tests__/phase-5-completion.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,280p' context/progress-tracker.md
+sed -n '1,320p' .agents/prompts/phase-05/step-9.md
+sed -n '321,520p' .agents/prompts/phase-05/step-9.md
+git status --short
+find context -maxdepth 1 -type f -print | sort
+sed -n '1,260p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '1,620p' context/ui-rules.md
+sed -n '261,620p' context/architecture.md
+sed -n '261,620p' context/build-plan.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/architecture.md
+sed -n '621,1040p' context/build-plan.md
+sed -n '621,980p' context/project-overview.md
+rg "node:test|node --test" packages apps package.json
+rg "TemplateLoader|loadTemplateFiles|createFile|filesystem|template" packages/generator/src packages/templates/src -g '*.ts'
+sed -n '1,260p' packages/generator/src/template-loader.ts
+sed -n '1,320p' packages/generator/src/file-tree.ts
+find packages/templates -maxdepth 5 -type f -print | sort
+sed -n '1,260p' packages/generator/src/features/registry.ts
+sed -n '1,760p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,320p' packages/generator/src/__tests__/template-loader.test.ts
+cat packages/templates/package.json
+cat packages/templates/tsconfig.json
+sed -n '1,220p' packages/templates/base/next/package.json
+sed -n '1,180p' packages/templates/base/next/app/layout.tsx
+sed -n '1,180p' packages/templates/base/next/app/page.tsx
+npm run typecheck -w @launchkit/generator
+npm test -w @launchkit/generator
+npm run typecheck -w @launchkit/templates
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/schema
+npm test -w @launchkit/schema
+npm run typecheck
+npm run test
+npm run lint
+git diff --check
+npm run build
+npm run build
+git status --short
+git diff --stat
+git diff -- packages/generator/src/generate-project.ts packages/generator/src/features/definitions.ts packages/generator/src/__tests__/feature-registry.test.ts packages/generator/src/__tests__/generate-project.test.ts packages/generator/src/__tests__/phase-4-coverage.test.ts packages/generator/src/__tests__/phase-5-completion.test.ts
+find packages/templates/base packages/templates/features -maxdepth 5 -type f -print | sort
+```
+
+Verification:
+
+- [x] `packages/templates/package.json` exists and is named `@launchkit/templates`.
+- [x] `packages/templates/tsconfig.json` exists.
+- [x] `packages/templates/src/index.ts` exists and exports template IDs.
+- [x] `packages/templates/base/` exists.
+- [x] `packages/templates/features/` exists.
+- [x] Base Next.js template includes `app/layout.tsx`, `app/page.tsx`, `app/globals.css`, `package.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `.gitignore`, and `README.md`.
+- [x] Base Next.js template uses App Router and TypeScript.
+- [x] Base Next.js generation does not include `src/`.
+- [x] Tailwind template setup exists and contributes Tailwind v4 dependencies.
+- [x] Tailwind alone does not add shadcn/ui files.
+- [x] shadcn/ui template includes `components.json`, `lib/utils.ts`, and `components/ui/button.tsx`.
+- [x] shadcn/ui dependencies and token CSS are verified.
+- [x] `ui: "none"` does not include shadcn/ui files.
+- [x] PostgreSQL generation includes `DATABASE_URL`.
+- [x] `database: "none"` does not include `DATABASE_URL`.
+- [x] PostgreSQL alone does not add Prisma, Auth.js, or Docker files.
+- [x] Prisma generation includes `prisma/schema.prisma`, `lib/db.ts`, and `prisma.config.ts`.
+- [x] Prisma dependencies, scripts, and README guidance are verified.
+- [x] Prisma without PostgreSQL is rejected.
+- [x] Auth.js credentials generation includes `auth.ts`, `app/api/auth/[...nextauth]/route.ts`, and `AUTH_SECRET`.
+- [x] Auth.js dependency and scaffold README warnings are verified.
+- [x] Auth.js credentials without a database is allowed.
+- [x] `auth: "none"` does not include Auth.js files.
+- [x] Docker PostgreSQL generation includes `docker-compose.yml`.
+- [x] Docker PostgreSQL without PostgreSQL is rejected.
+- [x] Docker README guidance is verified.
+- [x] Docker PostgreSQL does not add npm dependencies.
+- [x] Docker PostgreSQL alone does not add Prisma or Auth.js files.
+- [x] Compatibility rules still cover Prisma/PostgreSQL, Docker/PostgreSQL, Auth.js credentials, Auth.js credentials with Prisma, and shadcn/Tailwind.
+- [x] Generator output was verified with real template files for default, shadcn, PostgreSQL, PostgreSQL + Prisma, Auth.js credentials, PostgreSQL + Docker, and full MVP selections.
+- [x] Generated paths are normalized and safe.
+- [x] No generated file path starts with `/`.
+- [x] No generated file path contains `..`.
+- [x] No generated file path contains empty path segments.
+- [x] No generated project includes `src/`.
+- [x] No `node:test` or `node --test` usage exists in `packages/`, `apps/`, or root `package.json`.
+- [x] Templates package typecheck passed.
+- [x] Templates package tests passed.
+- [x] Schema package typecheck passed.
+- [x] Schema package tests passed.
+- [x] Generator package typecheck passed.
+- [x] Generator package tests passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm test -w @launchkit/generator` passed: generator package Vitest suite ran 111 tests.
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test -w @launchkit/templates` passed: templates package Vitest suite ran 51 tests.
+- `npm run typecheck -w @launchkit/schema` passed.
+- `npm test -w @launchkit/schema` passed: schema package Vitest suite ran 73 tests.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `rg "node:test|node --test" packages apps package.json` returned no matches.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes:
+
+- Phase 5 is complete.
+- Phase 6 is ready to begin with the website wizard shell.
+- The generator still uses an injected `TemplateLoader`; Step 9 added test coverage that verifies the implemented `packages/templates` files compose correctly through that interface.
+- The Phase 5 verification found and fixed missing base package metadata in generated `package.json`.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Phase 6 Step 1: Create website wizard shell.
 
 Phase 5 Step 8 completed: Create Docker PostgreSQL template
 
