@@ -141,6 +141,7 @@ function createPackageJsonFile(packageJson: PackageJsonPatch) {
   return {
     name: packageJson.name,
     private: packageJson.private ?? true,
+    ...(packageJson.type !== undefined ? { type: packageJson.type } : {}),
     scripts: packageJson.scripts ?? {},
     dependencies: packageJson.dependencies ?? {},
     devDependencies: packageJson.devDependencies ?? {},

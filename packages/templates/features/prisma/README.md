@@ -1,8 +1,10 @@
 # Prisma
 
-This project uses Prisma with PostgreSQL through `DATABASE_URL`.
+This project uses Prisma v7 with PostgreSQL through `DATABASE_URL`.
 
-Run Prisma commands after installing dependencies and configuring `.env`.
+`prisma.config.ts` loads `DATABASE_URL` for Prisma CLI commands. `lib/db.ts` uses `@prisma/adapter-pg` for runtime Prisma Client queries.
+
+Run Prisma commands after installing dependencies and configuring `.env`:
 
 ```bash
 npm run db:generate

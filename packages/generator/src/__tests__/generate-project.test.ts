@@ -138,8 +138,11 @@ describe("generation pipeline", () => {
     });
 
     expect(readJsonFile(project, "package.json")).toMatchObject({
+      type: "module",
       dependencies: {
+        "@prisma/adapter-pg": "latest",
         "@prisma/client": "latest",
+        dotenv: "latest",
       },
       devDependencies: {
         prisma: "latest",
@@ -167,8 +170,9 @@ describe("generation pipeline", () => {
     const postgresReadme = readTextFile(postgresProject, "README.md");
     const prismaReadme = readTextFile(prismaProject, "README.md");
 
-    expect(postgresReadme).not.toContain("Prisma uses the PostgreSQL `DATABASE_URL`");
-    expect(prismaReadme).toContain("Prisma uses the PostgreSQL `DATABASE_URL`");
+    expect(postgresReadme).not.toContain("Prisma v7 uses `prisma.config.ts`");
+    expect(prismaReadme).toContain("Prisma v7 uses `prisma.config.ts`");
+    expect(prismaReadme).toContain("@prisma/adapter-pg");
     expect(prismaReadme).toContain("npm run db:generate");
     expect(prismaReadme).toContain("npm run db:push");
     expect(prismaReadme).toContain("npm run db:studio");
@@ -189,7 +193,12 @@ describe("generation pipeline", () => {
       "prisma",
       "authjs-credentials",
     ]);
-    expect(plan.packageJson.dependencies).toEqual({ "@prisma/client": "latest" });
+    expect(plan.packageJson.type).toBe("module");
+    expect(plan.packageJson.dependencies).toEqual({
+      "@prisma/adapter-pg": "latest",
+      "@prisma/client": "latest",
+      dotenv: "latest",
+    });
     expect(plan.packageJson.devDependencies).toMatchObject({
       "@tailwindcss/postcss": "^4",
       tailwindcss: "^4",
@@ -211,6 +220,10 @@ describe("generation pipeline", () => {
       {
         sourcePath: "features/prisma/lib/db.ts",
         targetPath: "lib/db.ts",
+      },
+      {
+        sourcePath: "features/prisma/prisma.config.ts",
+        targetPath: "prisma.config.ts",
       },
     ]);
     expect(plan.env.map((envVar) => envVar.name)).toEqual(["DATABASE_URL", "AUTH_SECRET"]);
@@ -300,7 +313,14 @@ describe("generation pipeline", () => {
         {
           sourcePath: "features/prisma/lib/db.ts",
           targetPath: "lib/db.ts",
-          contents: 'import { PrismaClient } from "@prisma/client";',
+          contents: 'import { PrismaPg } from "@prisma/adapter-pg";',
+        },
+      ],
+      "features/prisma/prisma.config.ts": [
+        {
+          sourcePath: "features/prisma/prisma.config.ts",
+          targetPath: "prisma.config.ts",
+          contents: 'datasource: { url: env("DATABASE_URL") }',
         },
       ],
     });
@@ -335,14 +355,16 @@ describe("generation pipeline", () => {
     );
     expect(defaultProject.files.map((file) => file.path)).not.toContain("prisma/schema.prisma");
     expect(defaultProject.files.map((file) => file.path)).not.toContain("lib/db.ts");
+    expect(defaultProject.files.map((file) => file.path)).not.toContain("prisma.config.ts");
     expect(shadcnProject.files.map((file) => file.path)).toEqual(
       expect.arrayContaining(["components.json", "lib/utils.ts", "components/ui/button.tsx"]),
     );
     expect(prismaProject.files.map((file) => file.path)).toEqual(
-      expect.arrayContaining(["prisma/schema.prisma", "lib/db.ts"]),
+      expect.arrayContaining(["prisma/schema.prisma", "lib/db.ts", "prisma.config.ts"]),
     );
     expect(readTextFile(prismaProject, "prisma/schema.prisma")).toContain("postgresql");
-    expect(readTextFile(prismaProject, "lib/db.ts")).toContain("PrismaClient");
+    expect(readTextFile(prismaProject, "lib/db.ts")).toContain("@prisma/adapter-pg");
+    expect(readTextFile(prismaProject, "prisma.config.ts")).toContain("DATABASE_URL");
   });
 
   it("does not add Auth.js, Docker, or source-directory files for Prisma", async () => {
@@ -375,6 +397,13 @@ describe("generation pipeline", () => {
           contents: "db",
         },
       ],
+      "features/prisma/prisma.config.ts": [
+        {
+          sourcePath: "features/prisma/prisma.config.ts",
+          targetPath: "prisma.config.ts",
+          contents: "config",
+        },
+      ],
     });
     const project = await generateProject(
       {
@@ -386,7 +415,9 @@ describe("generation pipeline", () => {
     );
     const paths = project.files.map((file) => file.path);
 
-    expect(paths).toEqual(expect.arrayContaining(["prisma/schema.prisma", "lib/db.ts"]));
+    expect(paths).toEqual(
+      expect.arrayContaining(["prisma/schema.prisma", "lib/db.ts", "prisma.config.ts"]),
+    );
     expect(paths).not.toContain("app/api/auth/[...nextauth]/route.ts");
     expect(paths).not.toContain("auth.ts");
     expect(paths).not.toContain("docker-compose.yml");

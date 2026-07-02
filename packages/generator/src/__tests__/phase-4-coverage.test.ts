@@ -87,10 +87,13 @@ describe("Phase 4 generator coverage", () => {
 
     expect(packageJson).toMatchObject({
       name: "full-stack-demo",
+      type: "module",
       dependencies: {
+        "@prisma/adapter-pg": "latest",
         "@prisma/client": "latest",
         "class-variance-authority": "^0.7.1",
         clsx: "^2.1.1",
+        dotenv: "latest",
         "tailwind-merge": "^3.6.0",
       },
       devDependencies: {

@@ -170,8 +170,11 @@ describe("feature registry", () => {
     expect(getFeatureDefinition("prisma")).toMatchObject({
       requires: ["postgres"],
       packageJson: {
+        type: "module",
         dependencies: {
+          "@prisma/adapter-pg": "latest",
           "@prisma/client": "latest",
+          dotenv: "latest",
         },
         devDependencies: {
           prisma: "latest",
@@ -191,9 +194,14 @@ describe("feature registry", () => {
           sourcePath: "features/prisma/lib/db.ts",
           targetPath: "lib/db.ts",
         },
+        {
+          sourcePath: "features/prisma/prisma.config.ts",
+          targetPath: "prisma.config.ts",
+        },
       ],
       notes: expect.arrayContaining([
-        "Prisma uses the PostgreSQL `DATABASE_URL` from `.env.example`.",
+        "Prisma v7 uses `prisma.config.ts` to load the PostgreSQL `DATABASE_URL` from `.env.example`.",
+        "The Prisma client helper uses `@prisma/adapter-pg` for direct PostgreSQL connections.",
         "Run `npm run db:generate` after installing dependencies to generate the Prisma client.",
         "Run `npm run db:push` to sync the Prisma schema to your development database.",
         "Run `npm run db:studio` to inspect data with Prisma Studio.",

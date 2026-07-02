@@ -50,6 +50,7 @@ const requiredPostgresTemplateFiles = [
 const requiredPrismaTemplateFiles = [
   "prisma/schema.prisma",
   "lib/db.ts",
+  "prisma.config.ts",
   "README.md",
 ];
 
@@ -296,23 +297,35 @@ describe("Prisma feature template", () => {
     ).resolves.toHaveLength(requiredPrismaTemplateFiles.length);
   });
 
-  it("configures Prisma for PostgreSQL through DATABASE_URL", async () => {
+  it("configures Prisma schema for Prisma v7 and PostgreSQL", async () => {
     const schema = await readFile(join(prismaTemplateRoot, "prisma/schema.prisma"), "utf8");
 
     expect(schema).toContain('provider = "postgresql"');
-    expect(schema).toContain('url      = env("DATABASE_URL")');
-    expect(schema).toContain('provider = "prisma-client-js"');
+    expect(schema).not.toContain('url      = env("DATABASE_URL")');
+    expect(schema).toContain('provider = "prisma-client"');
+    expect(schema).toContain('output   = "../lib/generated/prisma"');
     expect(schema).toContain("model User");
     expect(schema).not.toContain("Account");
     expect(schema).not.toContain("Session");
   });
 
+  it("loads DATABASE_URL through Prisma config", async () => {
+    const config = await readFile(join(prismaTemplateRoot, "prisma.config.ts"), "utf8");
+
+    expect(config).toContain('import "dotenv/config";');
+    expect(config).toContain('import { defineConfig, env } from "prisma/config";');
+    expect(config).toContain('schema: "prisma/schema.prisma"');
+    expect(config).toContain('url: env("DATABASE_URL")');
+  });
+
   it("includes a development-safe Prisma client helper", async () => {
     const db = await readFile(join(prismaTemplateRoot, "lib/db.ts"), "utf8");
 
-    expect(db).toContain('import { PrismaClient } from "@prisma/client";');
+    expect(db).toContain('import { PrismaPg } from "@prisma/adapter-pg";');
+    expect(db).toContain('import { PrismaClient } from "./generated/prisma/client";');
+    expect(db).toContain("connectionString: process.env.DATABASE_URL");
     expect(db).toContain("const globalForPrisma = globalThis as unknown as");
-    expect(db).toContain("export const db = globalForPrisma.prisma ?? new PrismaClient();");
+    expect(db).toContain("export const db = globalForPrisma.prisma ?? new PrismaClient({ adapter });");
     expect(db).toContain('process.env.NODE_ENV !== "production"');
     expect(db).toContain("globalForPrisma.prisma = db;");
   });
@@ -320,7 +333,9 @@ describe("Prisma feature template", () => {
   it("includes concise Prisma README guidance", async () => {
     const readme = await readFile(join(prismaTemplateRoot, "README.md"), "utf8");
 
-    expect(readme).toContain("uses Prisma with PostgreSQL");
+    expect(readme).toContain("uses Prisma v7 with PostgreSQL");
+    expect(readme).toContain("prisma.config.ts");
+    expect(readme).toContain("@prisma/adapter-pg");
     expect(readme).toContain("npm run db:generate");
     expect(readme).toContain("npm run db:push");
     expect(readme).toContain("npm run db:studio");
