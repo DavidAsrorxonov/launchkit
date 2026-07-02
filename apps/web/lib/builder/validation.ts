@@ -29,6 +29,11 @@ export type DatabaseStepValidation = {
   errors: Pick<ValidationErrors, "database" | "orm" | "docker">;
 };
 
+export type OrmStepValidation = {
+  isValid: boolean;
+  errors: Pick<ValidationErrors, "orm" | "database">;
+};
+
 export function validateBuilderConfig(config: LaunchKitConfig): {
   isValid: boolean;
   errors: ValidationErrors;
@@ -133,6 +138,19 @@ export function validateDatabaseStep(
 
   return {
     isValid: !errors.database && !errors.orm && !errors.docker,
+    errors,
+  };
+}
+
+export function validateOrmStep(config: LaunchKitConfig): OrmStepValidation {
+  const validation = validateBuilderConfig(config);
+  const errors = {
+    orm: validation.errors.orm,
+    database: validation.errors.database,
+  };
+
+  return {
+    isValid: !errors.orm && !errors.database,
     errors,
   };
 }

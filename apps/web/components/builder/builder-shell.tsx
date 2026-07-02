@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { DatabaseStep } from "@/components/builder/steps/database-step";
 import { FrameworkStep } from "@/components/builder/steps/framework-step";
+import { OrmStep } from "@/components/builder/steps/orm-step";
 import { ProjectStep } from "@/components/builder/steps/project-step";
 import { StylingUiStep } from "@/components/builder/steps/styling-ui-step";
 import {
@@ -15,6 +16,7 @@ import { builderSteps } from "@/lib/builder/steps";
 import {
   validateDatabaseStep,
   validateFrameworkStep,
+  validateOrmStep,
   validateProjectStep,
   validateStylingUiStep,
 } from "@/lib/builder/validation";
@@ -33,15 +35,18 @@ export function BuilderShell() {
   const frameworkStepValidation = validateFrameworkStep(builderState.config);
   const stylingUiStepValidation = validateStylingUiStep(builderState.config);
   const databaseStepValidation = validateDatabaseStep(builderState.config);
+  const ormStepValidation = validateOrmStep(builderState.config);
   const isProjectStep = currentStep.id === "project";
   const isFrameworkStep = currentStep.id === "framework";
   const isStylingUiStep = currentStep.id === "styling-ui";
   const isDatabaseStep = currentStep.id === "database";
+  const isOrmStep = currentStep.id === "orm";
   const isNextDisabled =
     (isProjectStep && !projectStepValidation.isValid) ||
     (isFrameworkStep && !frameworkStepValidation.isValid) ||
     (isStylingUiStep && !stylingUiStepValidation.isValid) ||
-    (isDatabaseStep && !databaseStepValidation.isValid);
+    (isDatabaseStep && !databaseStepValidation.isValid) ||
+    (isOrmStep && !ormStepValidation.isValid);
 
   const selectedStack = useMemo(
     () => [
@@ -127,6 +132,13 @@ export function BuilderShell() {
                   <DatabaseStep
                     config={builderState.config}
                     validation={databaseStepValidation}
+                    onConfigChange={updateConfig}
+                  />
+                ) : null}
+                {isOrmStep ? (
+                  <OrmStep
+                    config={builderState.config}
+                    validation={ormStepValidation}
                     onConfigChange={updateConfig}
                   />
                 ) : null}

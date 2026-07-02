@@ -45,7 +45,7 @@ export const builderSteps = [
     id: "orm",
     label: "ORM",
     shortLabel: "ORM",
-    placeholder: "ORM step coming next.",
+    placeholder: "Choose ORM setup.",
   },
   {
     id: "auth",
