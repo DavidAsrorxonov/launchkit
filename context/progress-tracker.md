@@ -8,7 +8,7 @@ Use this file to track development progress, changes made, decisions, notes, blo
 Project: LaunchKit
 Stage: Foundation setup
 Current phase: Phase 6 in progress
-Primary focus: Phase 6 project step is ready to begin
+Primary focus: Phase 6 framework step is ready to begin
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 project step is ready to begin
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | In Progress | Step 1 created the website wizard shell; ready to add the project step without duplicating generator logic. |
+| Phase 6 | Website MVP                           | In Progress | Step 2 added the Project step; ready to add the Framework step without duplicating generator logic. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -30,6 +30,115 @@ Primary focus: Phase 6 project step is ready to begin
 Add entries in reverse chronological order.
 
 ### 2026-07-02
+
+Phase 6 Step 2 completed: Create project step
+
+Changes made:
+
+- Added Project step UI for generated project identity.
+- Added a project name input connected to shared builder config state.
+- Added project name validation using `@launchkit/schema` `LaunchKitConfigSchema`.
+- Added inline validation feedback for edited invalid project names.
+- Added a package manager selector using `@launchkit/schema` package manager metadata.
+- Connected package manager selection to shared builder config state.
+- Added builder config patch/update helpers.
+- Gated Next navigation when the Project step config is invalid.
+- Kept future wizard steps as placeholders.
+- Confirmed no `@launchkit/generator` import, API route, zip download flow, CLI work, or later step implementation was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/project-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/components/builder/wizard-navigation.tsx`
+- `apps/web/components/builder/wizard-step-panel.tsx`
+- `apps/web/lib/builder/builder-state.ts`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,360p' .agents/prompts/phase-06/step-2.md
+rg --files apps/web/components apps/web/lib apps/web/app packages/schema/src
+git status --short
+sed -n '1,260p' context/architecture.md
+sed -n '1,340p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '261,980p' context/architecture.md
+sed -n '341,1120p' context/build-plan.md
+sed -n '261,760p' context/project-overview.md
+sed -n '281,520p' context/ui-rules.md
+sed -n '1,260p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,240p' apps/web/components/builder/wizard-step-panel.tsx
+sed -n '1,220p' apps/web/components/builder/wizard-navigation.tsx
+sed -n '1,260p' packages/schema/src/metadata.ts
+sed -n '1,220p' packages/schema/src/options.ts
+sed -n '1,220p' packages/schema/src/config.ts
+sed -n '1,220p' packages/schema/src/__tests__/config.test.ts
+sed -n '1,220p' packages/schema/src/__tests__/metadata.test.ts
+cat apps/web/tsconfig.json
+mkdir -p apps/web/components/builder/steps
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+git status --short
+git diff --stat
+rg '@launchkit/generator|app/api|createProjectZip|download|node:test|node --test' apps/web
+git diff -- apps/web/components/builder apps/web/lib/builder
+```
+
+Verification:
+
+- [x] Project step renders in the wizard.
+- [x] Project name input is connected to builder config state.
+- [x] Project name validation uses `@launchkit/schema`.
+- [x] Invalid edited project names show concise feedback.
+- [x] Invalid project names prevent advancing from the Project step.
+- [x] Package manager selector supports `npm` and `pnpm`.
+- [x] Package manager options come from schema metadata.
+- [x] Package manager selection updates builder config state.
+- [x] No generator logic was added to `apps/web`.
+- [x] No API route or download flow was implemented.
+- [x] No CLI functionality was added.
+- [x] Future steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 3: Create framework step.
 
 Phase 6 Step 1 completed: Create website wizard shell
 

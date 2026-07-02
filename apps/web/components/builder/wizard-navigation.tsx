@@ -1,6 +1,7 @@
 type WizardNavigationProps = {
   isFirstStep: boolean;
   isLastStep: boolean;
+  isNextDisabled?: boolean;
   onBack: () => void;
   onNext: () => void;
 };
@@ -8,6 +9,7 @@ type WizardNavigationProps = {
 export function WizardNavigation({
   isFirstStep,
   isLastStep,
+  isNextDisabled = false,
   onBack,
   onNext,
 }: WizardNavigationProps) {
@@ -24,7 +26,7 @@ export function WizardNavigation({
       <button
         type="button"
         onClick={onNext}
-        disabled={isLastStep}
+        disabled={isLastStep || isNextDisabled}
         className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-45"
       >
         Next

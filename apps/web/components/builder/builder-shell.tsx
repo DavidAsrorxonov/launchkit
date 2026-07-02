@@ -2,19 +2,28 @@
 
 import { useMemo, useState } from "react";
 
-import { createInitialBuilderState } from "@/lib/builder/builder-state";
+import { ProjectStep } from "@/components/builder/steps/project-step";
+import {
+  createInitialBuilderState,
+  type BuilderConfigPatch,
+  updateBuilderConfig,
+} from "@/lib/builder/builder-state";
 import { builderSteps } from "@/lib/builder/steps";
+import { validateProjectStep } from "@/lib/builder/validation";
 import { WizardNavigation } from "./wizard-navigation";
 import { WizardProgress } from "./wizard-progress";
 import { WizardStepPanel } from "./wizard-step-panel";
 
 export function BuilderShell() {
-  const [builderState] = useState(createInitialBuilderState);
+  const [builderState, setBuilderState] = useState(createInitialBuilderState);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const currentStep = builderSteps[currentStepIndex];
   const isFirstStep = currentStepIndex === 0;
   const isLastStep = currentStepIndex === builderSteps.length - 1;
+  const projectStepValidation = validateProjectStep(builderState.config);
+  const isProjectStep = currentStep.id === "project";
+  const isNextDisabled = isProjectStep && !projectStepValidation.isValid;
 
   const selectedStack = useMemo(
     () => [
@@ -36,9 +45,17 @@ export function BuilderShell() {
   }
 
   function goNext() {
+    if (isNextDisabled) {
+      return;
+    }
+
     setCurrentStepIndex((stepIndex) =>
       Math.min(stepIndex + 1, builderSteps.length - 1),
     );
+  }
+
+  function updateConfig(patch: BuilderConfigPatch) {
+    setBuilderState((state) => updateBuilderConfig(state, patch));
   }
 
   return (
@@ -67,10 +84,19 @@ export function BuilderShell() {
                 step={currentStep}
                 stepNumber={currentStepIndex + 1}
                 totalSteps={builderSteps.length}
-              />
+              >
+                {isProjectStep ? (
+                  <ProjectStep
+                    config={builderState.config}
+                    validation={projectStepValidation}
+                    onConfigChange={updateConfig}
+                  />
+                ) : null}
+              </WizardStepPanel>
               <WizardNavigation
                 isFirstStep={isFirstStep}
                 isLastStep={isLastStep}
+                isNextDisabled={isNextDisabled}
                 onBack={goBack}
                 onNext={goNext}
               />

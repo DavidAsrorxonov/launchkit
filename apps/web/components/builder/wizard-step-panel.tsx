@@ -1,15 +1,18 @@
 import type { BuilderStep } from "@/lib/builder/steps";
+import type { ReactNode } from "react";
 
 type WizardStepPanelProps = {
   step: BuilderStep;
   stepNumber: number;
   totalSteps: number;
+  children?: ReactNode;
 };
 
 export function WizardStepPanel({
   step,
   stepNumber,
   totalSteps,
+  children,
 }: WizardStepPanelProps) {
   return (
     <section
@@ -33,7 +36,9 @@ export function WizardStepPanel({
         </span>
       </div>
       <div className="rounded-md border border-dashed border-border bg-background p-5">
-        <p className="text-sm text-muted-foreground">{step.placeholder}</p>
+        {children ?? (
+          <p className="text-sm text-muted-foreground">{step.placeholder}</p>
+        )}
       </div>
     </section>
   );
