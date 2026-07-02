@@ -211,6 +211,45 @@ describe("generation pipeline", () => {
     expect(prismaReadme).toContain("npm run db:studio");
   });
 
+  it("includes Docker PostgreSQL README guidance only when Docker PostgreSQL is selected", async () => {
+    const postgresProject = await generateProject({
+      ...defaultLaunchKitConfig,
+      database: "postgres",
+      docker: "none",
+    });
+    const dockerProject = await generateProject({
+      ...defaultLaunchKitConfig,
+      database: "postgres",
+      docker: "postgres",
+    });
+    const postgresReadme = readTextFile(postgresProject, "README.md");
+    const dockerReadme = readTextFile(dockerProject, "README.md");
+
+    expect(postgresReadme).not.toContain("Docker PostgreSQL is configured for local development.");
+    expect(dockerReadme).toContain("Docker PostgreSQL is configured for local development.");
+    expect(dockerReadme).toContain("docker compose up -d");
+    expect(dockerReadme).toContain("docker compose down");
+    expect(dockerReadme).toContain("development defaults");
+    expect(dockerReadme).toContain("`DATABASE_URL` should match");
+    expect(dockerReadme).toContain("production database hosting");
+  });
+
+  it("does not add npm dependencies for Docker PostgreSQL", async () => {
+    const postgresProject = await generateProject({
+      ...defaultLaunchKitConfig,
+      database: "postgres",
+    });
+    const dockerProject = await generateProject({
+      ...defaultLaunchKitConfig,
+      database: "postgres",
+      docker: "postgres",
+    });
+
+    expect(readJsonFile(dockerProject, "package.json")).toEqual(
+      readJsonFile(postgresProject, "package.json"),
+    );
+  });
+
   it("creates a generation plan with resolved features and merged contributions", () => {
     const plan = createGenerationPlan({
       ...defaultLaunchKitConfig,
@@ -272,6 +311,41 @@ describe("generation pipeline", () => {
     expect(plan.env.find((envVar) => envVar.name === "DATABASE_URL")?.value).toBe(
       "postgresql://postgres:postgres@localhost:5432/my-app",
     );
+  });
+
+  it("creates a Docker PostgreSQL generation plan without env or package contributions", () => {
+    const plan = createGenerationPlan({
+      ...defaultLaunchKitConfig,
+      database: "postgres",
+      docker: "postgres",
+    });
+
+    expect(plan.features.map((feature) => feature.id)).toEqual([
+      "next",
+      "tailwind",
+      "postgres",
+      "docker-postgres",
+    ]);
+    expect(plan.packageJson.dependencies).toEqual({});
+    expect(plan.packageJson.devDependencies).toEqual({
+      "@tailwindcss/postcss": "^4",
+      tailwindcss: "^4",
+    });
+    expect(plan.templateFiles).toEqual([
+      {
+        sourcePath: "features/tailwind/app/globals.css",
+        targetPath: "app/globals.css",
+      },
+      {
+        sourcePath: "features/tailwind/postcss.config.mjs",
+        targetPath: "postcss.config.mjs",
+      },
+      {
+        sourcePath: "features/docker-postgres/docker-compose.yml",
+        targetPath: "docker-compose.yml",
+      },
+    ]);
+    expect(plan.env.map((envVar) => envVar.name)).toEqual(["DATABASE_URL"]);
   });
 
   it("adds shadcn/ui dependencies and template files only when selected", () => {
@@ -379,6 +453,13 @@ describe("generation pipeline", () => {
           contents: 'import { handlers } from "@/auth";',
         },
       ],
+      "features/docker-postgres/docker-compose.yml": [
+        {
+          sourcePath: "features/docker-postgres/docker-compose.yml",
+          targetPath: "docker-compose.yml",
+          contents: "POSTGRES_DB: {{packageName}}",
+        },
+      ],
     });
 
     const defaultProject = await generateProject(defaultLaunchKitConfig, {
@@ -412,6 +493,16 @@ describe("generation pipeline", () => {
         templateLoader: loader,
       },
     );
+    const dockerProject = await generateProject(
+      {
+        ...defaultLaunchKitConfig,
+        database: "postgres",
+        docker: "postgres",
+      },
+      {
+        templateLoader: loader,
+      },
+    );
 
     expect(defaultProject.files.map((file) => file.path)).not.toContain("components.json");
     expect(defaultProject.files.map((file) => file.path)).not.toContain("lib/utils.ts");
@@ -425,6 +516,7 @@ describe("generation pipeline", () => {
     expect(defaultProject.files.map((file) => file.path)).not.toContain(
       "app/api/auth/[...nextauth]/route.ts",
     );
+    expect(defaultProject.files.map((file) => file.path)).not.toContain("docker-compose.yml");
     expect(shadcnProject.files.map((file) => file.path)).toEqual(
       expect.arrayContaining(["components.json", "lib/utils.ts", "components/ui/button.tsx"]),
     );
@@ -441,6 +533,51 @@ describe("generation pipeline", () => {
     expect(readTextFile(authProject, "app/api/auth/[...nextauth]/route.ts")).toContain(
       'from "@/auth"',
     );
+    expect(dockerProject.files.map((file) => file.path)).toContain("docker-compose.yml");
+    expect(readTextFile(dockerProject, "docker-compose.yml")).toContain("POSTGRES_DB: my-app");
+  });
+
+  it("does not add Auth.js, Prisma, or source-directory files for Docker PostgreSQL", async () => {
+    const loader = createInMemoryTemplateLoader({
+      "features/tailwind/app/globals.css": [
+        {
+          sourcePath: "features/tailwind/app/globals.css",
+          targetPath: "app/globals.css",
+          contents: "tailwind",
+        },
+      ],
+      "features/tailwind/postcss.config.mjs": [
+        {
+          sourcePath: "features/tailwind/postcss.config.mjs",
+          targetPath: "postcss.config.mjs",
+          contents: "postcss",
+        },
+      ],
+      "features/docker-postgres/docker-compose.yml": [
+        {
+          sourcePath: "features/docker-postgres/docker-compose.yml",
+          targetPath: "docker-compose.yml",
+          contents: "compose",
+        },
+      ],
+    });
+    const project = await generateProject(
+      {
+        ...defaultLaunchKitConfig,
+        database: "postgres",
+        docker: "postgres",
+      },
+      { templateLoader: loader },
+    );
+    const paths = project.files.map((file) => file.path);
+
+    expect(paths).toContain("docker-compose.yml");
+    expect(paths).not.toContain("app/api/auth/[...nextauth]/route.ts");
+    expect(paths).not.toContain("auth.ts");
+    expect(paths).not.toContain("prisma/schema.prisma");
+    expect(paths).not.toContain("lib/db.ts");
+    expect(paths).not.toContain("prisma.config.ts");
+    expect(paths.some((path) => path.startsWith("src/"))).toBe(false);
   });
 
   it("does not add Auth.js, Docker, or source-directory files for Prisma", async () => {

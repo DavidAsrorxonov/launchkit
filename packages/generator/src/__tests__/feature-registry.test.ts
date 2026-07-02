@@ -211,6 +211,37 @@ describe("feature registry", () => {
     ).toContain("docker-postgres");
   });
 
+  it("does not enable PostgreSQL Docker Compose when Docker is none", () => {
+    expect(
+      getEnabledFeatures({ ...defaultLaunchKitConfig, docker: "none" }).map(
+        (feature) => feature.id,
+      ),
+    ).not.toContain("docker-postgres");
+  });
+
+  it("describes Docker PostgreSQL file and README contributions without npm packages", () => {
+    expect(getFeatureDefinition("docker-postgres")).toMatchObject({
+      requires: ["postgres"],
+      templateFiles: [
+        {
+          sourcePath: "features/docker-postgres/docker-compose.yml",
+          targetPath: "docker-compose.yml",
+        },
+      ],
+      notes: expect.arrayContaining([
+        "Docker PostgreSQL is configured for local development.",
+        "Run `docker compose up -d` to start PostgreSQL.",
+        "Run `docker compose down` to stop the service.",
+        "The Docker PostgreSQL username, password, and database name are development defaults.",
+        "`DATABASE_URL` should match the Docker Compose PostgreSQL service.",
+        "Configure production database hosting separately.",
+        "If Prisma is selected, run `npm run db:push` after PostgreSQL is running.",
+      ]),
+    });
+    expect(getFeatureDefinition("docker-postgres").packageJson).toBeUndefined();
+    expect(getFeatureDefinition("docker-postgres").env).toBeUndefined();
+  });
+
   it("describes the required Prisma package contributions", () => {
     expect(getFeatureDefinition("prisma")).toMatchObject({
       requires: ["postgres"],

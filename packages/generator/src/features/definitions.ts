@@ -196,6 +196,21 @@ export const dockerPostgresFeature: FeatureDefinition = {
   label: "PostgreSQL Docker Compose",
   description: "Local PostgreSQL service for development.",
   requires: ["postgres"],
+  templateFiles: [
+    {
+      sourcePath: "features/docker-postgres/docker-compose.yml",
+      targetPath: "docker-compose.yml",
+    },
+  ],
+  notes: [
+    "Docker PostgreSQL is configured for local development.",
+    "Run `docker compose up -d` to start PostgreSQL.",
+    "Run `docker compose down` to stop the service.",
+    "The Docker PostgreSQL username, password, and database name are development defaults.",
+    "`DATABASE_URL` should match the Docker Compose PostgreSQL service.",
+    "Configure production database hosting separately.",
+    "If Prisma is selected, run `npm run db:push` after PostgreSQL is running.",
+  ],
   isEnabled: (config) => config.docker === "postgres",
 };
 

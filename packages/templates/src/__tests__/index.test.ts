@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import {
   authjsCredentialsTemplateId,
   baseNextTemplateId,
+  dockerPostgresTemplateId,
   postgresTemplateId,
   prismaTemplateId,
   shadcnTemplateId,
@@ -20,6 +21,7 @@ const templatesRoot = join(
 );
 const baseNextTemplateRoot = join(templatesRoot, "base", "next");
 const authjsCredentialsTemplateRoot = join(templatesRoot, "features", "authjs-credentials");
+const dockerPostgresTemplateRoot = join(templatesRoot, "features", "docker-postgres");
 const postgresTemplateRoot = join(templatesRoot, "features", "postgres");
 const prismaTemplateRoot = join(templatesRoot, "features", "prisma");
 const shadcnTemplateRoot = join(templatesRoot, "features", "shadcn");
@@ -55,6 +57,11 @@ const requiredAuthjsCredentialsTemplateFiles = [
   "README.md",
 ];
 
+const requiredDockerPostgresTemplateFiles = [
+  "docker-compose.yml",
+  "README.md",
+];
+
 const requiredPrismaTemplateFiles = [
   "prisma/schema.prisma",
   "lib/db.ts",
@@ -80,6 +87,10 @@ describe("@launchkit/templates package foundation", () => {
 
   it("exports the Auth.js credentials template id", () => {
     expect(authjsCredentialsTemplateId).toBe("authjs-credentials");
+  });
+
+  it("exports the Docker PostgreSQL template id", () => {
+    expect(dockerPostgresTemplateId).toBe("docker-postgres");
   });
 
   it("exports the Tailwind template id", () => {
@@ -127,6 +138,82 @@ describe("base Next.js template", () => {
         if (!["{{projectName}}", "{{packageName}}"].includes(placeholder[0])) {
           unsupportedPlaceholders.add(
             `${relative(baseNextTemplateRoot, filePath)}: ${placeholder[0]}`,
+          );
+        }
+      }
+    }
+
+    expect([...unsupportedPlaceholders]).toEqual([]);
+  });
+});
+
+describe("Docker PostgreSQL feature template", () => {
+  it("includes the required Docker PostgreSQL files", async () => {
+    await expect(
+      Promise.all(
+        requiredDockerPostgresTemplateFiles.map(async (filePath) => {
+          await readFile(join(dockerPostgresTemplateRoot, filePath));
+        }),
+      ),
+    ).resolves.toHaveLength(requiredDockerPostgresTemplateFiles.length);
+  });
+
+  it("configures a local PostgreSQL Compose service", async () => {
+    const compose = await readFile(join(dockerPostgresTemplateRoot, "docker-compose.yml"), "utf8");
+
+    expect(compose).toContain("services:");
+    expect(compose).toContain("postgres:");
+    expect(compose).toContain("image: postgres:16");
+    expect(compose).toContain("restart: unless-stopped");
+    expect(compose).toContain('"5432:5432"');
+    expect(compose).toContain("POSTGRES_USER: postgres");
+    expect(compose).toContain("POSTGRES_PASSWORD: postgres");
+    expect(compose).toContain('POSTGRES_DB: "{{packageName}}"');
+    expect(compose).toContain("postgres_data:/var/lib/postgresql/data");
+  });
+
+  it("includes concise Docker PostgreSQL README guidance", async () => {
+    const readme = await readFile(join(dockerPostgresTemplateRoot, "README.md"), "utf8");
+
+    expect(readme).toContain("local development");
+    expect(readme).toContain("docker compose up -d");
+    expect(readme).toContain("docker compose down");
+    expect(readme).toContain("development defaults");
+    expect(readme).toContain("DATABASE_URL");
+    expect(readme).toContain("postgresql://postgres:postgres@localhost:5432/{{packageName}}");
+    expect(readme).toContain("production database hosting");
+  });
+
+  it("does not add Prisma, Auth.js, npm, or source-directory files", async () => {
+    const templateFiles = (await listTemplateFiles(dockerPostgresTemplateRoot)).map((filePath) =>
+      relative(dockerPostgresTemplateRoot, filePath),
+    );
+
+    expect([...templateFiles].sort()).toEqual([...requiredDockerPostgresTemplateFiles].sort());
+    expect(templateFiles).not.toContain("prisma/schema.prisma");
+    expect(templateFiles).not.toContain("lib/db.ts");
+    expect(templateFiles).not.toContain("auth.ts");
+    expect(templateFiles).not.toContain("app/api/auth/[...nextauth]/route.ts");
+    expect(templateFiles).not.toContain("package.json");
+  });
+
+  it("does not include a src directory", async () => {
+    const entries = await readdir(dockerPostgresTemplateRoot, { withFileTypes: true });
+
+    expect(entries.some((entry) => entry.isDirectory() && entry.name === "src")).toBe(false);
+  });
+
+  it("uses only supported template placeholders", async () => {
+    const templateFiles = await listTemplateFiles(dockerPostgresTemplateRoot);
+    const unsupportedPlaceholders = new Set<string>();
+
+    for (const filePath of templateFiles) {
+      const contents = await readFile(filePath, "utf8");
+
+      for (const placeholder of contents.matchAll(/{{[^}]+}}/g)) {
+        if (!["{{projectName}}", "{{packageName}}"].includes(placeholder[0])) {
+          unsupportedPlaceholders.add(
+            `${relative(dockerPostgresTemplateRoot, filePath)}: ${placeholder[0]}`,
           );
         }
       }

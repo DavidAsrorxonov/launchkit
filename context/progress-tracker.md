@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 5 Step 7 complete
-Primary focus: Auth.js credentials scaffold is ready for Docker PostgreSQL template work
+Current phase: Phase 5 Step 8 complete
+Primary focus: Docker PostgreSQL template is ready for Phase 5 completion verification
 ```
 
 ## Phase Progress
@@ -19,7 +19,7 @@ Primary focus: Auth.js credentials scaffold is ready for Docker PostgreSQL templ
 | Phase 2 | Monorepo and Tooling Setup            | In Progress | Workspace typecheck, tests, lint, and build now pass in the current checkout.                           |
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
-| Phase 5 | Template Implementation               | In Progress | Step 7 created and verified Auth.js credentials scaffold files, dependency/env contributions, README warnings, and compatibility coverage without adding Docker files. |
+| Phase 5 | Template Implementation               | In Progress | Step 8 created and verified Docker PostgreSQL Compose files, README guidance, template references, and compatibility coverage without adding npm dependencies or Auth.js/Prisma behavior. |
 | Phase 6 | Website MVP                           | Not Started | Will build wizard UI, preview, and download flow.                                                       |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
@@ -30,6 +30,143 @@ Primary focus: Auth.js credentials scaffold is ready for Docker PostgreSQL templ
 Add entries in reverse chronological order.
 
 ### 2026-07-02
+
+Phase 5 Step 8 completed: Create Docker PostgreSQL template
+
+Changes made:
+
+- Created `packages/templates/features/docker-postgres/` as the optional Docker PostgreSQL feature template directory.
+- Added `packages/templates/features/docker-postgres/docker-compose.yml` with a local PostgreSQL 16 service.
+- Added `packages/templates/features/docker-postgres/README.md` with local development Docker Compose guidance.
+- Added the minimal `dockerPostgresTemplateId` export from `@launchkit/templates`.
+- Updated the generator Docker PostgreSQL feature definition to contribute `docker-compose.yml` and README notes.
+- Confirmed Docker PostgreSQL does not contribute npm dependencies.
+- Confirmed Docker PostgreSQL does not add a conflicting `DATABASE_URL`.
+- Confirmed Docker PostgreSQL requires PostgreSQL through the existing compatibility rule.
+- Confirmed Auth.js and Prisma files remain separate and are not added by Docker PostgreSQL alone.
+- Confirmed website UI, CLI functionality, and `src/` directories were not added.
+
+Files changed:
+
+- `packages/templates/features/docker-postgres/docker-compose.yml`
+- `packages/templates/features/docker-postgres/README.md`
+- `packages/templates/src/index.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `packages/generator/src/features/definitions.ts`
+- `packages/generator/src/__tests__/feature-registry.test.ts`
+- `packages/generator/src/__tests__/generate-project.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,300p' .agents/prompts/phase-05/step-8.md
+git status --short
+find context -maxdepth 1 -type f -print | sort
+sed -n '1,260p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/architecture.md
+sed -n '261,620p' context/build-plan.md
+sed -n '261,620p' context/project-overview.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '621,980p' context/architecture.md
+sed -n '621,1040p' context/build-plan.md
+sed -n '621,980p' context/project-overview.md
+sed -n '621,980p' context/ui-rules.md
+sed -n '1,260p' packages/generator/src/features/definitions.ts
+sed -n '1,520p' packages/generator/src/__tests__/feature-registry.test.ts
+sed -n '1,620p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,560p' packages/templates/src/__tests__/index.test.ts
+sed -n '1,260p' packages/templates/src/index.ts
+sed -n '1,260p' packages/schema/src/compatibility.ts
+sed -n '1,320p' packages/schema/src/__tests__/compatibility.test.ts
+sed -n '1,220p' packages/generator/src/__tests__/phase-4-coverage.test.ts
+find packages/templates/features -maxdepth 5 -type f -print | sort
+mkdir -p packages/templates/features/docker-postgres
+npm run typecheck -w @launchkit/templates
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/generator
+npm test -w @launchkit/generator
+npm test -w @launchkit/schema
+npm run typecheck
+npm run test
+npm run lint
+git diff --check
+npm run build
+npm run build
+git status --short
+git diff --stat
+find packages/templates/features/docker-postgres -maxdepth 4 -type f -print | sort
+git diff -- packages/generator/src/features/definitions.ts packages/generator/src/__tests__/feature-registry.test.ts packages/generator/src/__tests__/generate-project.test.ts packages/templates/src/index.ts packages/templates/src/__tests__/index.test.ts
+```
+
+Verification:
+
+- [x] Docker PostgreSQL feature template directory exists.
+- [x] `docker-compose.yml` exists.
+- [x] `docker-compose.yml` defines a PostgreSQL 16 service.
+- [x] `docker-compose.yml` maps port `5432:5432`.
+- [x] `docker-compose.yml` sets development defaults for `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB`.
+- [x] `docker-compose.yml` uses the supported `{{packageName}}` placeholder.
+- [x] `docker-compose.yml` defines a named `postgres_data` volume.
+- [x] Docker PostgreSQL README guidance exists.
+- [x] Docker PostgreSQL README guidance includes `docker compose up -d`.
+- [x] Docker PostgreSQL README guidance includes `docker compose down`.
+- [x] Docker PostgreSQL README guidance explains local development defaults.
+- [x] Docker PostgreSQL README guidance says `DATABASE_URL` should match the Compose service.
+- [x] Docker PostgreSQL README guidance says production database hosting should be configured separately.
+- [x] Docker PostgreSQL feature is enabled when `docker: "postgres"` is selected.
+- [x] Docker PostgreSQL feature is not enabled when `docker: "none"` is selected.
+- [x] Docker PostgreSQL feature contributes `docker-compose.yml`.
+- [x] Docker PostgreSQL feature does not contribute npm dependencies.
+- [x] Docker PostgreSQL feature does not contribute env vars or a conflicting `DATABASE_URL`.
+- [x] Generated project output with a provided template loader includes `docker-compose.yml` when Docker PostgreSQL is selected.
+- [x] Generated project output does not include `docker-compose.yml` when Docker is not selected.
+- [x] Docker PostgreSQL without PostgreSQL is rejected by existing compatibility validation with `PostgreSQL Docker Compose is only available when PostgreSQL is selected.`.
+- [x] Docker PostgreSQL does not add Auth.js files.
+- [x] Docker PostgreSQL does not add Prisma files.
+- [x] No `src/` folder was introduced.
+- [x] Templates package typecheck passed.
+- [x] Templates package tests passed.
+- [x] Generator package typecheck passed.
+- [x] Generator package tests passed.
+- [x] Schema package tests passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test -w @launchkit/templates` passed: templates package Vitest suite ran 51 tests.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm test -w @launchkit/generator` passed: generator package Vitest suite ran 110 tests.
+- `npm test -w @launchkit/schema` passed: schema package Vitest suite ran 73 tests.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 110 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox because Turbopack could not create/bind its worker process for the web app. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes:
+
+- Docker PostgreSQL remains a local development helper only.
+- Docker PostgreSQL uses the same database defaults as the existing PostgreSQL `DATABASE_URL` example.
+- Schema compatibility already rejected Docker PostgreSQL without PostgreSQL, so no schema source changes were needed.
+- Prisma and Auth.js behavior remain separate and are only included when their own features are selected.
+
+Blockers:
+
+- None.
+
+Recommended next step:
+
+- Phase 5 Step 9: Verify Phase 5 completion.
 
 Phase 5 Step 7 completed: Create Auth.js credentials template
 
