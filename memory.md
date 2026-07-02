@@ -1,58 +1,65 @@
-# Memory - LaunchKit Phase 6 Website Wizard
+# Memory — LaunchKit Phase 6 Preview Step
 
-Last updated: 2026-07-02 23:27 JST
+Last updated: 2026-07-02 23:40 JST
 
 ## What was built
 
-Phase 6 Website MVP wizard is complete through Step 8, Extras.
+Phase 6 Website MVP wizard is complete through Step 9, Preview.
 
-Completed recent steps:
+Completed this session:
 
-- Step 6 ORM: added `apps/web/components/builder/steps/orm-step.tsx`, wired `orm: "none" | "prisma"` into `builder-shell.tsx`, and added ORM validation in `apps/web/lib/builder/validation.ts`.
-- Step 7 Auth: added `apps/web/components/builder/steps/auth-step.tsx`, wired `auth: "none" | "authjs-credentials"` into `builder-shell.tsx`, and added Auth-step validation.
-- Step 8 Extras: added `apps/web/components/builder/steps/extras-step.tsx`, wired `docker: "none" | "postgres"` into `builder-shell.tsx`, added Extras-step validation, and updated `apps/web/lib/builder/steps.ts`.
-- `context/progress-tracker.md` is updated through Phase 6 Step 8 and says the next suggested step is Phase 6 Step 9: Create Preview step.
+- Added Preview step UI in `apps/web/components/builder/steps/preview-step.tsx`.
+- Added preview rendering components under `apps/web/components/builder/preview/`:
+  - `stack-summary.tsx`
+  - `dependency-list.tsx`
+  - `script-list.tsx`
+  - `env-var-list.tsx`
+  - `file-tree-preview.tsx`
+- Added `apps/web/lib/builder/preview.ts` to derive preview data.
+- Wired Preview into `apps/web/components/builder/builder-shell.tsx`.
+- Added Preview-step validation in `apps/web/lib/builder/validation.ts`.
+- Updated `apps/web/lib/builder/steps.ts` Preview placeholder.
+- Added `@launchkit/generator` as an explicit `apps/web` dependency in `apps/web/package.json` and `package-lock.json`.
+- Updated `context/progress-tracker.md` through Phase 6 Step 9. It now says the next suggested step is Phase 6 Step 10: Build generate API route.
 
 ## Decisions made
 
-- Website wizard steps use shared `@launchkit/schema` metadata and compatibility validation rather than duplicating compatibility rules in UI code.
-- UI may use local affordances to disable invalid options, such as Prisma or PostgreSQL Docker Compose requiring PostgreSQL.
-- Auth.js credentials is presented as a scaffold only and does not force database or ORM selections.
-- Database selection still owns narrow dependent resets: selecting no database resets Prisma ORM and PostgreSQL Docker Compose to none.
-- No generator logic, API route, zip creation, download flow, preview generation, or CLI functionality has been added to `apps/web` during these wizard option steps.
+- Preview data uses `@launchkit/generator` `createGenerationPlan(config)` for dependencies, dev dependencies, scripts, environment variables, and selected optional feature file paths.
+- Generator planning is isolated in `apps/web/lib/builder/preview.ts`; React components render data only.
+- Selected stack labels use `@launchkit/schema` metadata instead of raw enum values where metadata exists.
+- Environment variable preview shows names, descriptions, and required status only. It does not show generated placeholder values or imply production-ready secrets.
+- Full file content preview remains out of scope for Step 9.
+- No generate/download API route, zip download behavior, or CLI functionality was added.
 
 ## Problems solved
 
-- Turbopack builds consistently fail inside the sandbox because worker process or port binding is not permitted. The same `npm run build -w apps/web` and root `npm run build` pass when rerun with elevated permissions.
-- `authMetadata` currently has no `recommended` property, so the Auth step guards optional recommended badge rendering instead of assuming the field exists.
-- Extras and ORM steps show the valid effective selection as `none` when PostgreSQL is unavailable, while still preventing invalid state updates.
+- Turbopack builds still fail inside the sandbox because worker process or port binding is not permitted. The same web and workspace builds pass when rerun with elevated permissions.
+- The generator plan exposes selected feature file references but not a base template file manifest. `apps/web/lib/builder/preview.ts` currently keeps a small local list of MVP base Next.js file paths until the generator exports base template file references.
+- Port 3000 was already occupied by a local Node process. A sandboxed attempt to start the dev server on port 3001 failed with `listen EPERM`; the user said they will run the dev server themselves.
 
 ## Current state
 
-- Current tracker status: Phase 6 in progress; Extras step complete; Preview step next.
-- Modified/untracked working tree from the latest step includes:
-  - `apps/web/components/builder/steps/extras-step.tsx`
-  - `apps/web/components/builder/builder-shell.tsx`
-  - `apps/web/lib/builder/steps.ts`
-  - `apps/web/lib/builder/validation.ts`
-  - `context/progress-tracker.md`
-  - `.agents/prompts/phase-06/step-8.md` is untracked context input.
-- Verification for Step 8 passed:
+- Current tracker status: Phase 6 in progress; Preview step complete; Generate API route next.
+- Step 9 verification passed:
   - `npm run typecheck -w apps/web`
   - `npm run lint -w apps/web`
+  - `git diff --check`
   - `npm run build -w apps/web` outside sandbox
   - `npm run typecheck`
   - `npm run test`
   - `npm run lint`
   - `npm run build` outside sandbox
-  - `git diff --check`
-- No frontend component test setup exists in `apps/web`, so no new component test stack was added.
+- Workspace has uncommitted changes from recent Phase 6 work, including Step 8 and Step 9 files.
+- `memory.md` is now saved for the next session.
+- No local dev server is running from this session.
 
 ## Next session starts with
 
-Implement Phase 6 Step 9: Create Preview step. Start by reading `context/progress-tracker.md` and the Step 9 prompt in `.agents/prompts/phase-06/` if present. Keep the same boundaries: no API generate route, zip download behavior, or CLI unless the Step 9 prompt explicitly says otherwise.
+Implement Phase 6 Step 10: Build generate API route. Start by reading `context/progress-tracker.md` and the Step 10 prompt in `.agents/prompts/phase-06/` if present.
+
+Keep the same boundaries unless Step 10 explicitly changes them: use `@launchkit/schema` for validation, call `@launchkit/generator` from server-side code, do not put generator logic in UI components, do not add CLI functionality, and keep zip/download behavior limited to the Step 10 prompt scope.
 
 ## Open questions
 
-- The Preview step implementation details are not yet loaded. Need inspect the Step 9 prompt to determine whether preview is schema/metadata-derived only or whether it should use any existing generator preview helpers.
-- Decide whether to keep using the current manual selectable-row pattern or introduce shared option-row components after the Preview/Download steps, if duplication becomes painful.
+- The Step 10 prompt has not been loaded yet.
+- Decide whether Step 10 should also improve generator base template manifest exposure, or leave the Preview helper's local base file list in place until a later generator cleanup step.
