@@ -8,7 +8,7 @@ Use this file to track development progress, changes made, decisions, notes, blo
 Project: LaunchKit
 Stage: Foundation setup
 Current phase: Phase 6 in progress
-Primary focus: Phase 6 Styling and UI step is complete; Database step is next
+Primary focus: Phase 6 Database step is complete; ORM step is next
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 Styling and UI step is complete; Database step is next
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | In Progress | Step 4 added the fixed Tailwind summary and UI library selector; Database step is next. |
+| Phase 6 | Website MVP                           | In Progress | Step 5 added the Database step with PostgreSQL selection and dependent resets; ORM step is next. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -30,6 +30,125 @@ Primary focus: Phase 6 Styling and UI step is complete; Database step is next
 Add entries in reverse chronological order.
 
 ### 2026-07-02
+
+Phase 6 Step 5 completed: Create database step
+
+Changes made:
+
+- Added Database step UI to the website wizard.
+- Added a database selector for `database: "none"` and `database: "postgres"`.
+- Used `@launchkit/schema` `databaseMetadata` for database option labels, descriptions, and the PostgreSQL recommended indicator.
+- Connected database selection to shared builder config state.
+- Added dependent reset behavior when switching to `database: "none"`:
+  - resets `orm: "prisma"` to `orm: "none"`;
+  - resets `docker: "postgres"` to `docker: "none"`;
+  - leaves `auth` unchanged because Auth.js credentials may work without a database.
+- Extended builder compatibility error mapping so schema compatibility issues are available on every related field path.
+- Added database-step validation using schema parsing and compatibility helpers through the existing builder validation path.
+- Gated Next navigation on the Database step only when database-related schema or compatibility validation fails.
+- Confirmed unsupported databases are not exposed.
+- Confirmed no ORM, auth, Docker, preview, download, API route, generator logic, or CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/database-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-06/step-5.md
+rg --files apps/web/components apps/web/lib packages/schema/src context
+sed -n '261,520p' .agents/prompts/phase-06/step-5.md
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1120p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '261,900p' context/progress-tracker.md
+sed -n '901,1700p' context/progress-tracker.md
+sed -n '1701,2600p' context/progress-tracker.md
+git status --short
+sed -n '1,340p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/components/builder/steps/styling-ui-step.tsx
+sed -n '1,220p' packages/schema/src/metadata.ts
+sed -n '1,240p' packages/schema/src/options.ts
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+rg '@launchkit/generator|app/api|createProjectZip|download|MySQL|SQLite|Mongo|Supabase|PlanetScale|node:test|node --test' apps/web/components apps/web/lib apps/web/app
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+git status --short
+git diff --stat
+git diff -- apps/web/components/builder/builder-shell.tsx apps/web/components/builder/steps/database-step.tsx apps/web/lib/builder/validation.ts
+sed -n '1,220p' context/progress-tracker.md
+```
+
+Verification:
+
+- [x] Database step renders in the wizard.
+- [x] Database selector supports `none` and `postgres`.
+- [x] Database options come from schema metadata.
+- [x] PostgreSQL recommended indicator is shown from metadata.
+- [x] Selecting PostgreSQL updates `config.database`.
+- [x] Selecting no database updates `config.database`.
+- [x] Selecting no database resets Prisma ORM to none when needed.
+- [x] Selecting no database resets PostgreSQL Docker Compose to none when needed.
+- [x] Selecting no database does not reset Auth.js credentials.
+- [x] Database validation uses schema parsing and compatibility helpers.
+- [x] Unsupported databases are not rendered.
+- [x] No ORM controls were added.
+- [x] No auth controls were added.
+- [x] No Docker controls were added.
+- [x] No generator logic was added to `apps/web`.
+- [x] No API route or download flow was implemented.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 6: Create ORM step.
 
 Phase 6 Step 4 completed: Create Styling and UI step
 

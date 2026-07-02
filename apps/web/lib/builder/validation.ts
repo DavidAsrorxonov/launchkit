@@ -24,6 +24,11 @@ export type StylingUiStepValidation = {
   errors: Pick<ValidationErrors, "styling" | "ui">;
 };
 
+export type DatabaseStepValidation = {
+  isValid: boolean;
+  errors: Pick<ValidationErrors, "database" | "orm" | "docker">;
+};
+
 export function validateBuilderConfig(config: LaunchKitConfig): {
   isValid: boolean;
   errors: ValidationErrors;
@@ -50,10 +55,12 @@ export function validateBuilderConfig(config: LaunchKitConfig): {
   const errors: ValidationErrors = {};
 
   for (const issue of validateCompatibility(result.data)) {
-    const field = issue.path?.[0];
+    const fields = issue.path ?? [];
 
-    if (typeof field === "string" && !(field in errors)) {
-      errors[field as keyof LaunchKitConfig] = issue.message;
+    for (const field of fields) {
+      if (typeof field === "string" && !(field in errors)) {
+        errors[field as keyof LaunchKitConfig] = issue.message;
+      }
     }
   }
 
@@ -110,6 +117,22 @@ export function validateStylingUiStep(
 
   return {
     isValid: !errors.styling && !errors.ui,
+    errors,
+  };
+}
+
+export function validateDatabaseStep(
+  config: LaunchKitConfig,
+): DatabaseStepValidation {
+  const validation = validateBuilderConfig(config);
+  const errors = {
+    database: validation.errors.database,
+    orm: validation.errors.orm,
+    docker: validation.errors.docker,
+  };
+
+  return {
+    isValid: !errors.database && !errors.orm && !errors.docker,
     errors,
   };
 }

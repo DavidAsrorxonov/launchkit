@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { DatabaseStep } from "@/components/builder/steps/database-step";
 import { FrameworkStep } from "@/components/builder/steps/framework-step";
 import { ProjectStep } from "@/components/builder/steps/project-step";
 import { StylingUiStep } from "@/components/builder/steps/styling-ui-step";
@@ -12,6 +13,7 @@ import {
 } from "@/lib/builder/builder-state";
 import { builderSteps } from "@/lib/builder/steps";
 import {
+  validateDatabaseStep,
   validateFrameworkStep,
   validateProjectStep,
   validateStylingUiStep,
@@ -30,13 +32,16 @@ export function BuilderShell() {
   const projectStepValidation = validateProjectStep(builderState.config);
   const frameworkStepValidation = validateFrameworkStep(builderState.config);
   const stylingUiStepValidation = validateStylingUiStep(builderState.config);
+  const databaseStepValidation = validateDatabaseStep(builderState.config);
   const isProjectStep = currentStep.id === "project";
   const isFrameworkStep = currentStep.id === "framework";
   const isStylingUiStep = currentStep.id === "styling-ui";
+  const isDatabaseStep = currentStep.id === "database";
   const isNextDisabled =
     (isProjectStep && !projectStepValidation.isValid) ||
     (isFrameworkStep && !frameworkStepValidation.isValid) ||
-    (isStylingUiStep && !stylingUiStepValidation.isValid);
+    (isStylingUiStep && !stylingUiStepValidation.isValid) ||
+    (isDatabaseStep && !databaseStepValidation.isValid);
 
   const selectedStack = useMemo(
     () => [
@@ -115,6 +120,13 @@ export function BuilderShell() {
                   <StylingUiStep
                     config={builderState.config}
                     validation={stylingUiStepValidation}
+                    onConfigChange={updateConfig}
+                  />
+                ) : null}
+                {isDatabaseStep ? (
+                  <DatabaseStep
+                    config={builderState.config}
+                    validation={databaseStepValidation}
                     onConfigChange={updateConfig}
                   />
                 ) : null}
