@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 5 complete
-Primary focus: Phase 6 website wizard shell is ready to begin
+Current phase: Phase 6 in progress
+Primary focus: Phase 6 Step 12 responsive polish and automated verification are complete; user-run browser/download QA remains before marking Phase 6 complete
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 website wizard shell is ready to begin
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | Ready       | Ready to create the website wizard shell, preview, and download flow without duplicating generator logic. |
+| Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -29,7 +29,1551 @@ Primary focus: Phase 6 website wizard shell is ready to begin
 
 Add entries in reverse chronological order.
 
+### 2026-07-03
+
+Phase 6 Step 12 completed: Responsive UI polish and Phase 6 verification
+
+Changes made:
+
+- Removed the extra dashed inner frame from wizard step content to avoid a card-within-card feel.
+- Tightened wizard step header spacing on small screens.
+- Updated progress cards to use short labels on mobile/tablet and full labels on large screens.
+- Improved project-name wrapping in the header and Download step.
+- Improved current-selection value wrapping and width constraints.
+- Updated option-card label rows to wrap badges and radio indicators cleanly on narrow viewports.
+- Updated preview stack and download stack values to wrap instead of truncating important labels.
+- Updated dependency names and environment variable names to wrap safely.
+- Updated script command rows to scroll horizontally when exact command text is too long.
+- Added focused Phase 6 wizard contract tests for step order, supported options, validation, compatibility, preview contents, optional file inclusion/exclusion, and `src/` path exclusion.
+- Confirmed no CLI functionality was added.
+- Confirmed no new product options were added.
+- Confirmed generator logic was not moved into UI components.
+
+Files changed:
+
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/components/builder/preview/dependency-list.tsx`
+- `apps/web/components/builder/preview/env-var-list.tsx`
+- `apps/web/components/builder/preview/script-list.tsx`
+- `apps/web/components/builder/preview/stack-summary.tsx`
+- `apps/web/components/builder/steps/auth-step.tsx`
+- `apps/web/components/builder/steps/database-step.tsx`
+- `apps/web/components/builder/steps/download-step.tsx`
+- `apps/web/components/builder/steps/extras-step.tsx`
+- `apps/web/components/builder/steps/framework-step.tsx`
+- `apps/web/components/builder/steps/orm-step.tsx`
+- `apps/web/components/builder/steps/project-step.tsx`
+- `apps/web/components/builder/steps/styling-ui-step.tsx`
+- `apps/web/components/builder/wizard-progress.tsx`
+- `apps/web/components/builder/wizard-step-panel.tsx`
+- `apps/web/lib/builder/phase-6-verification.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-06/step-12.md
+git status --short
+rg --files context
+find apps/web -maxdepth 3 -type f | sort
+find packages -maxdepth 3 -type f | sort
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '321,760p' context/architecture.md
+sed -n '1,320p' context/build-plan.md
+sed -n '321,820p' context/build-plan.md
+sed -n '821,1240p' context/build-plan.md
+sed -n '1,320p' context/ui-rules.md
+sed -n '321,700p' context/ui-rules.md
+npm run test -w apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run dev -w apps/web
+npm run dev -w apps/web
+npm ls playwright
+npm ls @playwright/test
+curl -I http://localhost:3000
+curl -I http://localhost:3000
+npm run typecheck
+npm run test
+npm run lint
+git diff --check
+git status --short
+git diff --stat
+```
+
+Verification:
+
+- [x] All 9 wizard steps are defined in the required order.
+- [x] Supported MVP option values are constrained to the documented choices.
+- [x] Project-name validation uses shared schema validation.
+- [x] Unsupported package managers are rejected.
+- [x] Auth.js credentials remains valid without PostgreSQL.
+- [x] Prisma without PostgreSQL is rejected.
+- [x] Docker PostgreSQL without PostgreSQL is rejected.
+- [x] Preview includes selected stack summary data.
+- [x] Preview includes dependencies and dev dependencies.
+- [x] Preview includes scripts.
+- [x] Preview includes environment variables.
+- [x] Preview includes generated file tree paths.
+- [x] Preview excludes unselected optional feature files.
+- [x] Preview excludes `src/` paths.
+- [x] Full-stack preview includes Prisma, Auth.js, shadcn, Docker, env, and script additions.
+- [x] Download flow code still uses the API client and browser ZIP helper from Step 11.
+- [x] Responsive polish addressed mobile progress labels, wrapping, and scroll handling.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app tests passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- Initial `npm run test -w apps/web` failed because the new verification test expected `db:migrate`, while the current generator exposes `db:push`. The test was corrected to match the generator contract.
+- Initial `npm run typecheck -w apps/web` failed because an intentionally invalid package manager literal needed an `unknown` cast before casting to `LaunchKitConfig`. The test was corrected.
+- `npm run test -w apps/web` passed after fixes: 4 test files, 23 tests.
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: web app ran 23 tests, generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `git diff --check` passed.
+
+Manual verification:
+
+- Browser QA was not completed in this session.
+- The in-app browser connector failed before exposing a usable tab because the Node REPL tool returned an internal `sandbox-state-meta` error.
+- The workspace does not currently include Playwright or `@playwright/test`, so a local Playwright fallback was not available without adding dependencies.
+- A sandboxed `curl -I http://localhost:3000` could not connect.
+- An elevated localhost `curl` check was not allowed.
+- An elevated `npm run dev -w apps/web` attempt found another Next dev server lock/process and exited; the user said they will do manual browser/download verification themselves.
+
+Notes/blockers:
+
+- Phase 6 is intentionally still marked `In Progress` until user-run browser/download QA confirms the website MVP genuinely works end to end.
+- No CLI work was started.
+- No new stack options were added.
+- Pre-existing unrelated worktree changes remain: `memory.md` is modified and `.agents/prompts/phase-06/step-12.md` is untracked.
+
+Next suggested step:
+
+- User-run manual QA for the wizard at 375px, 768px, 1280px, and 1440px+ widths, including a real `Generate ZIP` download.
+
+Phase 6 Step 11 completed: Create download flow
+
+Changes made:
+
+- Added Download step UI to the website wizard.
+- Added compact project name and package manager summary.
+- Added short selected stack summary using existing schema/generator-derived preview labels.
+- Added `Generate ZIP` button.
+- Added loading, success, and error states.
+- Added client-side validation before calling the API.
+- Invalid config states show concise errors and do not call the API.
+- Added typed API client for `POST /api/generate`.
+- API client sends the current `LaunchKitConfig`.
+- API client parses structured API errors and throws concise client errors.
+- Added browser-side ZIP creation helper using `jszip`.
+- Added `jszip` to `apps/web` dependencies and updated `package-lock.json`.
+- ZIP helper puts generated files under a top-level `{{projectName}}/` folder.
+- ZIP helper supports UTF-8 file contents.
+- ZIP helper supports base64 file contents.
+- ZIP helper rejects unsafe paths:
+  - absolute paths;
+  - `..`;
+  - empty path segments;
+  - generated `src/` directory paths;
+  - unsafe top-level project folder names.
+- Added browser download trigger using `Blob`, object URL, temporary anchor click, and URL revocation.
+- Download flow only requests generated file data and packages it as a zip in the browser.
+- Confirmed no generated project code is executed.
+- Confirmed no generated project dependencies are installed.
+- Confirmed no generated files are written to the server filesystem.
+- Added focused Vitest coverage for the API client and ZIP helper.
+- Kept generator logic out of UI components.
+- Confirmed no CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/download/download-button.tsx`
+- `apps/web/components/builder/download/download-status.tsx`
+- `apps/web/components/builder/steps/download-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/api/client.ts`
+- `apps/web/lib/api/client.test.ts`
+- `apps/web/lib/api/types.ts`
+- `apps/web/lib/api/generate.ts`
+- `apps/web/lib/api/response.ts`
+- `apps/web/lib/download/create-project-zip.ts`
+- `apps/web/lib/download/create-project-zip.test.ts`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/package.json`
+- `package-lock.json`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,280p' context/progress-tracker.md
+sed -n '1,340p' .agents/prompts/phase-06/step-11.md
+git status --short
+sed -n '341,680p' .agents/prompts/phase-06/step-11.md
+sed -n '1,260p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '1,280p' context/project-overview.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+rg 'jszip|fflate|zip' package.json package-lock.json apps/web/package.json packages -g '!dist/**'
+sed -n '1,260p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/api/generate.ts
+sed -n '1,220p' apps/web/lib/builder/preview.ts
+npm install jszip -w apps/web
+npm install jszip -w apps/web
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/lib/builder/steps.ts
+sed -n '1,220p' apps/web/components/builder/wizard-navigation.tsx
+cat apps/web/package.json
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run test -w apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run test -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+rg 'child_process|exec\(|spawn\(|npm install|pnpm install|packages/cli|node:test|node --test|writeFile|mkdir|fs/promises|createProjectZip' apps/web packages -g '!dist/**'
+git diff -- apps/web/components/builder/steps/download-step.tsx apps/web/lib/download/create-project-zip.ts apps/web/lib/api/client.ts apps/web/lib/api/types.ts apps/web/components/builder/builder-shell.tsx apps/web/package.json package-lock.json
+git diff --check
+npm run build
+git status --short
+git diff --stat
+git diff -- apps/web/components/builder/steps/download-step.tsx apps/web/lib/download/create-project-zip.ts apps/web/lib/api/client.ts apps/web/lib/api/types.ts apps/web/components/builder/builder-shell.tsx apps/web/package.json package-lock.json
+```
+
+Verification:
+
+- [x] Download step renders in the wizard.
+- [x] Download step shows project name.
+- [x] Download step shows selected package manager.
+- [x] Download step shows a short selected stack summary.
+- [x] Download button calls the typed `POST /api/generate` client helper.
+- [x] Invalid config prevents API calls in the Download step.
+- [x] API client handles non-2xx structured API errors.
+- [x] Generated project data is turned into a ZIP.
+- [x] ZIP contains files under the top-level project folder.
+- [x] ZIP helper handles UTF-8 file contents.
+- [x] ZIP helper handles base64 file contents.
+- [x] ZIP helper rejects unsafe paths.
+- [x] ZIP helper rejects generated `src/` paths.
+- [x] Browser download trigger uses a `Blob`, object URL, temporary anchor, and URL revocation.
+- [x] Download button is disabled while generating.
+- [x] Loading, success, and error states are implemented.
+- [x] API errors render concise messages.
+- [x] No generated project code is executed.
+- [x] No generated project dependencies are installed.
+- [x] No generated files are written to the server filesystem by the download flow.
+- [x] No generator logic is duplicated in UI components.
+- [x] No CLI functionality was added.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app tests passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- Initial `npm install jszip -w apps/web` failed in the sandbox because the npm registry could not be resolved. Rerunning with elevated permissions succeeded, added 11 packages, and updated `package-lock.json`.
+- `npm install jszip -w apps/web` reported 2 moderate vulnerabilities in npm audit output. No `npm audit fix --force` was run because it would be an unrelated broad dependency change.
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run test -w apps/web` passed: 3 test files, 16 tests.
+- `git diff --check` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: web app ran 16 tests, generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` passed across all workspaces when run with elevated permissions for the known Turbopack process/port restriction.
+- Source search found no generated-code execution, generated dependency install, CLI work, or Node test runner usage in the Step 11 implementation. It found expected template/test install text, existing server-side template file reads from Step 10, and the browser-side ZIP helper.
+
+Manual verification:
+
+- Local browser download QA was not run in this session because the user said they will run the dev server locally.
+- Automated ZIP tests verified the top-level project folder, UTF-8 contents, base64 contents, unsafe path rejection, and `src/` path rejection.
+
+Notes/blockers:
+
+- The browser-side ZIP flow depends on the Phase 6 Step 10 API returning generated project JSON.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- `npm install` audit output currently reports 2 moderate vulnerabilities; this step did not attempt broad dependency remediation.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 12: Responsive UI polish and Phase 6 verification.
+
+Phase 6 Step 10 completed: Create API generate route
+
+Changes made:
+
+- Added `POST /api/generate` App Router API route.
+- Added a structured `GET /api/generate` method-not-allowed response.
+- Added request parsing for JSON bodies.
+- Rejects non-JSON request content.
+- Rejects malformed JSON.
+- Rejects request bodies over 64 KB.
+- Added request validation using `@launchkit/schema` `LaunchKitConfigSchema`.
+- Added compatibility validation using `@launchkit/schema` `validateCompatibility`.
+- Connected the route to `@launchkit/generator` `generateProject`.
+- Added a server-side web template loader that reads template files and passes them through the generator `TemplateLoader` API.
+- Kept template composition and feature decisions inside `@launchkit/generator`.
+- Added JSON success response shape with project name, package manager, generated file paths, contents, and `utf8`/`base64` encoding metadata.
+- Encodes `Uint8Array` file contents as base64 instead of returning Node `Buffer` objects.
+- Added structured error responses for invalid JSON, invalid config, incompatible config, oversized requests, unsupported content type, unsafe generated paths, and unexpected generation failures.
+- Added generated path safety checks before responding:
+  - relative paths only;
+  - no leading `/`;
+  - no `..`;
+  - no empty path segments;
+  - no generated `src/` directory paths.
+- Added focused Vitest coverage for API helper behavior.
+- Added `test` script to `apps/web` so root `npm run test` includes web API tests.
+- Confirmed no generated project files are written to disk.
+- Confirmed no generated project code is executed.
+- Confirmed no generated project dependencies are installed.
+- Confirmed no zip archive or final browser download UI was added.
+- Followed the Step 10 prompt's JSON-response handoff for Step 11, despite older architecture notes describing the eventual API as zip-returning.
+
+Files changed:
+
+- `apps/web/app/api/generate/route.ts`
+- `apps/web/lib/api/generate.ts`
+- `apps/web/lib/api/generate.test.ts`
+- `apps/web/lib/api/response.ts`
+- `apps/web/lib/api/template-loader.ts`
+- `apps/web/package.json`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,300p' .agents/prompts/phase-06/step-10.md
+git status --short
+sed -n '301,620p' .agents/prompts/phase-06/step-10.md
+sed -n '1,260p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '1,280p' context/project-overview.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+rg --files apps/web packages/generator/src packages/templates/src packages/schema/src | sort
+sed -n '1,360p' packages/generator/src/generate-project.ts
+sed -n '1,260p' packages/generator/src/template-loader.ts
+cat apps/web/package.json
+sed -n '1,260p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,260p' packages/generator/src/__tests__/phase-5-completion.test.ts
+sed -n '1,220p' packages/schema/src/compatibility.ts
+sed -n '1,180p' packages/schema/src/index.ts
+cat apps/web/tsconfig.json
+cat package.json
+cat packages/generator/tsconfig.json
+sed -n '1,220p' packages/generator/src/file-tree.ts
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run test -w apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run test -w apps/web
+git diff --check
+cat packages/schema/package.json
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run test -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+rg 'createProjectZip|Generate ZIP|download\(|app/api/generate|child_process|exec\(|spawn\(|npm install|pnpm install|packages/cli|node:test|node --test' apps/web packages -g '!dist/**'
+git diff -- apps/web/app/api/generate/route.ts apps/web/lib/api/generate.ts apps/web/lib/api/template-loader.ts apps/web/lib/api/response.ts apps/web/lib/api/generate.test.ts apps/web/package.json
+git diff --check
+npm run build
+```
+
+Verification:
+
+- [x] `POST /api/generate` exists.
+- [x] Route validates request JSON using `@launchkit/schema`.
+- [x] Route validates compatibility using shared schema helpers.
+- [x] Route calls `@launchkit/generator`.
+- [x] Valid config returns generated project data.
+- [x] Invalid config returns structured `400`.
+- [x] Incompatible config returns structured `422`.
+- [x] Malformed JSON returns structured `400`.
+- [x] Non-JSON content returns structured `400`.
+- [x] Oversized body returns structured `400`.
+- [x] Unexpected generator failure returns structured `500` without stack traces or internal paths.
+- [x] Binary generated file contents serialize as base64.
+- [x] Generated file paths are checked before response.
+- [x] Unsafe generated paths are rejected before response serialization.
+- [x] Generated `src/` directory paths are rejected before response serialization.
+- [x] No generated `src/` paths are returned for the valid generated project.
+- [x] No generated project code is executed.
+- [x] No generated project dependencies are installed.
+- [x] No generated project files are written to disk.
+- [x] No zip archive was created.
+- [x] No final browser download UI was implemented.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app tests passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run test -w apps/web` passed: 1 test file, 10 tests.
+- `git diff --check` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed and listed `/api/generate` as a dynamic route.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: web app ran 10 tests, generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` passed across all workspaces when run with elevated permissions for the known Turbopack process/port restriction.
+- Source search found no API shell execution, CLI work, zip creation, or browser download implementation. It only found generated README install-command text and related generator tests.
+
+Notes/blockers:
+
+- Step 10 intentionally returns generated project JSON instead of a zip. Step 11 should consume this API response and implement the final browser download flow.
+- The web API template loader reads template files from the monorepo `packages/templates` directory through the generator `TemplateLoader` API because the generator package does not yet expose a production filesystem template loader.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 11: Create download flow.
+
 ### 2026-07-02
+
+Phase 6 Step 9 completed: Create Preview step
+
+Changes made:
+
+- Added the Preview step UI to the website wizard.
+- Added selected stack summary with metadata labels from `@launchkit/schema`.
+- Added dependency and dev dependency preview sections from `@launchkit/generator` `createGenerationPlan(config)`.
+- Added generated package script preview from generator plan data.
+- Added environment variable preview from generator plan data.
+- Environment variables show names, descriptions, and required state only; no real secret values are displayed.
+- Added generated file tree preview with compact monospace formatting.
+- File tree preview includes selected optional feature files from generator plan data.
+- File tree preview excludes unselected optional feature files.
+- File tree preview includes no `src/` paths.
+- Added Preview-step validation using the existing schema parsing and compatibility helper path.
+- Gated Next navigation on the Preview step when the full config is invalid.
+- Avoided full file content preview.
+- Added `@launchkit/generator` as an explicit `apps/web` dependency for the planning helper import.
+- Kept generator planning logic isolated in `apps/web/lib/builder/preview.ts`; UI components only render preview data.
+- Confirmed no generate/download API route was added.
+- Confirmed no zip download behavior was added.
+- Confirmed no CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/preview/dependency-list.tsx`
+- `apps/web/components/builder/preview/env-var-list.tsx`
+- `apps/web/components/builder/preview/file-tree-preview.tsx`
+- `apps/web/components/builder/preview/script-list.tsx`
+- `apps/web/components/builder/preview/stack-summary.tsx`
+- `apps/web/components/builder/steps/preview-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/preview.ts`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/lib/builder/validation.ts`
+- `apps/web/package.json`
+- `package-lock.json`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-06/step-9.md
+git status --short
+rg --files context | sort
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,260p' context/progress-tracker.md
+sed -n '261,700p' context/progress-tracker.md
+sed -n '1,280p' context/project-overview.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+rg --files apps/web/components/builder apps/web/lib/builder apps/web/app packages/generator/src packages/schema/src
+sed -n '1,420p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/builder/steps.ts
+sed -n '1,320p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' packages/generator/src/index.ts
+sed -n '1,360p' packages/generator/src/generation-plan.ts
+sed -n '1,380p' packages/generator/src/features/registry.ts
+sed -n '1,320p' packages/generator/src/generate-project.ts
+sed -n '1,460p' packages/generator/src/features/definitions.ts
+cat apps/web/package.json
+cat packages/generator/package.json
+sed -n '1,320p' packages/generator/src/template-loader.ts
+sed -n '1,320p' packages/generator/src/file-tree.ts
+sed -n '1,420p' packages/schema/src/metadata.ts
+sed -n '1,320p' packages/schema/src/config.ts
+sed -n '1,220p' apps/web/lib/builder/builder-state.ts
+sed -n '1,260p' apps/web/components/builder/wizard-step-panel.tsx
+sed -n '1,320p' apps/web/components/builder/steps/extras-step.tsx
+sed -n '1,320p' apps/web/components/builder/steps/auth-step.tsx
+sed -n '1,320p' apps/web/components/builder/steps/project-step.tsx
+sed -n '1,220p' apps/web/components/builder/wizard-navigation.tsx
+rg --files packages/templates | sort
+cat packages/templates/package.json
+sed -n '1,260p' packages/templates/src/index.ts
+ls package-lock.json
+sed -n '1,220p' package-lock.json
+find node_modules/@launchkit -maxdepth 1 -type l -o -type d -print
+ls -la node_modules/@launchkit
+rg 'node_modules\/\@launchkit\/(generator|schema|templates|shared)' package-lock.json
+sed -n '/node_modules\/\@launchkit\/generator/,+18p' package-lock.json
+find packages/templates/base/next -maxdepth 2 -type f | sort
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+rg '@launchkit/generator|app/api|createProjectZip|download|node:test|node --test|src/' apps/web
+npm run build
+git status --short
+git diff --stat
+git diff -- apps/web/lib/builder/preview.ts apps/web/components/builder/steps/preview-step.tsx apps/web/components/builder/builder-shell.tsx apps/web/lib/builder/validation.ts apps/web/package.json package-lock.json
+sed -n '1,120p' context/progress-tracker.md
+git diff --check
+git status --short
+git diff --stat
+sed -n '1,220p' context/progress-tracker.md
+lsof -nP -iTCP:3000 -sTCP:LISTEN
+npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3001
+npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3001
+```
+
+Verification:
+
+- [x] Preview step renders in the wizard.
+- [x] Selected stack summary includes project name, framework, language, router, project structure, styling, UI, database, ORM, auth, Docker, and package manager.
+- [x] Stack summary uses schema metadata labels when metadata exists.
+- [x] Dependencies come from `@launchkit/generator` plan data.
+- [x] Dev dependencies come from `@launchkit/generator` plan data.
+- [x] Scripts come from `@launchkit/generator` plan data.
+- [x] Environment variables come from `@launchkit/generator` plan data.
+- [x] Environment variable preview does not display real secrets.
+- [x] File tree preview shows selected optional feature files only.
+- [x] File tree preview includes no `src/` paths.
+- [x] Invalid schema or compatibility state shows a concise Preview-step error.
+- [x] Invalid schema or compatibility state prevents moving from Preview to Download.
+- [x] No full file content preview was added.
+- [x] No generate/download API route was added.
+- [x] No zip download behavior was added.
+- [x] No CLI functionality was added.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` passed across all workspaces when run with elevated permissions for the known Turbopack process/port restriction.
+- `lsof -nP -iTCP:3000 -sTCP:LISTEN` showed port 3000 was already in use by a local Node process.
+- `npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3001` failed in the sandbox because binding to `127.0.0.1:3001` was not permitted. The elevated rerun was rejected, so no dev server is running from this step.
+
+Notes/blockers:
+
+- The generator plan currently exposes selected feature file references, dependencies, dev dependencies, scripts, and environment variables, but it does not expose a base template file manifest. The Preview helper therefore keeps a small local list of MVP base Next.js file paths until the generator exports base template file references.
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; port 3000 was already occupied, the sandbox blocked port 3001, and the elevated rerun was rejected.
+
+Next suggested step:
+
+- Phase 6 Step 10: Build generate API route.
+
+Phase 6 Step 8 completed: Create extras step
+
+Changes made:
+
+- Added Extras step UI to the website wizard.
+- Added a Docker selector for `docker: "none"` and `docker: "postgres"`.
+- Used `@launchkit/schema` `dockerMetadata` for Docker option labels and descriptions.
+- Displayed `No Docker setup` and `PostgreSQL Docker Compose` as the two supported Docker choices.
+- Disabled PostgreSQL Docker Compose unless `database: "postgres"` is selected.
+- Shows the disabled reason `Requires PostgreSQL` when Docker PostgreSQL is unavailable.
+- Shows `No Docker setup` as the effective selection when PostgreSQL is not selected.
+- Connected Docker selection to shared builder config state.
+- Guarded Docker state updates so PostgreSQL Docker Compose cannot be selected without PostgreSQL.
+- Docker changes preserve database, ORM, auth, UI, and all other builder config values.
+- Added Extras-step validation using the existing schema parsing and compatibility helper path.
+- Gated Next navigation on the Extras step when an invalid `database: "none"` plus `docker: "postgres"` config is present.
+- Added a concise note that Docker Compose is for local PostgreSQL development and README plus `.env.example` are included by default.
+- Confirmed unsupported extras are not exposed.
+- Confirmed no preview, download, API route, generator logic, or CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/extras-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,300p' .agents/prompts/phase-06/step-8.md
+rg --files context apps/web packages/schema/src .agents/prompts/phase-06
+sed -n '301,620p' .agents/prompts/phase-06/step-8.md
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,280p' context/project-overview.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+sed -n '1,380p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,280p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/components/builder/steps/database-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/orm-step.tsx
+sed -n '1,240p' apps/web/lib/builder/steps.ts
+sed -n '1,340p' packages/schema/src/metadata.ts
+sed -n '1,220p' packages/schema/src/options.ts
+sed -n '1,240p' packages/schema/src/compatibility.ts
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+rg '@launchkit/generator|app/api|createProjectZip|download|preview|Redis|Sentry|analytics|Stripe|Clerk|node:test|node --test' apps/web
+git diff --check
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build -w apps/web
+npm run build
+git diff -- apps/web/components/builder/builder-shell.tsx apps/web/components/builder/steps/extras-step.tsx apps/web/lib/builder/steps.ts apps/web/lib/builder/validation.ts
+git status --short
+git diff --stat
+```
+
+Verification:
+
+- [x] Extras step renders in the wizard.
+- [x] Docker selector supports `none` and `postgres`.
+- [x] Docker options come from schema metadata.
+- [x] Docker PostgreSQL is disabled when `database !== "postgres"`.
+- [x] Docker PostgreSQL disabled state shows `Requires PostgreSQL`.
+- [x] No Docker setup is shown as selected when PostgreSQL is not selected.
+- [x] Selecting Docker PostgreSQL updates `config.docker` only when PostgreSQL is selected.
+- [x] Selecting Docker PostgreSQL does not modify `config.database`.
+- [x] Selecting no Docker sets `config.docker` to `"none"`.
+- [x] Docker updates preserve database, ORM, auth, UI, and other config values.
+- [x] Invalid Docker PostgreSQL without PostgreSQL uses schema compatibility validation and prevents Next on the Extras step.
+- [x] Unsupported extras are not rendered.
+- [x] No preview or download flow was implemented.
+- [x] No API route was added.
+- [x] No generator logic was added to `apps/web`.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` passed across all workspaces when run with elevated permissions for the known Turbopack process/port restriction.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 9: Create Preview step.
+
+Phase 6 Step 7 completed: Create Auth step
+
+Changes made:
+
+- Added Auth step UI to the website wizard.
+- Added an auth selector for `auth: "none"` and `auth: "authjs-credentials"`.
+- Used `@launchkit/schema` `authMetadata` for auth option labels and descriptions.
+- Displayed `No auth` and `Auth.js credentials scaffold` as the two supported auth choices.
+- Added concise scaffold messaging for Auth.js credentials:
+  - communicates that it is scaffold only;
+  - tells users to connect it to their user model and password verification;
+  - avoids implying production-ready auth, complete user management, secure password verification, or a sign-in UI.
+- Connected auth selection to shared builder config state.
+- Auth changes preserve database, ORM, Docker, and all other builder config values.
+- Auth.js credentials can be selected without PostgreSQL.
+- Auth.js credentials can be selected with PostgreSQL and no ORM.
+- Auth.js credentials can be selected with PostgreSQL and Prisma.
+- Added Auth-step validation using the existing schema parsing and compatibility helper path.
+- Gated Next navigation on the Auth step when the full config is not schema-compatible.
+- Confirmed unsupported auth providers are not exposed.
+- Confirmed no Docker controls, preview, download, API route, generator logic, or CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/auth-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-06/step-7.md
+rg --files context apps/web packages/schema/src .agents/prompts/phase-06
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,280p' context/project-overview.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+sed -n '1,360p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/components/builder/steps/orm-step.tsx
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+sed -n '1,240p' apps/web/lib/builder/steps.ts
+sed -n '1,320p' packages/schema/src/metadata.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+sed -n '1,280p' packages/schema/src/config.ts
+git status --short
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+rg '@launchkit/generator|app/api|createProjectZip|download|Clerk|Supabase Auth|NextAuth provider|OAuth|docker|preview|node:test|node --test' apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build -w apps/web
+npm run build
+git diff -- apps/web/components/builder/builder-shell.tsx apps/web/components/builder/steps/auth-step.tsx apps/web/lib/builder/steps.ts apps/web/lib/builder/validation.ts
+git status --short
+git diff --stat
+```
+
+Verification:
+
+- [x] Auth step renders in the wizard.
+- [x] Auth selector supports `none` and `authjs-credentials`.
+- [x] Auth options come from schema metadata.
+- [x] Selecting Auth.js credentials updates `config.auth`.
+- [x] Selecting no auth updates `config.auth`.
+- [x] Auth updates preserve database, ORM, Docker, and other config values.
+- [x] Auth.js credentials can be selected without PostgreSQL.
+- [x] Auth.js credentials can be selected with PostgreSQL and no ORM.
+- [x] Auth.js credentials can be selected with PostgreSQL and Prisma.
+- [x] Auth.js credentials option includes concise scaffold messaging.
+- [x] Auth-step validation uses schema parsing and compatibility helpers.
+- [x] Incompatible full config state prevents Next on the Auth step.
+- [x] Unsupported auth providers are not rendered.
+- [x] No Docker controls were added.
+- [x] No preview or download flow was implemented.
+- [x] No API route was added.
+- [x] No generator logic was added to `apps/web`.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` initially failed because `authMetadata` has no `recommended` field in the current schema metadata. The Auth step was updated to guard the optional recommended badge. Rerunning passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` passed across all workspaces when run with elevated permissions for the known Turbopack process/port restriction.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 8: Create Extras step.
+
+Phase 6 Step 6 completed: Create ORM step
+
+Changes made:
+
+- Added ORM step UI to the website wizard.
+- Added an ORM selector for `orm: "none"` and `orm: "prisma"`.
+- Used `@launchkit/schema` `ormMetadata` for ORM option labels, descriptions, and the Prisma recommended indicator.
+- Disabled the Prisma option unless `database: "postgres"` is selected.
+- Shows the disabled reason `Requires PostgreSQL` when Prisma is unavailable.
+- Shows `No ORM` as the effective selection when PostgreSQL is not selected.
+- Connected ORM selection to shared builder config state.
+- Preserved all other builder config values when changing ORM selection.
+- Guarded Prisma state updates so Prisma cannot be selected without PostgreSQL.
+- Added ORM-step validation using the existing schema parsing and compatibility helper path.
+- Gated Next navigation on the ORM step when an invalid `database: "none"` plus `orm: "prisma"` config is present.
+- Confirmed unsupported ORMs are not exposed.
+- Confirmed no auth, Docker, preview, download, API route, generator logic, or CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/orm-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-06/step-6.md
+rg --files
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,280p' context/project-overview.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+sed -n '1,360p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,280p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/components/builder/steps/database-step.tsx
+sed -n '1,280p' apps/web/components/builder/steps/styling-ui-step.tsx
+sed -n '1,240p' apps/web/lib/builder/builder-state.ts
+sed -n '1,220p' apps/web/lib/builder/steps.ts
+sed -n '1,340p' packages/schema/src/metadata.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+sed -n '1,260p' apps/web/components/builder/wizard-step-panel.tsx
+sed -n '1,260p' apps/web/components/builder/steps/framework-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/project-step.tsx
+cat apps/web/package.json
+git status --short
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+rg '@launchkit/generator|app/api|createProjectZip|download|Drizzle|typeorm|sequelize|SQLite|MySQL|Mongo|Supabase|PlanetScale|node:test|node --test' apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+git diff -- apps/web/components/builder/builder-shell.tsx apps/web/components/builder/steps/orm-step.tsx apps/web/lib/builder/steps.ts apps/web/lib/builder/validation.ts
+git diff --stat
+git status --short
+sed -n '1,220p' context/progress-tracker.md
+```
+
+Verification:
+
+- [x] ORM step renders in the wizard.
+- [x] ORM selector supports `none` and `prisma`.
+- [x] ORM options come from schema metadata.
+- [x] Prisma recommended indicator is shown from metadata.
+- [x] Prisma is disabled when `database !== "postgres"`.
+- [x] Prisma disabled state shows `Requires PostgreSQL`.
+- [x] No ORM is shown as selected when PostgreSQL is not selected.
+- [x] Selecting Prisma updates `config.orm` only when PostgreSQL is selected.
+- [x] Selecting Prisma does not modify `config.database`.
+- [x] Selecting no ORM sets `config.orm` to `"none"`.
+- [x] ORM updates preserve database, auth, Docker, and other config values.
+- [x] Invalid Prisma without PostgreSQL uses schema compatibility validation and prevents Next on the ORM step.
+- [x] Unsupported ORMs are not rendered.
+- [x] No auth controls were added.
+- [x] No Docker controls were added.
+- [x] No preview or download flow was implemented.
+- [x] No API route was added.
+- [x] No generator logic was added to `apps/web`.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 7: Create Auth step.
+
+Phase 6 Step 5 completed: Create database step
+
+Changes made:
+
+- Added Database step UI to the website wizard.
+- Added a database selector for `database: "none"` and `database: "postgres"`.
+- Used `@launchkit/schema` `databaseMetadata` for database option labels, descriptions, and the PostgreSQL recommended indicator.
+- Connected database selection to shared builder config state.
+- Added dependent reset behavior when switching to `database: "none"`:
+  - resets `orm: "prisma"` to `orm: "none"`;
+  - resets `docker: "postgres"` to `docker: "none"`;
+  - leaves `auth` unchanged because Auth.js credentials may work without a database.
+- Extended builder compatibility error mapping so schema compatibility issues are available on every related field path.
+- Added database-step validation using schema parsing and compatibility helpers through the existing builder validation path.
+- Gated Next navigation on the Database step only when database-related schema or compatibility validation fails.
+- Confirmed unsupported databases are not exposed.
+- Confirmed no ORM, auth, Docker, preview, download, API route, generator logic, or CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/database-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-06/step-5.md
+rg --files apps/web/components apps/web/lib packages/schema/src context
+sed -n '261,520p' .agents/prompts/phase-06/step-5.md
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1120p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '261,900p' context/progress-tracker.md
+sed -n '901,1700p' context/progress-tracker.md
+sed -n '1701,2600p' context/progress-tracker.md
+git status --short
+sed -n '1,340p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/components/builder/steps/styling-ui-step.tsx
+sed -n '1,220p' packages/schema/src/metadata.ts
+sed -n '1,240p' packages/schema/src/options.ts
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+rg '@launchkit/generator|app/api|createProjectZip|download|MySQL|SQLite|Mongo|Supabase|PlanetScale|node:test|node --test' apps/web/components apps/web/lib apps/web/app
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+git status --short
+git diff --stat
+git diff -- apps/web/components/builder/builder-shell.tsx apps/web/components/builder/steps/database-step.tsx apps/web/lib/builder/validation.ts
+sed -n '1,220p' context/progress-tracker.md
+```
+
+Verification:
+
+- [x] Database step renders in the wizard.
+- [x] Database selector supports `none` and `postgres`.
+- [x] Database options come from schema metadata.
+- [x] PostgreSQL recommended indicator is shown from metadata.
+- [x] Selecting PostgreSQL updates `config.database`.
+- [x] Selecting no database updates `config.database`.
+- [x] Selecting no database resets Prisma ORM to none when needed.
+- [x] Selecting no database resets PostgreSQL Docker Compose to none when needed.
+- [x] Selecting no database does not reset Auth.js credentials.
+- [x] Database validation uses schema parsing and compatibility helpers.
+- [x] Unsupported databases are not rendered.
+- [x] No ORM controls were added.
+- [x] No auth controls were added.
+- [x] No Docker controls were added.
+- [x] No generator logic was added to `apps/web`.
+- [x] No API route or download flow was implemented.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 6: Create ORM step.
+
+Phase 6 Step 4 completed: Create Styling and UI step
+
+Changes made:
+
+- Added Styling and UI step UI to the website wizard.
+- Displayed Tailwind CSS as the fixed MVP styling choice using `@launchkit/schema` styling metadata.
+- Added a UI library selector for `ui: "none"` and `ui: "shadcn"` using `@launchkit/schema` UI metadata.
+- Added the recommended indicator for shadcn/ui from schema metadata.
+- Connected UI library selection to shared builder config state.
+- Kept `config.styling` fixed as `"tailwind"` whenever the UI option changes.
+- Extended builder validation to include schema compatibility issues through `validateCompatibility()` from `@launchkit/schema`.
+- Gated Next navigation on the Styling and UI step only if styling/UI schema or compatibility validation fails.
+- Confirmed unsupported styling systems are not exposed.
+- Confirmed no `@launchkit/generator` import, API route, zip download flow, CLI work, or later step implementation was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/styling-ui-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-06/step-4.md
+rg --files
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1120p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '241,900p' context/progress-tracker.md
+sed -n '901,1600p' context/progress-tracker.md
+sed -n '1601,2300p' context/progress-tracker.md
+sed -n '2301,3000p' context/progress-tracker.md
+sed -n '3001,3700p' context/progress-tracker.md
+git status --short
+sed -n '1,320p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/components/builder/steps/framework-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/project-step.tsx
+sed -n '1,260p' apps/web/lib/builder/builder-state.ts
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/lib/builder/steps.ts
+sed -n '1,260p' apps/web/components/builder/wizard-step-panel.tsx
+sed -n '1,360p' packages/schema/src/metadata.ts
+sed -n '1,320p' packages/schema/src/config.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+cat apps/web/package.json
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+rg '@launchkit/generator|app/api|createProjectZip|download|CSS Modules|Sass|Styled Components|Panda CSS|UnoCSS|node:test|node --test' apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3000
+git status --short
+git diff --stat
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,240p' apps/web/components/builder/steps/styling-ui-step.tsx
+```
+
+Verification:
+
+- [x] Styling and UI step renders in the wizard.
+- [x] Tailwind CSS is displayed as the fixed styling choice.
+- [x] Tailwind styling metadata comes from `@launchkit/schema`.
+- [x] UI options are limited to `none` and `shadcn`.
+- [x] UI option metadata comes from `@launchkit/schema`.
+- [x] shadcn/ui recommended indicator is shown from metadata.
+- [x] Selecting a UI option updates `config.ui`.
+- [x] UI updates preserve all other builder config values.
+- [x] UI updates keep `config.styling` as `"tailwind"`.
+- [x] Styling/UI validation uses schema parsing and compatibility helpers.
+- [x] Valid `styling: "tailwind"` with `ui: "none"` or `ui: "shadcn"` can advance.
+- [x] Unsupported styling systems are not rendered.
+- [x] No generator logic was added to `apps/web`.
+- [x] No API route or download flow was implemented.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+- `npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3000` failed in the sandbox because binding to `127.0.0.1:3000` was not permitted. The elevated rerun was rejected because the user will run the dev server locally.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server is not running; the user said they will run it themselves.
+
+Next suggested step:
+
+- Phase 6 Step 5: Create database step.
+
+Phase 6 Step 3 completed: Create framework step
+
+Changes made:
+
+- Added Framework step UI for the fixed generated-project foundation.
+- Displayed the MVP framework stack: Next.js, TypeScript, App Router, and no `src/` project structure.
+- Used `@launchkit/schema` metadata for framework, language, router, and project structure labels/descriptions.
+- Added framework-step validation using `@launchkit/schema` through the existing builder config validation path.
+- Gated Next navigation only if the fixed framework config is somehow invalid.
+- Confirmed the default config remains `framework: "next"`, `language: "typescript"`, `router: "app"`, and `projectStructure: "no-src"`.
+- Confirmed unsupported framework, language, router, and structure choices are not exposed.
+- Confirmed no `@launchkit/generator` import, API route, zip download flow, CLI work, or later step implementation was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/framework-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,360p' .agents/prompts/phase-06/step-3.md
+git status --short
+rg --files apps/web/components apps/web/lib packages/schema/src
+sed -n '1,1040p' context/architecture.md
+sed -n '1,1120p' context/build-plan.md
+sed -n '1,760p' context/project-overview.md
+sed -n '1,520p' context/ui-rules.md
+sed -n '1,260p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+git status --short
+git diff --stat
+rg '@launchkit/generator|app/api|createProjectZip|node:test|node --test|React Router|Remix|Astro|Vue|Svelte|JavaScript|Pages Router|src/' apps/web
+git diff -- apps/web/components/builder apps/web/lib/builder
+```
+
+Verification:
+
+- [x] Framework step renders in the wizard.
+- [x] Framework step shows Next.js.
+- [x] Framework step shows TypeScript.
+- [x] Framework step shows App Router.
+- [x] Framework step shows no `src/` project structure.
+- [x] Framework step uses schema metadata.
+- [x] Unsupported framework/language/router/structure choices are not exposed.
+- [x] Current config remains valid according to `@launchkit/schema`.
+- [x] User can continue with the default config.
+- [x] No generator logic was added to `apps/web`.
+- [x] No API route or download flow was implemented.
+- [x] No CLI functionality was added.
+- [x] Later steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 4: Create styling and UI step.
+
+Phase 6 Step 2 completed: Create project step
+
+Changes made:
+
+- Added Project step UI for generated project identity.
+- Added a project name input connected to shared builder config state.
+- Added project name validation using `@launchkit/schema` `LaunchKitConfigSchema`.
+- Added inline validation feedback for edited invalid project names.
+- Added a package manager selector using `@launchkit/schema` package manager metadata.
+- Connected package manager selection to shared builder config state.
+- Added builder config patch/update helpers.
+- Gated Next navigation when the Project step config is invalid.
+- Kept future wizard steps as placeholders.
+- Confirmed no `@launchkit/generator` import, API route, zip download flow, CLI work, or later step implementation was added.
+
+Files changed:
+
+- `apps/web/components/builder/steps/project-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/components/builder/wizard-navigation.tsx`
+- `apps/web/components/builder/wizard-step-panel.tsx`
+- `apps/web/lib/builder/builder-state.ts`
+- `apps/web/lib/builder/validation.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,360p' .agents/prompts/phase-06/step-2.md
+rg --files apps/web/components apps/web/lib apps/web/app packages/schema/src
+git status --short
+sed -n '1,260p' context/architecture.md
+sed -n '1,340p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '261,980p' context/architecture.md
+sed -n '341,1120p' context/build-plan.md
+sed -n '261,760p' context/project-overview.md
+sed -n '281,520p' context/ui-rules.md
+sed -n '1,260p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,240p' apps/web/components/builder/wizard-step-panel.tsx
+sed -n '1,220p' apps/web/components/builder/wizard-navigation.tsx
+sed -n '1,260p' packages/schema/src/metadata.ts
+sed -n '1,220p' packages/schema/src/options.ts
+sed -n '1,220p' packages/schema/src/config.ts
+sed -n '1,220p' packages/schema/src/__tests__/config.test.ts
+sed -n '1,220p' packages/schema/src/__tests__/metadata.test.ts
+cat apps/web/tsconfig.json
+mkdir -p apps/web/components/builder/steps
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+git status --short
+git diff --stat
+rg '@launchkit/generator|app/api|createProjectZip|download|node:test|node --test' apps/web
+git diff -- apps/web/components/builder apps/web/lib/builder
+```
+
+Verification:
+
+- [x] Project step renders in the wizard.
+- [x] Project name input is connected to builder config state.
+- [x] Project name validation uses `@launchkit/schema`.
+- [x] Invalid edited project names show concise feedback.
+- [x] Invalid project names prevent advancing from the Project step.
+- [x] Package manager selector supports `npm` and `pnpm`.
+- [x] Package manager options come from schema metadata.
+- [x] Package manager selection updates builder config state.
+- [x] No generator logic was added to `apps/web`.
+- [x] No API route or download flow was implemented.
+- [x] No CLI functionality was added.
+- [x] Future steps remain placeholders.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 3: Create framework step.
+
+Phase 6 Step 1 completed: Create website wizard shell
+
+Changes made:
+
+- Created the LaunchKit builder home page in `apps/web/app/page.tsx`.
+- Added a client-side builder shell with current-step navigation state.
+- Added wizard progress, navigation, and placeholder step panel components.
+- Added shared wizard step definitions for all 9 MVP steps.
+- Added builder state initialization from `@launchkit/schema` `defaultLaunchKitConfig`.
+- Added a compact current-selection panel using the initialized builder config.
+- Updated app metadata from the default Create Next App copy to LaunchKit.
+- Added `@launchkit/schema` as an explicit `apps/web` workspace dependency and updated `package-lock.json`.
+- Confirmed no `@launchkit/generator` import, API route, zip download flow, CLI work, or individual wizard step forms were added.
+
+Files changed:
+
+- `apps/web/app/page.tsx`
+- `apps/web/app/layout.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/components/builder/wizard-progress.tsx`
+- `apps/web/components/builder/wizard-navigation.tsx`
+- `apps/web/components/builder/wizard-step-panel.tsx`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/lib/builder/builder-state.ts`
+- `apps/web/package.json`
+- `package-lock.json`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,360p' .agents/prompts/phase-06/step-1.md
+rg --files apps/web
+cat apps/web/package.json
+cat package.json
+sed -n '1,260p' context/project-overview.md
+sed -n '1,260p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '1,220p' apps/web/app/page.tsx
+sed -n '1,260p' apps/web/app/globals.css
+sed -n '1,220p' packages/schema/src/index.ts
+cat packages/schema/package.json
+sed -n '1,220p' packages/schema/src/defaults.ts
+sed -n '1,260p' packages/schema/src/config.ts
+cat apps/web/tsconfig.json
+sed -n '1,220p' apps/web/app/layout.tsx
+sed -n '1,160p' apps/web/lib/utils.ts
+rg '"@launchkit/schema"|workspace:' package-lock.json package.json apps packages
+sed -n '261,620p' context/project-overview.md
+sed -n '261,620p' context/architecture.md
+sed -n '261,620p' context/build-plan.md
+sed -n '261,620p' context/ui-rules.md
+mkdir -p apps/web/components/builder apps/web/lib/builder
+npm install --package-lock-only
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+npm run build
+npm run build
+git diff --check
+git status --short
+git diff --stat
+git diff -- apps/web/app/page.tsx apps/web/app/layout.tsx apps/web/components/builder/builder-shell.tsx apps/web/components/builder/wizard-progress.tsx apps/web/components/builder/wizard-navigation.tsx apps/web/components/builder/wizard-step-panel.tsx apps/web/lib/builder/steps.ts apps/web/lib/builder/builder-state.ts apps/web/package.json package-lock.json
+npm run dev -- --hostname 127.0.0.1 --port 3000
+npm run dev -w apps/web -- --hostname 127.0.0.1 --port 3000
+```
+
+Verification:
+
+- [x] Website home page renders the LaunchKit builder shell.
+- [x] Wizard defines all 9 planned steps: Project, Framework, Styling and UI, Database, ORM, Auth, Extras, Preview, Download.
+- [x] Step progress is visible.
+- [x] Back and Next navigation state is implemented.
+- [x] Back is disabled on the first step.
+- [x] Next is disabled on the last step.
+- [x] Placeholder content renders for each step.
+- [x] Builder config state initializes from `@launchkit/schema`.
+- [x] No generator logic was added to `apps/web`.
+- [x] No API route or download flow was implemented.
+- [x] No CLI functionality was added.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed after rerunning outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` failed in the sandbox for the same Turbopack process/port restriction. Rerunning with elevated permissions passed across all workspaces.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No frontend component test pattern or app test script exists for `apps/web`, so no new component test stack was added in this step.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not left running because sandboxed localhost binding failed and the elevated dev-server rerun was not approved.
+
+Next suggested step:
+
+- Phase 6 Step 2: Create project step.
 
 Phase 5 Step 9 completed: Verify Phase 5 completion
 

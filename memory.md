@@ -1,79 +1,104 @@
-# Memory - LaunchKit Phase 5 Complete
+# Memory - Phase 6 Step 12 Website Polish
 
-Last updated: 2026-07-02 13:02 JST
+Last updated: 2026-07-03 14:44 JST
 
 ## What was built
 
-- Completed Phase 5 Step 7: Auth.js credentials template.
-  - Added `packages/templates/features/authjs-credentials/auth.ts`.
-  - Added `packages/templates/features/authjs-credentials/app/api/auth/[...nextauth]/route.ts`.
-  - Added `packages/templates/features/authjs-credentials/README.md`.
-  - Added `authjsCredentialsTemplateId`.
-  - Auth.js credentials feature now contributes `next-auth`, `AUTH_SECRET`, template file references, and generated README notes.
-  - Tests cover Auth.js feature selection, generated files, env/dependency contributions, README warnings, and compatibility.
-- Completed Phase 5 Step 8: Docker PostgreSQL template.
-  - Added `packages/templates/features/docker-postgres/docker-compose.yml`.
-  - Added `packages/templates/features/docker-postgres/README.md`.
-  - Added `dockerPostgresTemplateId`.
-  - Docker PostgreSQL feature now contributes `docker-compose.yml` and generated README notes without npm dependencies or env vars.
-  - Tests cover Docker feature selection, generated file output, README guidance, no dependency contribution, and separation from Prisma/Auth.js.
-- Completed Phase 5 Step 9: Phase 5 completion verification.
-  - Added `packages/generator/src/__tests__/phase-5-completion.test.ts`.
-  - Verified real `packages/templates` files compose through the generator template-loader interface for default, shadcn, PostgreSQL, PostgreSQL + Prisma, Auth.js credentials, PostgreSQL + Docker, and full MVP selections.
-  - Updated `context/progress-tracker.md`: Phase 5 is now `Complete`; Phase 6 is `Ready`.
-- Small in-scope fixes from Step 9 verification:
-  - `generateProject` now loads the base `base/next` template when a `TemplateLoader` is provided.
-  - Generated files are merged by normalized path so later generated files override duplicate template paths predictably.
-  - Base Next.js package metadata is now contributed declaratively by `nextFeature`: Next, React, React DOM, TypeScript, app scripts, and version.
-  - Generated `package.json` now renders `version`.
-  - Generated README no longer says real templates will be added later.
+Phase 6 Step 12 was implemented for the LaunchKit website MVP.
+
+Responsive polish was applied across the wizard:
+
+- `apps/web/components/builder/wizard-step-panel.tsx`: removed the extra dashed inner frame and tightened mobile header spacing.
+- `apps/web/components/builder/wizard-progress.tsx`: progress cards now use short labels on mobile/tablet and full labels on large screens.
+- `apps/web/components/builder/builder-shell.tsx`: improved project-name and current-selection wrapping.
+- Preview components now wrap long names or scroll exact command text safely:
+  - `dependency-list.tsx`
+  - `env-var-list.tsx`
+  - `script-list.tsx`
+  - `stack-summary.tsx`
+- Step option cards now wrap badges/radio indicators cleanly on narrow viewports:
+  - `project-step.tsx`
+  - `framework-step.tsx`
+  - `styling-ui-step.tsx`
+  - `database-step.tsx`
+  - `orm-step.tsx`
+  - `auth-step.tsx`
+  - `extras-step.tsx`
+- `apps/web/components/builder/steps/download-step.tsx`: project name and selected stack values wrap instead of truncating.
+
+Added `apps/web/lib/builder/phase-6-verification.test.ts` with focused Vitest coverage for:
+
+- required 9-step wizard order;
+- supported MVP option values only;
+- project-name validation;
+- unsupported package manager rejection;
+- Auth.js credentials compatibility without PostgreSQL;
+- Prisma and Docker PostgreSQL rejection without PostgreSQL;
+- preview data for selected stack, dependencies, dev dependencies, scripts, env vars, and file tree;
+- unselected optional feature exclusion;
+- `src/` path exclusion;
+- full-stack preview additions for shadcn, PostgreSQL, Prisma, Auth.js credentials, and Docker.
+
+Updated `context/progress-tracker.md` with the Step 12 change log, verification results, and manual-QA handoff.
 
 ## Decisions made
 
-- Phase 5 is complete only after verifying real template files compose through the existing injected `TemplateLoader`; no production filesystem template loader was added in this phase.
-- Keep Phase 6 as the next boundary. Do not start website UI, CLI work, new product options, or unsupported stacks before the Phase 6 prompt.
-- Keep Auth.js credentials scaffold intentionally non-production-complete. Developers must add real user lookup and secure password verification.
-- Keep Docker PostgreSQL as a local development helper only. It must require PostgreSQL and must not add npm dependencies or conflicting env vars.
-- Keep Prisma v7 setup from earlier work: `prisma.config.ts`, generated client output, ESM package type when Prisma is selected, and `@prisma/adapter-pg`.
+Phase 6 remains `In Progress` until manual browser/download QA is completed by the user. Step 12 code and automated verification are complete, but the phase should not be marked complete until the user confirms the website MVP works end to end in a real browser.
+
+No CLI work was started. No new product options were added. Generator logic remains outside UI components.
+
+The new verification test follows the current generator contract: Prisma scripts include `db:push`, not `db:migrate`.
 
 ## Problems solved
 
-- Step 9 verification found that generated projects with a template loader loaded feature templates but not the base Next.js template. Fixed by loading `base/${plan.baseTemplate}` before selected feature templates.
-- Step 9 verification found generated `package.json` lacked base Next/React/TypeScript metadata. Fixed by moving base package metadata into the declarative `nextFeature` contribution.
-- Step 9 verification found `version` was merged into the package patch but not rendered into generated `package.json`. Fixed renderer output.
-- The workspace build still fails inside the sandbox because Turbopack cannot create/bind a worker process. Rerunning `npm run build` with elevated permissions passes.
+The first Step 12 web test run failed because the new verification test expected `db:migrate`; the generator currently exposes `db:push`. The test was corrected.
+
+The first Step 12 web typecheck failed because an intentionally invalid `packageManager: "yarn"` test value needed to be cast through `unknown` before `LaunchKitConfig`. The test was corrected.
+
+`npm run build -w apps/web` fails inside the sandbox because Turbopack cannot create/bind worker processes. Rerunning the web build with elevated permissions passed.
+
+Browser QA could not be completed in-session:
+
+- the in-app browser connector failed with an internal `sandbox-state-meta` Node REPL error;
+- the workspace has no Playwright or `@playwright/test`;
+- sandboxed localhost `curl` could not connect;
+- elevated localhost `curl` was not allowed;
+- elevated `npm run dev -w apps/web` found another Next dev server lock/process;
+- the user said they will do manual browser/download QA themselves.
 
 ## Current state
 
-- `context/progress-tracker.md` says Phase 5 is complete and Phase 6 is ready.
-- Phase 5 template layers are implemented and verified:
-  - Base Next.js
-  - Tailwind
-  - shadcn/ui
-  - PostgreSQL
-  - Prisma
-  - Auth.js credentials
-  - Docker PostgreSQL
-- Verification passed:
-  - `npm run typecheck -w @launchkit/generator`
-  - `npm test -w @launchkit/generator` (111 tests)
-  - `npm run typecheck -w @launchkit/templates`
-  - `npm test -w @launchkit/templates` (51 tests)
-  - `npm run typecheck -w @launchkit/schema`
-  - `npm test -w @launchkit/schema` (73 tests)
-  - `npm run typecheck`
-  - `npm run test`
-  - `npm run lint`
-  - `git diff --check`
-  - `npm run build` passed when rerun outside the sandbox after the known Turbopack sandbox failure.
-- `rg "node:test|node --test" packages apps package.json` returned no matches.
-- At the time of saving, the latest tracker state and memory save should be treated as the handoff source of truth.
+Automated verification passed:
+
+- `npm run test -w apps/web`: 4 files, 23 tests.
+- `npm run typecheck -w apps/web`.
+- `npm run lint -w apps/web`.
+- `npm run build -w apps/web` passed when rerun elevated after the sandbox Turbopack failure.
+- `npm run typecheck` across workspaces.
+- `npm run test` across workspaces: web 23 tests, generator 111 tests, schema 73 tests, templates 51 tests.
+- `npm run lint`.
+- `git diff --check`.
+
+The progress tracker says Phase 6 Step 12 responsive polish and automated verification are complete, but Phase 6 is still `In Progress` pending user-run manual browser/download QA.
+
+At the time memory was saved, `git status --short` was clean before writing this memory file.
 
 ## Next session starts with
 
-Run `/remember restore`, then read `context/progress-tracker.md` and the next Phase 6 prompt. Start Phase 6 Step 1: create the website wizard shell. Keep generator logic in `packages/generator`; the website should import shared schema/options and call generator APIs rather than duplicating generation rules.
+Wait for the user to report results from manual QA, or ask them to run the website flow at 375px, 768px, 1280px, and 1440px+ widths:
+
+1. Enter a valid project name.
+2. Choose npm or pnpm.
+3. Walk through all 9 wizard steps.
+4. Try invalid project names and blocked Prisma/Docker combinations.
+5. Verify Preview content and no `src/` paths.
+6. Click `Generate ZIP`.
+7. Confirm the ZIP downloads, is named from the project name, contains a top-level folder, contains expected files, and excludes unsafe/`src/` paths.
+
+If manual QA passes, update `context/progress-tracker.md` to mark Phase 6 complete. If QA finds issues, make focused fixes in `apps/web/` only.
 
 ## Open questions
 
-- Phase 6 prompt is not yet loaded in this memory. Confirm the exact `.agents/prompts/phase-06/...` file before implementing.
-- Decide in Phase 6 whether the preview is computed directly from schema/feature metadata or via a lightweight generator preview path, while preserving the architecture boundary.
+Did the user-run browser/download QA pass on mobile, tablet, desktop, and wide desktop?
+
+Should the repo add a browser automation dependency later for repeatable responsive/download QA, or keep this manual until Phase 7?
