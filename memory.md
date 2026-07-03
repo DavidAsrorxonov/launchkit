@@ -1,74 +1,104 @@
-# Memory — LaunchKit Phase 6 Download Flow
+# Memory - Phase 6 Step 12 Website Polish
 
-Last updated: 2026-07-03 12:01 JST
+Last updated: 2026-07-03 14:44 JST
 
 ## What was built
 
-Phase 6 Website MVP wizard is complete through Step 11, Download flow.
+Phase 6 Step 12 was implemented for the LaunchKit website MVP.
 
-Completed recent steps:
+Responsive polish was applied across the wizard:
 
-- Step 10 API route:
-  - Added `apps/web/app/api/generate/route.ts`.
-  - Added server API helpers under `apps/web/lib/api/`.
-  - `POST /api/generate` validates JSON/config/compatibility, calls `@launchkit/generator`, uses a web template loader, returns generated project JSON, and rejects unsafe generated paths.
-  - Added focused API helper tests.
-- Step 11 Download flow:
-  - Added `apps/web/components/builder/steps/download-step.tsx`.
-  - Added `apps/web/components/builder/download/download-button.tsx`.
-  - Added `apps/web/components/builder/download/download-status.tsx`.
-  - Added typed API client in `apps/web/lib/api/client.ts`.
-  - Added shared API response types in `apps/web/lib/api/types.ts`.
-  - Added browser-side zip helper in `apps/web/lib/download/create-project-zip.ts`.
-  - Added API client and zip helper tests.
-  - Wired Download into `apps/web/components/builder/builder-shell.tsx`.
-  - Updated `apps/web/lib/builder/steps.ts`.
-  - Added `jszip` to `apps/web/package.json` and updated `package-lock.json`.
-  - Updated `context/progress-tracker.md` through Phase 6 Step 11. It now says the next suggested step is Phase 6 Step 12: Responsive UI polish and Phase 6 verification.
+- `apps/web/components/builder/wizard-step-panel.tsx`: removed the extra dashed inner frame and tightened mobile header spacing.
+- `apps/web/components/builder/wizard-progress.tsx`: progress cards now use short labels on mobile/tablet and full labels on large screens.
+- `apps/web/components/builder/builder-shell.tsx`: improved project-name and current-selection wrapping.
+- Preview components now wrap long names or scroll exact command text safely:
+  - `dependency-list.tsx`
+  - `env-var-list.tsx`
+  - `script-list.tsx`
+  - `stack-summary.tsx`
+- Step option cards now wrap badges/radio indicators cleanly on narrow viewports:
+  - `project-step.tsx`
+  - `framework-step.tsx`
+  - `styling-ui-step.tsx`
+  - `database-step.tsx`
+  - `orm-step.tsx`
+  - `auth-step.tsx`
+  - `extras-step.tsx`
+- `apps/web/components/builder/steps/download-step.tsx`: project name and selected stack values wrap instead of truncating.
+
+Added `apps/web/lib/builder/phase-6-verification.test.ts` with focused Vitest coverage for:
+
+- required 9-step wizard order;
+- supported MVP option values only;
+- project-name validation;
+- unsupported package manager rejection;
+- Auth.js credentials compatibility without PostgreSQL;
+- Prisma and Docker PostgreSQL rejection without PostgreSQL;
+- preview data for selected stack, dependencies, dev dependencies, scripts, env vars, and file tree;
+- unselected optional feature exclusion;
+- `src/` path exclusion;
+- full-stack preview additions for shadcn, PostgreSQL, Prisma, Auth.js credentials, and Docker.
+
+Updated `context/progress-tracker.md` with the Step 12 change log, verification results, and manual-QA handoff.
 
 ## Decisions made
 
-- Step 10 API returns generated project JSON, and Step 11 creates the ZIP in the browser from that JSON response.
-- The browser download flow uses `Blob`, object URL, temporary anchor click, and URL revocation.
-- ZIP contents are always nested under a top-level project folder named after the generated project.
-- ZIP helper validates response paths again on the client even though the API already validates generated paths.
-- ZIP helper rejects absolute paths, `..`, empty segments, generated `src/` directory paths, and unsafe project folder names.
-- `jszip` is used only in `apps/web`; no ZIP logic was added to `@launchkit/generator`.
-- No generator logic belongs in UI components. UI calls the typed API client and browser ZIP helper only.
-- No CLI functionality has been added.
+Phase 6 remains `In Progress` until manual browser/download QA is completed by the user. Step 12 code and automated verification are complete, but the phase should not be marked complete until the user confirms the website MVP works end to end in a real browser.
+
+No CLI work was started. No new product options were added. Generator logic remains outside UI components.
+
+The new verification test follows the current generator contract: Prisma scripts include `db:push`, not `db:migrate`.
 
 ## Problems solved
 
-- `npm install jszip -w apps/web` failed in the sandbox because DNS could not resolve the npm registry. Rerunning with elevated permissions succeeded.
-- npm audit output after installing `jszip` reports 2 moderate vulnerabilities. No `npm audit fix --force` was run because that would be an unrelated broad dependency change.
-- Turbopack builds continue to fail inside the sandbox because worker process or port binding is not permitted. The same web and workspace builds pass when rerun with elevated permissions.
-- Local browser/manual download QA was not run because the user said they will run the dev server locally.
+The first Step 12 web test run failed because the new verification test expected `db:migrate`; the generator currently exposes `db:push`. The test was corrected.
+
+The first Step 12 web typecheck failed because an intentionally invalid `packageManager: "yarn"` test value needed to be cast through `unknown` before `LaunchKitConfig`. The test was corrected.
+
+`npm run build -w apps/web` fails inside the sandbox because Turbopack cannot create/bind worker processes. Rerunning the web build with elevated permissions passed.
+
+Browser QA could not be completed in-session:
+
+- the in-app browser connector failed with an internal `sandbox-state-meta` Node REPL error;
+- the workspace has no Playwright or `@playwright/test`;
+- sandboxed localhost `curl` could not connect;
+- elevated localhost `curl` was not allowed;
+- elevated `npm run dev -w apps/web` found another Next dev server lock/process;
+- the user said they will do manual browser/download QA themselves.
 
 ## Current state
 
-- Current tracker status: Phase 6 in progress; Download flow complete; Responsive UI polish and Phase 6 verification next.
-- Step 11 verification passed:
-  - `npm run typecheck -w apps/web`
-  - `npm run lint -w apps/web`
-  - `npm run test -w apps/web` passed: 3 test files, 16 tests.
-  - `git diff --check`
-  - `npm run build -w apps/web` passed outside sandbox.
-  - `npm run typecheck`
-  - `npm run test` passed across workspaces: web 16 tests, generator 111, schema 73, templates 51.
-  - `npm run lint`
-  - `npm run build` passed outside sandbox.
-- Source search found no generated-code execution, generated dependency installation, CLI work, or Node built-in test runner usage in the Step 11 implementation.
-- Workspace still has uncommitted Phase 6 changes and untracked Step prompt files.
-- No local dev server is running from this session.
+Automated verification passed:
+
+- `npm run test -w apps/web`: 4 files, 23 tests.
+- `npm run typecheck -w apps/web`.
+- `npm run lint -w apps/web`.
+- `npm run build -w apps/web` passed when rerun elevated after the sandbox Turbopack failure.
+- `npm run typecheck` across workspaces.
+- `npm run test` across workspaces: web 23 tests, generator 111 tests, schema 73 tests, templates 51 tests.
+- `npm run lint`.
+- `git diff --check`.
+
+The progress tracker says Phase 6 Step 12 responsive polish and automated verification are complete, but Phase 6 is still `In Progress` pending user-run manual browser/download QA.
+
+At the time memory was saved, `git status --short` was clean before writing this memory file.
 
 ## Next session starts with
 
-Implement Phase 6 Step 12: Responsive UI polish and Phase 6 verification. Start by reading `context/progress-tracker.md` and the Step 12 prompt in `.agents/prompts/phase-06/` if present.
+Wait for the user to report results from manual QA, or ask them to run the website flow at 375px, 768px, 1280px, and 1440px+ widths:
 
-Manual browser QA is important next: run the app locally, complete the wizard, click Generate ZIP, confirm the ZIP downloads, inspect that it contains a top-level project folder, expected generated files, and no `src/` folder.
+1. Enter a valid project name.
+2. Choose npm or pnpm.
+3. Walk through all 9 wizard steps.
+4. Try invalid project names and blocked Prisma/Docker combinations.
+5. Verify Preview content and no `src/` paths.
+6. Click `Generate ZIP`.
+7. Confirm the ZIP downloads, is named from the project name, contains a top-level folder, contains expected files, and excludes unsafe/`src/` paths.
+
+If manual QA passes, update `context/progress-tracker.md` to mark Phase 6 complete. If QA finds issues, make focused fixes in `apps/web/` only.
 
 ## Open questions
 
-- The Step 12 prompt has not been loaded yet.
-- Decide whether to address npm audit's 2 moderate vulnerabilities now, defer to Phase 7 hardening, or document them as a known dependency audit item.
-- The generator still does not expose a production filesystem template loader; the web API owns a server-side template loader under `apps/web/lib/api/template-loader.ts`.
+Did the user-run browser/download QA pass on mobile, tablet, desktop, and wide desktop?
+
+Should the repo add a browser automation dependency later for repeatable responsive/download QA, or keep this manual until Phase 7?
