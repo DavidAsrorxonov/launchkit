@@ -83,7 +83,7 @@ export function ExtrasStep({
                   !isSelected && !isDisabled ? "hover:bg-muted" : "",
                 ].join(" ")}
               >
-                <span className="flex items-start justify-between gap-3">
+                <span className="flex flex-wrap items-start justify-between gap-3">
                   <span className="text-sm font-semibold">
                     {getDockerOptionLabel(option)}
                   </span>

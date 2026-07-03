@@ -12,8 +12,10 @@ export function ScriptList({ scripts }: ScriptListProps) {
         <dl className="space-y-2">
           {scripts.map((script) => (
             <div key={script.name} className="min-w-0 text-sm">
-              <dt className="font-mono text-foreground">{script.name}</dt>
-              <dd className="mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-xs text-muted-foreground">
+              <dt className="font-mono text-foreground break-all">
+                {script.name}
+              </dt>
+              <dd className="mt-0.5 overflow-x-auto pb-1 font-mono text-xs text-muted-foreground whitespace-nowrap">
                 {script.command}
               </dd>
             </div>

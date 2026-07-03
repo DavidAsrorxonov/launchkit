@@ -1,65 +1,74 @@
-# Memory — LaunchKit Phase 6 Preview Step
+# Memory — LaunchKit Phase 6 Download Flow
 
-Last updated: 2026-07-02 23:40 JST
+Last updated: 2026-07-03 12:01 JST
 
 ## What was built
 
-Phase 6 Website MVP wizard is complete through Step 9, Preview.
+Phase 6 Website MVP wizard is complete through Step 11, Download flow.
 
-Completed this session:
+Completed recent steps:
 
-- Added Preview step UI in `apps/web/components/builder/steps/preview-step.tsx`.
-- Added preview rendering components under `apps/web/components/builder/preview/`:
-  - `stack-summary.tsx`
-  - `dependency-list.tsx`
-  - `script-list.tsx`
-  - `env-var-list.tsx`
-  - `file-tree-preview.tsx`
-- Added `apps/web/lib/builder/preview.ts` to derive preview data.
-- Wired Preview into `apps/web/components/builder/builder-shell.tsx`.
-- Added Preview-step validation in `apps/web/lib/builder/validation.ts`.
-- Updated `apps/web/lib/builder/steps.ts` Preview placeholder.
-- Added `@launchkit/generator` as an explicit `apps/web` dependency in `apps/web/package.json` and `package-lock.json`.
-- Updated `context/progress-tracker.md` through Phase 6 Step 9. It now says the next suggested step is Phase 6 Step 10: Build generate API route.
+- Step 10 API route:
+  - Added `apps/web/app/api/generate/route.ts`.
+  - Added server API helpers under `apps/web/lib/api/`.
+  - `POST /api/generate` validates JSON/config/compatibility, calls `@launchkit/generator`, uses a web template loader, returns generated project JSON, and rejects unsafe generated paths.
+  - Added focused API helper tests.
+- Step 11 Download flow:
+  - Added `apps/web/components/builder/steps/download-step.tsx`.
+  - Added `apps/web/components/builder/download/download-button.tsx`.
+  - Added `apps/web/components/builder/download/download-status.tsx`.
+  - Added typed API client in `apps/web/lib/api/client.ts`.
+  - Added shared API response types in `apps/web/lib/api/types.ts`.
+  - Added browser-side zip helper in `apps/web/lib/download/create-project-zip.ts`.
+  - Added API client and zip helper tests.
+  - Wired Download into `apps/web/components/builder/builder-shell.tsx`.
+  - Updated `apps/web/lib/builder/steps.ts`.
+  - Added `jszip` to `apps/web/package.json` and updated `package-lock.json`.
+  - Updated `context/progress-tracker.md` through Phase 6 Step 11. It now says the next suggested step is Phase 6 Step 12: Responsive UI polish and Phase 6 verification.
 
 ## Decisions made
 
-- Preview data uses `@launchkit/generator` `createGenerationPlan(config)` for dependencies, dev dependencies, scripts, environment variables, and selected optional feature file paths.
-- Generator planning is isolated in `apps/web/lib/builder/preview.ts`; React components render data only.
-- Selected stack labels use `@launchkit/schema` metadata instead of raw enum values where metadata exists.
-- Environment variable preview shows names, descriptions, and required status only. It does not show generated placeholder values or imply production-ready secrets.
-- Full file content preview remains out of scope for Step 9.
-- No generate/download API route, zip download behavior, or CLI functionality was added.
+- Step 10 API returns generated project JSON, and Step 11 creates the ZIP in the browser from that JSON response.
+- The browser download flow uses `Blob`, object URL, temporary anchor click, and URL revocation.
+- ZIP contents are always nested under a top-level project folder named after the generated project.
+- ZIP helper validates response paths again on the client even though the API already validates generated paths.
+- ZIP helper rejects absolute paths, `..`, empty segments, generated `src/` directory paths, and unsafe project folder names.
+- `jszip` is used only in `apps/web`; no ZIP logic was added to `@launchkit/generator`.
+- No generator logic belongs in UI components. UI calls the typed API client and browser ZIP helper only.
+- No CLI functionality has been added.
 
 ## Problems solved
 
-- Turbopack builds still fail inside the sandbox because worker process or port binding is not permitted. The same web and workspace builds pass when rerun with elevated permissions.
-- The generator plan exposes selected feature file references but not a base template file manifest. `apps/web/lib/builder/preview.ts` currently keeps a small local list of MVP base Next.js file paths until the generator exports base template file references.
-- Port 3000 was already occupied by a local Node process. A sandboxed attempt to start the dev server on port 3001 failed with `listen EPERM`; the user said they will run the dev server themselves.
+- `npm install jszip -w apps/web` failed in the sandbox because DNS could not resolve the npm registry. Rerunning with elevated permissions succeeded.
+- npm audit output after installing `jszip` reports 2 moderate vulnerabilities. No `npm audit fix --force` was run because that would be an unrelated broad dependency change.
+- Turbopack builds continue to fail inside the sandbox because worker process or port binding is not permitted. The same web and workspace builds pass when rerun with elevated permissions.
+- Local browser/manual download QA was not run because the user said they will run the dev server locally.
 
 ## Current state
 
-- Current tracker status: Phase 6 in progress; Preview step complete; Generate API route next.
-- Step 9 verification passed:
+- Current tracker status: Phase 6 in progress; Download flow complete; Responsive UI polish and Phase 6 verification next.
+- Step 11 verification passed:
   - `npm run typecheck -w apps/web`
   - `npm run lint -w apps/web`
+  - `npm run test -w apps/web` passed: 3 test files, 16 tests.
   - `git diff --check`
-  - `npm run build -w apps/web` outside sandbox
+  - `npm run build -w apps/web` passed outside sandbox.
   - `npm run typecheck`
-  - `npm run test`
+  - `npm run test` passed across workspaces: web 16 tests, generator 111, schema 73, templates 51.
   - `npm run lint`
-  - `npm run build` outside sandbox
-- Workspace has uncommitted changes from recent Phase 6 work, including Step 8 and Step 9 files.
-- `memory.md` is now saved for the next session.
+  - `npm run build` passed outside sandbox.
+- Source search found no generated-code execution, generated dependency installation, CLI work, or Node built-in test runner usage in the Step 11 implementation.
+- Workspace still has uncommitted Phase 6 changes and untracked Step prompt files.
 - No local dev server is running from this session.
 
 ## Next session starts with
 
-Implement Phase 6 Step 10: Build generate API route. Start by reading `context/progress-tracker.md` and the Step 10 prompt in `.agents/prompts/phase-06/` if present.
+Implement Phase 6 Step 12: Responsive UI polish and Phase 6 verification. Start by reading `context/progress-tracker.md` and the Step 12 prompt in `.agents/prompts/phase-06/` if present.
 
-Keep the same boundaries unless Step 10 explicitly changes them: use `@launchkit/schema` for validation, call `@launchkit/generator` from server-side code, do not put generator logic in UI components, do not add CLI functionality, and keep zip/download behavior limited to the Step 10 prompt scope.
+Manual browser QA is important next: run the app locally, complete the wizard, click Generate ZIP, confirm the ZIP downloads, inspect that it contains a top-level project folder, expected generated files, and no `src/` folder.
 
 ## Open questions
 
-- The Step 10 prompt has not been loaded yet.
-- Decide whether Step 10 should also improve generator base template manifest exposure, or leave the Preview helper's local base file list in place until a later generator cleanup step.
+- The Step 12 prompt has not been loaded yet.
+- Decide whether to address npm audit's 2 moderate vulnerabilities now, defer to Phase 7 hardening, or document them as a known dependency audit item.
+- The generator still does not expose a production filesystem template loader; the web API owns a server-side template loader under `apps/web/lib/api/template-loader.ts`.

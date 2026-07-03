@@ -22,9 +22,9 @@ export function DependencyList({ title, dependencies }: DependencyListProps) {
           {dependencies.map((dependency) => (
             <li
               key={dependency.name}
-              className="flex min-w-0 items-center justify-between gap-3 text-sm"
+              className="flex min-w-0 items-start justify-between gap-3 text-sm"
             >
-              <span className="truncate font-mono text-foreground">
+              <span className="min-w-0 font-mono text-foreground break-all">
                 {dependency.name}
               </span>
               <span className="shrink-0 font-mono text-xs text-muted-foreground">

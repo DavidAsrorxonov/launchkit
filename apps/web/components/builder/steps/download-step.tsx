@@ -66,7 +66,7 @@ export function DownloadStep({ config, validation }: DownloadStepProps) {
             <dt className="text-xs font-medium text-muted-foreground">
               Project name
             </dt>
-            <dd className="mt-0.5 font-mono text-sm text-foreground">
+            <dd className="mt-0.5 font-mono text-sm text-foreground break-all">
               {config.name}
             </dd>
           </div>
@@ -89,7 +89,7 @@ export function DownloadStep({ config, validation }: DownloadStepProps) {
               <dt className="text-xs font-medium text-muted-foreground">
                 {item.label}
               </dt>
-              <dd className="mt-0.5 truncate text-sm text-foreground">
+              <dd className="mt-0.5 text-sm text-foreground break-words">
                 {item.value}
               </dd>
             </div>

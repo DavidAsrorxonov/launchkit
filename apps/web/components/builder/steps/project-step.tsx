@@ -80,7 +80,7 @@ export function ProjectStep({
                     : "border-border bg-background text-foreground hover:bg-muted",
                 ].join(" ")}
               >
-                <span className="flex items-center justify-between gap-3">
+                <span className="flex flex-wrap items-start justify-between gap-2">
                   <span className="text-sm font-semibold">{option.label}</span>
                   {option.recommended ? (
                     <span className="rounded-md border border-border bg-card px-2 py-0.5 text-xs font-medium text-muted-foreground">

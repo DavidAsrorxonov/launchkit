@@ -18,7 +18,7 @@ export function StackSummary({ items }: StackSummaryProps) {
             <dt className="text-xs font-medium text-muted-foreground">
               {item.label}
             </dt>
-            <dd className="mt-0.5 truncate text-sm text-foreground">
+            <dd className="mt-0.5 text-sm text-foreground break-words">
               {item.value}
             </dd>
           </div>

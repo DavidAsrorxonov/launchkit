@@ -19,7 +19,7 @@ export function WizardStepPanel({
       aria-labelledby="builder-step-title"
       className="rounded-lg border border-border bg-card p-5 text-card-foreground shadow-sm sm:p-6"
     >
-      <div className="mb-10 flex items-start justify-between gap-4">
+      <div className="mb-8 flex items-start justify-between gap-4 sm:mb-10">
         <div className="min-w-0">
           <p className="text-sm font-medium text-muted-foreground">
             Step {stepNumber} of {totalSteps}
@@ -35,11 +35,9 @@ export function WizardStepPanel({
           {step.shortLabel}
         </span>
       </div>
-      <div className="rounded-md border border-dashed border-border bg-background p-5">
-        {children ?? (
-          <p className="text-sm text-muted-foreground">{step.placeholder}</p>
-        )}
-      </div>
+      {children ?? (
+        <p className="text-sm text-muted-foreground">{step.placeholder}</p>
+      )}
     </section>
   );
 }

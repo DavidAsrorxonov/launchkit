@@ -79,7 +79,7 @@ export function FrameworkStep({ config, validation }: FrameworkStepProps) {
             key={item.label}
             className="rounded-md border border-primary bg-accent p-4 text-accent-foreground"
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   {item.label}

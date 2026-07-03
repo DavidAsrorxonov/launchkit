@@ -8,7 +8,7 @@ Use this file to track development progress, changes made, decisions, notes, blo
 Project: LaunchKit
 Stage: Foundation setup
 Current phase: Phase 6 in progress
-Primary focus: Phase 6 Download flow is complete; Responsive UI polish and Phase 6 verification are next
+Primary focus: Phase 6 Step 12 responsive polish and automated verification are complete; user-run browser/download QA remains before marking Phase 6 complete
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 Download flow is complete; Responsive UI polish and Phase
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | In Progress | Step 11 added the Download step, API client, browser ZIP creation, browser download trigger, and download-state handling; responsive polish and Phase 6 verification are next. |
+| Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -30,6 +30,142 @@ Primary focus: Phase 6 Download flow is complete; Responsive UI polish and Phase
 Add entries in reverse chronological order.
 
 ### 2026-07-03
+
+Phase 6 Step 12 completed: Responsive UI polish and Phase 6 verification
+
+Changes made:
+
+- Removed the extra dashed inner frame from wizard step content to avoid a card-within-card feel.
+- Tightened wizard step header spacing on small screens.
+- Updated progress cards to use short labels on mobile/tablet and full labels on large screens.
+- Improved project-name wrapping in the header and Download step.
+- Improved current-selection value wrapping and width constraints.
+- Updated option-card label rows to wrap badges and radio indicators cleanly on narrow viewports.
+- Updated preview stack and download stack values to wrap instead of truncating important labels.
+- Updated dependency names and environment variable names to wrap safely.
+- Updated script command rows to scroll horizontally when exact command text is too long.
+- Added focused Phase 6 wizard contract tests for step order, supported options, validation, compatibility, preview contents, optional file inclusion/exclusion, and `src/` path exclusion.
+- Confirmed no CLI functionality was added.
+- Confirmed no new product options were added.
+- Confirmed generator logic was not moved into UI components.
+
+Files changed:
+
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/components/builder/preview/dependency-list.tsx`
+- `apps/web/components/builder/preview/env-var-list.tsx`
+- `apps/web/components/builder/preview/script-list.tsx`
+- `apps/web/components/builder/preview/stack-summary.tsx`
+- `apps/web/components/builder/steps/auth-step.tsx`
+- `apps/web/components/builder/steps/database-step.tsx`
+- `apps/web/components/builder/steps/download-step.tsx`
+- `apps/web/components/builder/steps/extras-step.tsx`
+- `apps/web/components/builder/steps/framework-step.tsx`
+- `apps/web/components/builder/steps/orm-step.tsx`
+- `apps/web/components/builder/steps/project-step.tsx`
+- `apps/web/components/builder/steps/styling-ui-step.tsx`
+- `apps/web/components/builder/wizard-progress.tsx`
+- `apps/web/components/builder/wizard-step-panel.tsx`
+- `apps/web/lib/builder/phase-6-verification.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-06/step-12.md
+git status --short
+rg --files context
+find apps/web -maxdepth 3 -type f | sort
+find packages -maxdepth 3 -type f | sort
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '321,760p' context/architecture.md
+sed -n '1,320p' context/build-plan.md
+sed -n '321,820p' context/build-plan.md
+sed -n '821,1240p' context/build-plan.md
+sed -n '1,320p' context/ui-rules.md
+sed -n '321,700p' context/ui-rules.md
+npm run test -w apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run dev -w apps/web
+npm run dev -w apps/web
+npm ls playwright
+npm ls @playwright/test
+curl -I http://localhost:3000
+curl -I http://localhost:3000
+npm run typecheck
+npm run test
+npm run lint
+git diff --check
+git status --short
+git diff --stat
+```
+
+Verification:
+
+- [x] All 9 wizard steps are defined in the required order.
+- [x] Supported MVP option values are constrained to the documented choices.
+- [x] Project-name validation uses shared schema validation.
+- [x] Unsupported package managers are rejected.
+- [x] Auth.js credentials remains valid without PostgreSQL.
+- [x] Prisma without PostgreSQL is rejected.
+- [x] Docker PostgreSQL without PostgreSQL is rejected.
+- [x] Preview includes selected stack summary data.
+- [x] Preview includes dependencies and dev dependencies.
+- [x] Preview includes scripts.
+- [x] Preview includes environment variables.
+- [x] Preview includes generated file tree paths.
+- [x] Preview excludes unselected optional feature files.
+- [x] Preview excludes `src/` paths.
+- [x] Full-stack preview includes Prisma, Auth.js, shadcn, Docker, env, and script additions.
+- [x] Download flow code still uses the API client and browser ZIP helper from Step 11.
+- [x] Responsive polish addressed mobile progress labels, wrapping, and scroll handling.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app tests passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- Initial `npm run test -w apps/web` failed because the new verification test expected `db:migrate`, while the current generator exposes `db:push`. The test was corrected to match the generator contract.
+- Initial `npm run typecheck -w apps/web` failed because an intentionally invalid package manager literal needed an `unknown` cast before casting to `LaunchKitConfig`. The test was corrected.
+- `npm run test -w apps/web` passed after fixes: 4 test files, 23 tests.
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: web app ran 23 tests, generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `git diff --check` passed.
+
+Manual verification:
+
+- Browser QA was not completed in this session.
+- The in-app browser connector failed before exposing a usable tab because the Node REPL tool returned an internal `sandbox-state-meta` error.
+- The workspace does not currently include Playwright or `@playwright/test`, so a local Playwright fallback was not available without adding dependencies.
+- A sandboxed `curl -I http://localhost:3000` could not connect.
+- An elevated localhost `curl` check was not allowed.
+- An elevated `npm run dev -w apps/web` attempt found another Next dev server lock/process and exited; the user said they will do manual browser/download verification themselves.
+
+Notes/blockers:
+
+- Phase 6 is intentionally still marked `In Progress` until user-run browser/download QA confirms the website MVP genuinely works end to end.
+- No CLI work was started.
+- No new stack options were added.
+- Pre-existing unrelated worktree changes remain: `memory.md` is modified and `.agents/prompts/phase-06/step-12.md` is untracked.
+
+Next suggested step:
+
+- User-run manual QA for the wizard at 375px, 768px, 1280px, and 1440px+ widths, including a real `Generate ZIP` download.
 
 Phase 6 Step 11 completed: Create download flow
 

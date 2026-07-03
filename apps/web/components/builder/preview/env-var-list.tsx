@@ -14,8 +14,8 @@ export function EnvVarList({ envVars }: EnvVarListProps) {
         <ul className="space-y-3">
           {envVars.map((envVar) => (
             <li key={envVar.name} className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="truncate font-mono text-sm text-foreground">
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <span className="font-mono text-sm text-foreground break-all">
                   {envVar.name}
                 </span>
                 {envVar.required ? (

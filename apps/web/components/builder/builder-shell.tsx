@@ -110,7 +110,7 @@ export function BuilderShell() {
               Project builder
             </h1>
           </div>
-          <div className="rounded-md border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
+          <div className="max-w-full rounded-md border border-border bg-card px-3 py-2 font-mono text-sm text-muted-foreground break-all">
             {builderState.config.name}
           </div>
         </header>
@@ -208,10 +208,10 @@ export function BuilderShell() {
                 {selectedStack.map(([label, value]) => (
                   <div
                     key={label}
-                    className="flex items-center justify-between gap-4 border-b border-border pb-3 last:border-b-0 last:pb-0"
+                    className="flex min-w-0 items-start justify-between gap-4 border-b border-border pb-3 last:border-b-0 last:pb-0"
                   >
                     <dt className="text-sm text-muted-foreground">{label}</dt>
-                    <dd className="rounded-md bg-muted px-2 py-1 font-mono text-xs text-foreground">
+                    <dd className="max-w-48 rounded-md bg-muted px-2 py-1 text-right font-mono text-xs text-foreground wrap-break-word">
                       {value}
                     </dd>
                   </div>

@@ -21,7 +21,7 @@ export function WizardProgress({ currentStepId }: WizardProgressProps) {
               <div
                 aria-current={isCurrent ? "step" : undefined}
                 className={[
-                  "flex min-h-14 flex-col justify-center rounded-md border px-3 py-2 text-left transition-colors",
+                  "flex min-h-12 flex-col justify-center rounded-md border px-2.5 py-2 text-left transition-colors sm:min-h-14 sm:px-3",
                   isCurrent
                     ? "border-primary bg-accent text-accent-foreground"
                     : "border-border bg-card text-foreground",
@@ -32,10 +32,11 @@ export function WizardProgress({ currentStepId }: WizardProgressProps) {
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <span className="truncate text-sm font-semibold">
+                  <span className="sm:hidden">{step.shortLabel}</span>
                   <span className="hidden sm:inline lg:hidden">
                     {step.shortLabel}
                   </span>
-                  <span className="sm:hidden lg:inline">{step.label}</span>
+                  <span className="hidden lg:inline">{step.label}</span>
                 </span>
               </div>
             </li>

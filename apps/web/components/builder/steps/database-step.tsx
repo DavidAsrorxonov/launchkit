@@ -76,7 +76,7 @@ export function DatabaseStep({
                     : "border-border bg-background text-foreground hover:bg-muted",
                 ].join(" ")}
               >
-                <span className="flex items-start justify-between gap-3">
+                <span className="flex flex-wrap items-start justify-between gap-3">
                   <span className="text-sm font-semibold">
                     {getDatabaseOptionLabel(option)}
                   </span>
