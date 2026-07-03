@@ -13,20 +13,9 @@ import {
 
 import { jsonErrorResponse, jsonResponse } from "./response";
 import { createWebTemplateLoader } from "./template-loader";
+import type { GenerateProjectResponse } from "./types";
 
 export const MAX_GENERATE_REQUEST_BYTES = 64 * 1024;
-
-export type GenerateProjectResponse = {
-  project: {
-    name: string;
-    packageManager: "npm" | "pnpm";
-    files: Array<{
-      path: string;
-      contents: string;
-      encoding: "utf8" | "base64";
-    }>;
-  };
-};
 
 export type GenerateProjectHandlerOptions = {
   generate?: (config: LaunchKitConfig) => Promise<GeneratedProject>;

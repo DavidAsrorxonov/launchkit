@@ -8,7 +8,7 @@ Use this file to track development progress, changes made, decisions, notes, blo
 Project: LaunchKit
 Stage: Foundation setup
 Current phase: Phase 6 in progress
-Primary focus: Phase 6 Generate API route is complete; Download flow is next
+Primary focus: Phase 6 Download flow is complete; Responsive UI polish and Phase 6 verification are next
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 Generate API route is complete; Download flow is next
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | In Progress | Step 10 added `POST /api/generate` with schema validation, compatibility checks, generator integration, JSON project output, and path safety checks; Download flow is next. |
+| Phase 6 | Website MVP                           | In Progress | Step 11 added the Download step, API client, browser ZIP creation, browser download trigger, and download-state handling; responsive polish and Phase 6 verification are next. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -30,6 +30,172 @@ Primary focus: Phase 6 Generate API route is complete; Download flow is next
 Add entries in reverse chronological order.
 
 ### 2026-07-03
+
+Phase 6 Step 11 completed: Create download flow
+
+Changes made:
+
+- Added Download step UI to the website wizard.
+- Added compact project name and package manager summary.
+- Added short selected stack summary using existing schema/generator-derived preview labels.
+- Added `Generate ZIP` button.
+- Added loading, success, and error states.
+- Added client-side validation before calling the API.
+- Invalid config states show concise errors and do not call the API.
+- Added typed API client for `POST /api/generate`.
+- API client sends the current `LaunchKitConfig`.
+- API client parses structured API errors and throws concise client errors.
+- Added browser-side ZIP creation helper using `jszip`.
+- Added `jszip` to `apps/web` dependencies and updated `package-lock.json`.
+- ZIP helper puts generated files under a top-level `{{projectName}}/` folder.
+- ZIP helper supports UTF-8 file contents.
+- ZIP helper supports base64 file contents.
+- ZIP helper rejects unsafe paths:
+  - absolute paths;
+  - `..`;
+  - empty path segments;
+  - generated `src/` directory paths;
+  - unsafe top-level project folder names.
+- Added browser download trigger using `Blob`, object URL, temporary anchor click, and URL revocation.
+- Download flow only requests generated file data and packages it as a zip in the browser.
+- Confirmed no generated project code is executed.
+- Confirmed no generated project dependencies are installed.
+- Confirmed no generated files are written to the server filesystem.
+- Added focused Vitest coverage for the API client and ZIP helper.
+- Kept generator logic out of UI components.
+- Confirmed no CLI functionality was added.
+
+Files changed:
+
+- `apps/web/components/builder/download/download-button.tsx`
+- `apps/web/components/builder/download/download-status.tsx`
+- `apps/web/components/builder/steps/download-step.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/lib/api/client.ts`
+- `apps/web/lib/api/client.test.ts`
+- `apps/web/lib/api/types.ts`
+- `apps/web/lib/api/generate.ts`
+- `apps/web/lib/api/response.ts`
+- `apps/web/lib/download/create-project-zip.ts`
+- `apps/web/lib/download/create-project-zip.test.ts`
+- `apps/web/lib/builder/steps.ts`
+- `apps/web/package.json`
+- `package-lock.json`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,280p' context/progress-tracker.md
+sed -n '1,340p' .agents/prompts/phase-06/step-11.md
+git status --short
+sed -n '341,680p' .agents/prompts/phase-06/step-11.md
+sed -n '1,260p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '1,280p' context/project-overview.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+rg 'jszip|fflate|zip' package.json package-lock.json apps/web/package.json packages -g '!dist/**'
+sed -n '1,260p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/api/generate.ts
+sed -n '1,220p' apps/web/lib/builder/preview.ts
+npm install jszip -w apps/web
+npm install jszip -w apps/web
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/lib/builder/steps.ts
+sed -n '1,220p' apps/web/components/builder/wizard-navigation.tsx
+cat apps/web/package.json
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run test -w apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run test -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+rg 'child_process|exec\(|spawn\(|npm install|pnpm install|packages/cli|node:test|node --test|writeFile|mkdir|fs/promises|createProjectZip' apps/web packages -g '!dist/**'
+git diff -- apps/web/components/builder/steps/download-step.tsx apps/web/lib/download/create-project-zip.ts apps/web/lib/api/client.ts apps/web/lib/api/types.ts apps/web/components/builder/builder-shell.tsx apps/web/package.json package-lock.json
+git diff --check
+npm run build
+git status --short
+git diff --stat
+git diff -- apps/web/components/builder/steps/download-step.tsx apps/web/lib/download/create-project-zip.ts apps/web/lib/api/client.ts apps/web/lib/api/types.ts apps/web/components/builder/builder-shell.tsx apps/web/package.json package-lock.json
+```
+
+Verification:
+
+- [x] Download step renders in the wizard.
+- [x] Download step shows project name.
+- [x] Download step shows selected package manager.
+- [x] Download step shows a short selected stack summary.
+- [x] Download button calls the typed `POST /api/generate` client helper.
+- [x] Invalid config prevents API calls in the Download step.
+- [x] API client handles non-2xx structured API errors.
+- [x] Generated project data is turned into a ZIP.
+- [x] ZIP contains files under the top-level project folder.
+- [x] ZIP helper handles UTF-8 file contents.
+- [x] ZIP helper handles base64 file contents.
+- [x] ZIP helper rejects unsafe paths.
+- [x] ZIP helper rejects generated `src/` paths.
+- [x] Browser download trigger uses a `Blob`, object URL, temporary anchor, and URL revocation.
+- [x] Download button is disabled while generating.
+- [x] Loading, success, and error states are implemented.
+- [x] API errors render concise messages.
+- [x] No generated project code is executed.
+- [x] No generated project dependencies are installed.
+- [x] No generated files are written to the server filesystem by the download flow.
+- [x] No generator logic is duplicated in UI components.
+- [x] No CLI functionality was added.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app tests passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- Initial `npm install jszip -w apps/web` failed in the sandbox because the npm registry could not be resolved. Rerunning with elevated permissions succeeded, added 11 packages, and updated `package-lock.json`.
+- `npm install jszip -w apps/web` reported 2 moderate vulnerabilities in npm audit output. No `npm audit fix --force` was run because it would be an unrelated broad dependency change.
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run test -w apps/web` passed: 3 test files, 16 tests.
+- `git diff --check` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: web app ran 16 tests, generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` passed across all workspaces when run with elevated permissions for the known Turbopack process/port restriction.
+- Source search found no generated-code execution, generated dependency install, CLI work, or Node test runner usage in the Step 11 implementation. It found expected template/test install text, existing server-side template file reads from Step 10, and the browser-side ZIP helper.
+
+Manual verification:
+
+- Local browser download QA was not run in this session because the user said they will run the dev server locally.
+- Automated ZIP tests verified the top-level project folder, UTF-8 contents, base64 contents, unsafe path rejection, and `src/` path rejection.
+
+Notes/blockers:
+
+- The browser-side ZIP flow depends on the Phase 6 Step 10 API returning generated project JSON.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- `npm install` audit output currently reports 2 moderate vulnerabilities; this step did not attempt broad dependency remediation.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 12: Responsive UI polish and Phase 6 verification.
 
 Phase 6 Step 10 completed: Create API generate route
 

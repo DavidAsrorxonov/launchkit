@@ -69,6 +69,6 @@ export const builderSteps = [
     id: "download",
     label: "Download",
     shortLabel: "ZIP",
-    placeholder: "Download step coming later.",
+    placeholder: "Generate and download the project ZIP.",
   },
 ] as const satisfies readonly BuilderStep[];

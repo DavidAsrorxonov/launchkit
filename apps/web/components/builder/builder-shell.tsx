@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { AuthStep } from "@/components/builder/steps/auth-step";
 import { DatabaseStep } from "@/components/builder/steps/database-step";
+import { DownloadStep } from "@/components/builder/steps/download-step";
 import { ExtrasStep } from "@/components/builder/steps/extras-step";
 import { FrameworkStep } from "@/components/builder/steps/framework-step";
 import { OrmStep } from "@/components/builder/steps/orm-step";
@@ -53,6 +54,7 @@ export function BuilderShell() {
   const isAuthStep = currentStep.id === "auth";
   const isExtrasStep = currentStep.id === "extras";
   const isPreviewStep = currentStep.id === "preview";
+  const isDownloadStep = currentStep.id === "download";
   const isNextDisabled =
     (isProjectStep && !projectStepValidation.isValid) ||
     (isFrameworkStep && !frameworkStepValidation.isValid) ||
@@ -173,6 +175,12 @@ export function BuilderShell() {
                 ) : null}
                 {isPreviewStep ? (
                   <PreviewStep
+                    config={builderState.config}
+                    validation={previewStepValidation}
+                  />
+                ) : null}
+                {isDownloadStep ? (
+                  <DownloadStep
                     config={builderState.config}
                     validation={previewStepValidation}
                   />

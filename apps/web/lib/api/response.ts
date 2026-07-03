@@ -1,10 +1,4 @@
-export type ApiErrorResponse = {
-  error: {
-    code: string;
-    message: string;
-    issues?: unknown[];
-  };
-};
+import type { ApiErrorResponse } from "./types";
 
 export function jsonResponse<TBody>(body: TBody, status: number): Response {
   return Response.json(body, { status });
