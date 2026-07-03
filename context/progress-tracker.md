@@ -8,7 +8,7 @@ Use this file to track development progress, changes made, decisions, notes, blo
 Project: LaunchKit
 Stage: Foundation setup
 Current phase: Phase 6 in progress
-Primary focus: Phase 6 Preview step is complete; Generate API route is next
+Primary focus: Phase 6 Generate API route is complete; Download flow is next
 ```
 
 ## Phase Progress
@@ -20,7 +20,7 @@ Primary focus: Phase 6 Preview step is complete; Generate API route is next
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | In Progress | Step 9 added the Preview step using generator plan data for package, script, env, and feature file details; Generate API route is next. |
+| Phase 6 | Website MVP                           | In Progress | Step 10 added `POST /api/generate` with schema validation, compatibility checks, generator integration, JSON project output, and path safety checks; Download flow is next. |
 | Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
@@ -28,6 +28,159 @@ Primary focus: Phase 6 Preview step is complete; Generate API route is next
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-03
+
+Phase 6 Step 10 completed: Create API generate route
+
+Changes made:
+
+- Added `POST /api/generate` App Router API route.
+- Added a structured `GET /api/generate` method-not-allowed response.
+- Added request parsing for JSON bodies.
+- Rejects non-JSON request content.
+- Rejects malformed JSON.
+- Rejects request bodies over 64 KB.
+- Added request validation using `@launchkit/schema` `LaunchKitConfigSchema`.
+- Added compatibility validation using `@launchkit/schema` `validateCompatibility`.
+- Connected the route to `@launchkit/generator` `generateProject`.
+- Added a server-side web template loader that reads template files and passes them through the generator `TemplateLoader` API.
+- Kept template composition and feature decisions inside `@launchkit/generator`.
+- Added JSON success response shape with project name, package manager, generated file paths, contents, and `utf8`/`base64` encoding metadata.
+- Encodes `Uint8Array` file contents as base64 instead of returning Node `Buffer` objects.
+- Added structured error responses for invalid JSON, invalid config, incompatible config, oversized requests, unsupported content type, unsafe generated paths, and unexpected generation failures.
+- Added generated path safety checks before responding:
+  - relative paths only;
+  - no leading `/`;
+  - no `..`;
+  - no empty path segments;
+  - no generated `src/` directory paths.
+- Added focused Vitest coverage for API helper behavior.
+- Added `test` script to `apps/web` so root `npm run test` includes web API tests.
+- Confirmed no generated project files are written to disk.
+- Confirmed no generated project code is executed.
+- Confirmed no generated project dependencies are installed.
+- Confirmed no zip archive or final browser download UI was added.
+- Followed the Step 10 prompt's JSON-response handoff for Step 11, despite older architecture notes describing the eventual API as zip-returning.
+
+Files changed:
+
+- `apps/web/app/api/generate/route.ts`
+- `apps/web/lib/api/generate.ts`
+- `apps/web/lib/api/generate.test.ts`
+- `apps/web/lib/api/response.ts`
+- `apps/web/lib/api/template-loader.ts`
+- `apps/web/package.json`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,300p' .agents/prompts/phase-06/step-10.md
+git status --short
+sed -n '301,620p' .agents/prompts/phase-06/step-10.md
+sed -n '1,260p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '1,280p' context/project-overview.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,1040p' context/architecture.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '281,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,280p' context/ui-rules.md
+sed -n '281,620p' context/ui-rules.md
+rg --files apps/web packages/generator/src packages/templates/src packages/schema/src | sort
+sed -n '1,360p' packages/generator/src/generate-project.ts
+sed -n '1,260p' packages/generator/src/template-loader.ts
+cat apps/web/package.json
+sed -n '1,260p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,260p' packages/generator/src/__tests__/phase-5-completion.test.ts
+sed -n '1,220p' packages/schema/src/compatibility.ts
+sed -n '1,180p' packages/schema/src/index.ts
+cat apps/web/tsconfig.json
+cat package.json
+cat packages/generator/tsconfig.json
+sed -n '1,220p' packages/generator/src/file-tree.ts
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run test -w apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run test -w apps/web
+git diff --check
+cat packages/schema/package.json
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run test -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm run test
+npm run lint
+rg 'createProjectZip|Generate ZIP|download\(|app/api/generate|child_process|exec\(|spawn\(|npm install|pnpm install|packages/cli|node:test|node --test' apps/web packages -g '!dist/**'
+git diff -- apps/web/app/api/generate/route.ts apps/web/lib/api/generate.ts apps/web/lib/api/template-loader.ts apps/web/lib/api/response.ts apps/web/lib/api/generate.test.ts apps/web/package.json
+git diff --check
+npm run build
+```
+
+Verification:
+
+- [x] `POST /api/generate` exists.
+- [x] Route validates request JSON using `@launchkit/schema`.
+- [x] Route validates compatibility using shared schema helpers.
+- [x] Route calls `@launchkit/generator`.
+- [x] Valid config returns generated project data.
+- [x] Invalid config returns structured `400`.
+- [x] Incompatible config returns structured `422`.
+- [x] Malformed JSON returns structured `400`.
+- [x] Non-JSON content returns structured `400`.
+- [x] Oversized body returns structured `400`.
+- [x] Unexpected generator failure returns structured `500` without stack traces or internal paths.
+- [x] Binary generated file contents serialize as base64.
+- [x] Generated file paths are checked before response.
+- [x] Unsafe generated paths are rejected before response serialization.
+- [x] Generated `src/` directory paths are rejected before response serialization.
+- [x] No generated `src/` paths are returned for the valid generated project.
+- [x] No generated project code is executed.
+- [x] No generated project dependencies are installed.
+- [x] No generated project files are written to disk.
+- [x] No zip archive was created.
+- [x] No final browser download UI was implemented.
+- [x] Web app typecheck passed.
+- [x] Web app lint passed.
+- [x] Web app tests passed.
+- [x] Web app build passed after rerunning outside the sandbox.
+- [x] Workspace typecheck passed.
+- [x] Workspace tests passed.
+- [x] Workspace lint passed.
+- [x] Workspace build passed outside the sandbox.
+- [x] `git diff --check` passed.
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm run test -w apps/web` passed: 1 test file, 10 tests.
+- `git diff --check` passed.
+- `npm run build -w apps/web` failed in the sandbox because Turbopack could not create/bind a worker process. Rerunning with elevated permissions passed and listed `/api/generate` as a dynamic route.
+- `npm run typecheck` passed across all workspaces.
+- `npm run test` passed across workspaces: web app ran 10 tests, generator package ran 111 tests, schema package ran 73 tests, and templates package ran 51 tests.
+- `npm run lint` passed.
+- `npm run build` passed across all workspaces when run with elevated permissions for the known Turbopack process/port restriction.
+- Source search found no API shell execution, CLI work, zip creation, or browser download implementation. It only found generated README install-command text and related generator tests.
+
+Notes/blockers:
+
+- Step 10 intentionally returns generated project JSON instead of a zip. Step 11 should consume this API response and implement the final browser download flow.
+- The web API template loader reads template files from the monorepo `packages/templates` directory through the generator `TemplateLoader` API because the generator package does not yet expose a production filesystem template loader.
+- The Turbopack sandbox failure remains an environment restriction; elevated builds pass.
+- A local dev server was not started; the user will run it locally.
+
+Next suggested step:
+
+- Phase 6 Step 11: Create download flow.
 
 ### 2026-07-02
 
