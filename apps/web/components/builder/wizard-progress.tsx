@@ -5,7 +5,9 @@ type WizardProgressProps = {
 };
 
 export function WizardProgress({ currentStepId }: WizardProgressProps) {
-  const currentIndex = builderSteps.findIndex((step) => step.id === currentStepId);
+  const currentIndex = builderSteps.findIndex(
+    (step) => step.id === currentStepId,
+  );
 
   return (
     <nav aria-label="Builder progress" className="min-w-0">
