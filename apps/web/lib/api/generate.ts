@@ -86,7 +86,7 @@ export async function handleGenerateProjectRequest(
     if (error instanceof UnsafeGeneratedPathError) {
       return jsonErrorResponse({
         status: 500,
-        code: "unsafe_generated_path",
+        code: "unsafe_generated_output",
         message: "Generated project contained unsafe file paths.",
       });
     }
@@ -161,8 +161,8 @@ async function readJsonRequestBody(
     return {
       ok: false,
       response: jsonErrorResponse({
-        status: 400,
-        code: "unsupported_content_type",
+        status: 415,
+        code: "invalid_content_type",
         message: "Request body must use application/json.",
       }),
     };
@@ -178,7 +178,7 @@ async function readJsonRequestBody(
     return {
       ok: false,
       response: jsonErrorResponse({
-        status: 400,
+        status: 413,
         code: "request_too_large",
         message: "Request body must be 64 KB or smaller.",
       }),
@@ -191,7 +191,7 @@ async function readJsonRequestBody(
     return {
       ok: false,
       response: jsonErrorResponse({
-        status: 400,
+        status: 413,
         code: "request_too_large",
         message: "Request body must be 64 KB or smaller.",
       }),

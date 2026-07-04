@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 7 Step 4 generated project smoke tests completed with Phase 6 manual QA still pending
-Primary focus: Opt-in smoke coverage now verifies default and all-compatible generated projects install, typecheck, and build; API hardening is the next Phase 7 step
+Current phase: Phase 7 Step 5 API validation and safety hardening completed with Phase 6 manual QA still pending
+Primary focus: Generate API now has tighter structured error handling and regression coverage; file safety hardening is the next Phase 7 step
 ```
 
 ## Phase Progress
@@ -21,7 +21,7 @@ Primary focus: Opt-in smoke coverage now verifies default and all-compatible gen
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
-| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 4 added opt-in generated-project smoke tests for default and all-compatible outputs, including install, typecheck, and build verification. |
+| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 5 hardened generate API request validation, stable error codes, generated output safety checks, and route/helper regression coverage. |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
@@ -30,6 +30,141 @@ Primary focus: Opt-in smoke coverage now verifies default and all-compatible gen
 Add entries in reverse chronological order.
 
 ### 2026-07-04
+
+Phase 7 Step 5 completed: Harden API validation and safety limits
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Step 4 was complete before starting this step.
+- Kept this step limited to `apps/web` generate API hardening and tests.
+- Did not move to Phase 7 Step 6.
+- Did not add broad UI error polishing.
+- Did not change supported product options.
+- Did not add CLI functionality.
+- Did not run generated project code on the LaunchKit server.
+- Did not install generated project dependencies from the API route.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Hardened `POST /api/generate` helper behavior with Step 5 stable error codes:
+  - non-JSON requests now return `415` with `invalid_content_type`;
+  - oversized requests now return `413` with `request_too_large`;
+  - unsafe generated output now returns `500` with `unsafe_generated_output`.
+- Verified the route supports `POST /api/generate` and rejects `GET` with a structured `method_not_allowed` error.
+- Added route-level tests for `POST` and `GET` exports.
+- Added/expanded request validation tests for:
+  - valid JSON config;
+  - `application/json; charset=utf-8`;
+  - non-JSON content type;
+  - malformed JSON;
+  - oversized body content;
+  - oversized `content-length`;
+  - invalid config shape.
+- Added/expanded compatibility tests for:
+  - Prisma requiring PostgreSQL;
+  - Docker PostgreSQL requiring PostgreSQL;
+  - Auth.js credentials working without a database;
+  - unsupported non-Tailwind styling being rejected by schema before shadcn compatibility can run.
+- Added generated output safety regression coverage for:
+  - traversal paths;
+  - absolute paths;
+  - empty path segments;
+  - `.` and `..`;
+  - current-directory path segments;
+  - `src` as the first path segment;
+  - `src` as a nested path segment.
+- Added a helper-level test that unsafe generated output is converted to a structured API error instead of leaking internals.
+- Confirmed binary generated contents serialize as base64 strings and are not returned as raw `Uint8Array` or buffer objects.
+- Existing generator failure handling remains generic and does not expose stack traces, absolute paths, internal source paths, or raw error objects.
+- Existing API response shapes remain JSON-safe and stable:
+  - success response uses `project.name`, `project.packageManager`, and serialized `files`;
+  - error response uses `{ error: { code, message, issues? } }`.
+- Confirmed by code inspection and tests that the API route only validates input, calls the generator, validates/serializes output, and returns JSON; it does not write generated files to disk, execute generated code, install dependencies, run shell commands, start dev servers, start Docker, or connect to databases.
+
+Files changed:
+
+- `apps/web/lib/api/generate.ts`
+- `apps/web/lib/api/generate.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-07/step-5.md
+sed -n '261,620p' .agents/prompts/phase-07/step-5.md
+git status --short
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,980p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '1,220p' context/progress-tracker.md
+rg --files apps/web/app apps/web/lib | sort
+sed -n '1,260p' apps/web/app/api/generate/route.ts
+sed -n '1,360p' apps/web/lib/api/generate.ts
+sed -n '1,320p' apps/web/lib/api/generate.test.ts
+sed -n '1,220p' apps/web/lib/api/client.ts
+sed -n '1,220p' apps/web/lib/api/client.test.ts
+sed -n '1,220p' apps/web/lib/api/response.ts
+sed -n '1,220p' apps/web/lib/api/types.ts
+sed -n '1,260p' packages/schema/src/compatibility.ts
+sed -n '1,260p' packages/schema/src/config.ts
+sed -n '1,180p' packages/schema/src/index.ts
+npm test -w apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm test
+npm run typecheck
+npm run lint
+git diff -- apps/web/lib/api/generate.ts apps/web/lib/api/generate.test.ts apps/web/app/api/generate/route.ts
+npm test -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run build
+git status --short
+git diff --stat
+git diff -- apps/web/lib/api/generate.ts apps/web/lib/api/generate.test.ts
+git diff -- context/progress-tracker.md | head -80
+```
+
+Verification result:
+
+- `npm test -w apps/web` passed: 4 files, 38 tests.
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm test` passed across workspaces:
+  - web: 4 files, 38 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack process/port sandbox restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed.
+- Escalated `npm run build` passed across all workspaces.
+- `npm run test:smoke` was not rerun for this apps-only API hardening step because smoke tests are manual/network-dependent and generated project output was not changed.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- `.agents/prompts/phase-07/step-5.md` is untracked and was left untouched.
+
+Next suggested step:
+
+- Phase 7 Step 6: Improve user-facing errors and failure states
 
 Phase 7 Step 4 completed: Add generated project smoke tests
 
