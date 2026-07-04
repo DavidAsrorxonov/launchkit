@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 7 Step 6 user-facing error and failure-state polish completed with Phase 6 manual QA still pending
-Primary focus: Builder, preview, API-client, and download failure messages are clearer and safer; Phase 7 completion review is next
+Current phase: Phase 7 Step 7 automated completion verification passed; manual website/download QA remains pending
+Primary focus: Phase 7 remains in progress until user-run manual browser/download verification is completed
 ```
 
 ## Phase Progress
@@ -21,7 +21,7 @@ Primary focus: Builder, preview, API-client, and download failure messages are c
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
-| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 6 improved user-facing validation, preview, API error, empty-state, loading-state, and download failure messages. |
+| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 7 verified automated schema, generator, template, API, UI failure-state, build, and smoke coverage; manual website/download QA remains before marking complete. |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
@@ -30,6 +30,232 @@ Primary focus: Builder, preview, API-client, and download failure messages are c
 Add entries in reverse chronological order.
 
 ### 2026-07-04
+
+Phase 7 Step 7 completed: Verify Phase 7 completion
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Steps 1-6 are documented as complete in this tracker before starting this step.
+- Kept this step limited to verification and tracker updates.
+- Did not start Phase 8.
+- Did not add CLI functionality.
+- Did not add new product options.
+- Did not perform broad refactors.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+- Manual browser/download verification was left for the user to perform.
+
+Changes made:
+
+- Verified test tooling:
+  - Vitest is used by workspace test scripts.
+  - Root `test` delegates to workspace test scripts.
+  - Root `test:smoke` delegates to `@launchkit/generator`.
+  - `@launchkit/generator` exposes `test:smoke` through `vitest.smoke.config.ts`.
+  - `rg -n "node:test|node --test|jest|mocha" package.json apps packages -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'` returned no matches.
+  - A broader repo search only found historical tracker references to those terms.
+- Verified schema regression coverage for:
+  - MVP option arrays;
+  - `LaunchKitConfigSchema`;
+  - project name validation;
+  - default config;
+  - option metadata;
+  - public schema exports where practical;
+  - compatibility rules for Prisma/PostgreSQL, Docker/PostgreSQL, Auth.js credentials without a database, Auth.js credentials with Prisma/PostgreSQL, and shadcn/Tailwind.
+- Verified generator and template coverage for:
+  - default output;
+  - shadcn/ui output;
+  - PostgreSQL output;
+  - Prisma output;
+  - Auth.js credentials output;
+  - Docker PostgreSQL output;
+  - all compatible MVP features selected together;
+  - optional feature files appearing only when selected;
+  - valid generated `package.json`;
+  - selected `.env.example` output;
+  - safe generated paths;
+  - generated output and templates not using `src/`.
+- Verified focused snapshot coverage:
+  - generated path lists;
+  - generated `package.json`;
+  - generated `.env.example`;
+  - template file-list boundaries.
+- Verified generated project smoke coverage:
+  - default generated project;
+  - all-compatible MVP generated project;
+  - smoke writes only to OS temp directories;
+  - smoke validates generated paths before writing;
+  - smoke runs `npm install`, generated `npm run typecheck`, and generated `npm run build`;
+  - all-compatible smoke also runs `npm run db:generate`;
+  - smoke does not start Docker, connect to a real database, or run generated app servers.
+- Verified API hardening for `POST /api/generate`:
+  - rejects non-JSON requests where practical;
+  - rejects oversized requests;
+  - handles malformed JSON safely;
+  - validates config using `@launchkit/schema`;
+  - validates compatibility using shared schema helpers;
+  - returns structured schema and compatibility errors;
+  - handles generator failures without leaking stack traces;
+  - validates generated output paths before response;
+  - does not write generated project files to disk;
+  - does not execute generated code;
+  - does not install generated dependencies.
+- Verified website failure-state coverage by code/test inspection for:
+  - invalid project name;
+  - incompatible selections;
+  - preview errors;
+  - API validation errors;
+  - API compatibility errors;
+  - API unexpected failures;
+  - download errors;
+  - ZIP creation errors;
+  - retry after failure;
+  - visible loading/success/error status;
+  - avoiding raw stack traces and internal paths in user-facing error paths;
+  - basic error accessibility where practical.
+- No small in-scope implementation issues were found that required code changes.
+- Did not mark Phase 7 complete because manual website/download QA remains pending.
+
+Files changed:
+
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-07/step-7.md
+sed -n '261,520p' .agents/prompts/phase-07/step-7.md
+git status --short
+rg --files context | sort
+find . -maxdepth 3 -name package.json -print | sort
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,980p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,520p' context/ui-rules.md
+sed -n '221,520p' context/progress-tracker.md
+sed -n '521,900p' context/progress-tracker.md
+cat package.json
+npm pkg get scripts --workspaces --if-present
+sed -n '1,260p' /Users/dovudxonasrorxonov/.codex/plugins/cache/openai-bundled/browser/26.608.12217/skills/control-in-app-browser/SKILL.md
+rg -n "node:test|node --test|jest|mocha" . -g '!node_modules/**' -g '!.git/**' -g '!apps/web/.next/**' -g '!dist/**' -g '!*.tsbuildinfo'
+rg --files packages apps | sort
+find . -path './node_modules' -prune -o -path './.git' -prune -o -name 'vitest.config.*' -print | sort
+find packages apps -path '*/node_modules' -prune -o -name '*test.ts' -print | sort
+rg -n "node:test|node --test|jest|mocha" package.json apps packages -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+sed -n '1,260p' packages/schema/src/__tests__/compatibility.test.ts
+sed -n '1,320p' packages/schema/src/__tests__/config.test.ts
+sed -n '1,300p' packages/schema/src/__tests__/options.test.ts
+sed -n '1,300p' packages/schema/src/__tests__/defaults.test.ts
+sed -n '1,360p' packages/schema/src/__tests__/metadata.test.ts
+sed -n '1,360p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+sed -n '361,760p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+sed -n '1,360p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,360p' packages/templates/src/__tests__/index.test.ts
+sed -n '1,320p' packages/generator/test/smoke/generated-projects.test.ts
+sed -n '1,420p' apps/web/lib/api/generate.test.ts
+sed -n '1,420p' apps/web/lib/api/generate.ts
+sed -n '1,340p' apps/web/lib/builder/phase-6-verification.test.ts
+sed -n '1,300p' apps/web/lib/api/client.test.ts
+sed -n '1,260p' apps/web/lib/download/create-project-zip.test.ts
+sed -n '1,340p' apps/web/components/builder/steps/download-step.tsx
+sed -n '1,280p' apps/web/components/builder/steps/preview-step.tsx
+sed -n '1,280p' apps/web/components/builder/steps/project-step.tsx
+sed -n '1,260p' apps/web/components/builder/download/download-status.tsx
+sed -n '1,220p' apps/web/components/builder/download/download-button.tsx
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run build
+npm test -w @launchkit/schema
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/schema
+npm run typecheck -w @launchkit/generator
+npm run typecheck -w @launchkit/templates
+npm run build -w apps/web
+npm run build -w apps/web
+npm run test:smoke
+npm run test:smoke
+npm run dev -w apps/web
+npm run dev -w apps/web
+curl -I http://localhost:3000
+npm run start -w apps/web -- -p 3001
+npm run start -w apps/web -- -p 3001
+```
+
+Verification result:
+
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 4 files, 46 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across all workspaces.
+- `npm test -w @launchkit/schema` passed: 5 files, 87 tests.
+- `npm test -w @launchkit/generator` passed: 11 files, 127 tests.
+- `npm test -w @launchkit/templates` passed: 1 file, 52 tests.
+- `npm run typecheck -w @launchkit/schema` passed.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm run typecheck -w @launchkit/templates` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction.
+- Escalated `npm run build -w apps/web` passed.
+
+Smoke test result:
+
+- Initial sandboxed `npm run test:smoke` stayed silent beyond the expected helper timeout window during generated dependency work and was interrupted with `Ctrl-C`.
+- Escalated `npm run test:smoke` passed:
+  - 1 smoke test file;
+  - 2 smoke tests;
+  - default generated project installed, typechecked, and built in about 25 seconds;
+  - all-compatible generated project installed, ran `db:generate`, typechecked, and built in about 33 seconds;
+  - total duration about 59 seconds.
+
+Manual verification:
+
+- Manual browser/download QA was not completed by the assistant because the user said they will do it themselves.
+- Sandboxed `npm run dev -w apps/web` failed because binding to `0.0.0.0:3000` is not permitted in the sandbox.
+- Escalated `npm run dev -w apps/web` reported a stale existing Next dev server for this app on PID `66572` and exited:
+  - Next reported `http://localhost:3000`;
+  - `curl -I http://localhost:3000` could not connect.
+- Sandboxed `npm run start -w apps/web -- -p 3001` failed because binding to `0.0.0.0:3001` is not permitted in the sandbox.
+- Escalated `npm run start -w apps/web -- -p 3001` was requested for manual verification but not run because the user chose to do manual verification themselves.
+
+Blocked/missing:
+
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending:
+  - complete the wizard with default options;
+  - preview generated output;
+  - download and inspect the ZIP;
+  - repeat with all compatible MVP features selected;
+  - confirm invalid combinations are prevented or clearly explained;
+  - confirm download error/retry behavior where practical.
+
+Notes:
+
+- Phase 7 remains `In Progress`.
+- Phase 8 remains `Not Started`; do not begin Phase 8 until the pending manual verification is complete.
+- `.agents/prompts/phase-07/step-7.md` is untracked and was left untouched.
+
+Next suggested step:
+
+- Complete the listed manual website/download QA, then mark Phase 7 complete only if it passes.
 
 Phase 7 Step 6 completed: Improve user-facing errors and failure states
 
