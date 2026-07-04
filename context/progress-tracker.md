@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 6 in progress
-Primary focus: Phase 6 Step 12 responsive polish and automated verification are complete; user-run browser/download QA remains before marking Phase 6 complete
+Current phase: Phase 7 Step 1 audit completed with Phase 6 manual QA still pending
+Primary focus: Phase 7 test coverage and hardening audit is documented; next work should resolve Phase 6 browser/download QA before deeper hardening steps
 ```
 
 ## Phase Progress
@@ -21,13 +21,181 @@ Primary focus: Phase 6 Step 12 responsive polish and automated verification are 
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
-| Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
+| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 1 audit documented current coverage, commands, verification results, and hardening gaps; broad new tests are next only after Phase 6 manual QA is resolved. |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-04
+
+Phase 7 Step 1 completed: Audit test coverage and hardening gaps
+
+Scope and prerequisite note:
+
+- Audited the current repo without adding broad tests or refactoring implementation code.
+- The Step 1 prompt asks to confirm Phase 6 is complete, but the tracker still has Phase 6 `In Progress` because user-run browser/download QA remains pending.
+- Phase 7 is marked `In Progress` only for the completed audit; deeper Phase 7 hardening steps should wait until Phase 6 manual QA is resolved.
+
+Current test tooling:
+
+- Vitest is the only test runner used by package scripts.
+- Root `test` delegates to workspace test scripts with `npm run test --workspaces --if-present`.
+- `packages/schema` and `packages/generator` have `vitest.config.ts` files using Node environment and `src/**/*.test.ts`.
+- `apps/web` and `packages/templates` use `vitest run` without local Vitest config files.
+- `packages/shared` has no `test` script.
+- No real `node:test`, `node --test`, Jest, or Mocha usage was found in source/package files.
+- Historical tracker text mentions `node:test`, Jest, and Mocha, but source/package searches were clean.
+
+Commands available:
+
+- Root: `dev`, `build`, `lint`, `test`, `typecheck`.
+- `apps/web`: `dev`, `build`, `start`, `lint`, `test`, `typecheck`.
+- `@launchkit/schema`: `build`, `test`, `typecheck`.
+- `@launchkit/generator`: `build`, `test`, `typecheck`.
+- `@launchkit/templates`: `build`, `test`, `typecheck`.
+- `@launchkit/shared`: `build`, `typecheck`; no `test` script.
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-07/step-1.md
+git status --short
+sed -n '1,340p' context/project-overview.md
+sed -n '341,760p' context/project-overview.md
+sed -n '1,420p' context/architecture.md
+sed -n '421,940p' context/architecture.md
+sed -n '1,520p' context/build-plan.md
+sed -n '521,1120p' context/build-plan.md
+sed -n '1,380p' context/ui-rules.md
+sed -n '381,760p' context/ui-rules.md
+npm run
+npm pkg get scripts
+find . -path './node_modules' -prune -o -path './.git' -prune -o -name 'package.json' -print | sort
+find . -path './node_modules' -prune -o -path './.git' -prune -o -name 'vitest.config.*' -print | sort
+find . -path './node_modules' -prune -o -path './.git' -prune -o \( -name '*test.ts' -o -name '*test.tsx' -o -name '*.test.ts' -o -name '*.spec.ts' \) -print | sort
+cat package.json
+cat apps/web/package.json
+cat packages/schema/package.json
+cat packages/generator/package.json
+cat packages/templates/package.json
+cat packages/shared/package.json
+rg -n "node:test|jest|mocha|node --test|vitest|describe\(|it\(|test\(" . -g '!node_modules/**' -g '!.git/**' -g '!apps/web/.next/**'
+rg -n "node:test|node --test|jest|mocha" package.json apps packages -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+rg -n "npm install|pnpm install|child_process|exec\(|spawn\(|writeFile|mkdir|createWriteStream|unlink|rm\(" apps packages -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+rg -n "smoke|snapshot|toMatchSnapshot|install.*build|npm run build|typecheck" apps packages package.json -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+cat packages/schema/vitest.config.ts && cat packages/generator/vitest.config.ts
+find packages/templates -maxdepth 5 -type f | sort
+sed -n '1,240p' packages/schema/src/__tests__/config.test.ts
+sed -n '1,240p' packages/schema/src/__tests__/compatibility.test.ts
+sed -n '1,200p' packages/schema/src/__tests__/options.test.ts
+sed -n '1,180p' packages/schema/src/__tests__/defaults.test.ts
+sed -n '1,220p' packages/schema/src/__tests__/metadata.test.ts
+sed -n '1,240p' packages/generator/src/__tests__/file-tree.test.ts
+sed -n '1,220p' packages/generator/src/__tests__/package-json.test.ts
+sed -n '1,220p' packages/generator/src/__tests__/env.test.ts
+sed -n '1,180p' packages/generator/src/__tests__/template-loader.test.ts
+sed -n '1,240p' packages/generator/src/__tests__/phase-5-completion.test.ts
+sed -n '1,260p' apps/web/lib/api/generate.test.ts
+sed -n '1,180p' apps/web/lib/api/client.test.ts
+sed -n '1,180p' apps/web/lib/download/create-project-zip.test.ts
+sed -n '1,220p' apps/web/lib/builder/phase-6-verification.test.ts
+sed -n '1,280p' apps/web/lib/api/generate.ts
+sed -n '1,180p' apps/web/lib/api/template-loader.ts
+sed -n '1,240p' apps/web/lib/builder/validation.ts
+sed -n '1,160p' apps/web/components/builder/steps/database-step.tsx
+sed -n '1,170p' apps/web/components/builder/steps/orm-step.tsx
+sed -n '1,170p' apps/web/components/builder/steps/extras-step.tsx
+npm run typecheck
+npm test
+npm run lint
+npm test -w @launchkit/schema
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm run build
+npm run build -w apps/web
+npm run build -w @launchkit/schema
+npm run build -w @launchkit/generator
+npm run build -w @launchkit/templates
+npm run build -w apps/web
+npm run build
+npm test -w @launchkit/shared
+```
+
+Verification result:
+
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 4 files, 23 tests;
+  - generator: 10 files, 111 tests;
+  - schema: 5 files, 73 tests;
+  - templates: 1 file, 51 tests.
+- `npm run lint` passed.
+- `npm test -w @launchkit/schema` passed: 5 files, 73 tests.
+- `npm test -w @launchkit/generator` passed: 10 files, 111 tests.
+- `npm test -w @launchkit/templates` passed: 1 file, 51 tests.
+- `npm test -w @launchkit/shared` failed because `@launchkit/shared` has no `test` script.
+- Package builds passed for `@launchkit/schema`, `@launchkit/generator`, and `@launchkit/templates`.
+- Initial parallel `npm run build` and `npm run build -w apps/web` produced noisy failures:
+  - root build hit a concurrent Next build lock because the web build was running separately;
+  - web build hit the known Turbopack sandbox worker/port restriction.
+- Sequential elevated `npm run build -w apps/web` passed.
+- Sequential elevated `npm run build` passed across all workspaces.
+
+Existing coverage:
+
+- Schema:
+  - option arrays and option union alignment;
+  - `LaunchKitConfigSchema` valid default and full MVP configs;
+  - invalid project names and valid lowercase/hyphen names;
+  - unknown option values and unknown object keys;
+  - default config;
+  - option metadata categories, exact value alignment, uniqueness, supported values, and non-empty labels/descriptions;
+  - compatibility rules for Prisma/PostgreSQL, Docker/PostgreSQL, Auth.js credentials without database, Auth.js credentials with PostgreSQL, Auth.js credentials with Prisma/PostgreSQL, Auth.js credentials with Prisma but no PostgreSQL, and shadcn/Tailwind.
+- Generator:
+  - generated file tree model, path normalization, backslash normalization, leading slash rejection, `..` traversal rejection, empty segment rejection, empty/current-directory rejection, and Windows absolute path rejection;
+  - generated project path validation;
+  - generation plan defaults;
+  - feature registry IDs, feature enablement, and package/env/file/README contributions;
+  - package.json merge success, duplicate compatible values, conflicting dependencies/dev dependencies/scripts/metadata, and non-mutation;
+  - env var merge success, duplicate compatible values, conflicting env vars, descriptions, required propagation, order, rendering, quote escaping, and placeholder secret values;
+  - template placeholders, binary preservation, unknown template IDs, unsafe target path rejection, and non-mutation;
+  - `generateProject(config)` for default, selected feature outputs, README/package/env content, invalid schema configs, incompatible configs, and real-template MVP combinations.
+- Templates:
+  - base Next.js required files, no `src` directory, and supported placeholders;
+  - Tailwind, shadcn/ui, PostgreSQL, Prisma, Auth.js credentials, and Docker PostgreSQL required files;
+  - selected template contents such as Tailwind v4 imports, shadcn config/helper/button, PostgreSQL `DATABASE_URL`, Prisma schema/config/client helper, Auth.js scaffold/route, Docker Compose service, README guidance, no unrelated optional files, no `src`, and supported placeholders.
+- API:
+  - successful valid config response;
+  - invalid config, incompatible config, malformed JSON, oversized bodies, and non-JSON requests;
+  - structured errors and no stack trace leakage for unexpected generator errors;
+  - unsafe generated response paths and generated `src/` response paths;
+  - binary file serialization as base64;
+  - code validates configs with schema and compatibility before generation and calls `@launchkit/generator`.
+- Website:
+  - API client success and structured non-2xx errors;
+  - browser ZIP helper top-level folder, UTF-8 contents, base64 contents, unsafe path rejection, and `src/` path rejection;
+  - wizard contract at a logic level: 9 steps, supported MVP options, project validation, Auth.js independence, Prisma/Docker compatibility, preview data, optional file exclusion, full-stack preview additions, and no `src` preview paths.
+- Smoke tests:
+  - no generated-project smoke test harness exists yet;
+  - no tests currently generate a project, install dependencies, and run generated `typecheck` or `build`;
+  - adding smoke tests will require network/package-manager strategy and should be separated from normal fast unit tests.
+
+Hardening gaps:
+
+- Phase 6 manual browser/download QA is still pending, so Phase 7 deeper work should not assume the website MVP is fully complete.
+- No generated-project smoke tests exist for minimal, shadcn, PostgreSQL + Prisma, Auth.js, Docker, or full-stack outputs.
+- No snapshot tests exist for generated file trees; current file-list assertions cover important combinations but are not snapshot-based.
+- API tests target helper functions, but there is no direct route-module test for `POST`/`GET` exports or method-not-allowed behavior.
+- API path-safety tests cover `../outside.txt` and `src/app/page.tsx`, but not every response-path edge case such as leading slash, empty segments, trailing slash, current-directory segment, or Windows absolute paths at the API boundary.
+- Web template loader has path normalization in code but no focused tests for unexpected template IDs, unsafe source paths, unsafe target paths, or binary-file handling from real web template loading.
+- Download flow has helper tests, but no component/integration tests for button disabled state, loading state, success state, rendered error state, or browser download trigger behavior.
+- Wizard dependent option reset/disable behavior is covered partly by logic tests and code inspection, but not by component-level interaction tests.
+- Mobile responsiveness is documented and partially polished, but no automated viewport/layout checks exist.
+- Source search found no generated-code execution, dependency installation, or generated filesystem writes in app/package code; this remains mostly code-inspection coverage rather than dedicated regression tests.
 
 ### 2026-07-03
 
