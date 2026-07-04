@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 7 Step 3 generator/template snapshot tests completed with Phase 6 manual QA still pending
-Primary focus: Generator and template output regression coverage is strengthened; generated project smoke tests remain the next Phase 7 hardening step
+Current phase: Phase 7 Step 4 generated project smoke tests completed with Phase 6 manual QA still pending
+Primary focus: Opt-in smoke coverage now verifies default and all-compatible generated projects install, typecheck, and build; API hardening is the next Phase 7 step
 ```
 
 ## Phase Progress
@@ -21,7 +21,7 @@ Primary focus: Generator and template output regression coverage is strengthened
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
-| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 3 added generator/template output snapshots, feature inclusion/exclusion coverage, generated path safety checks, and generator compatibility-boundary tests. |
+| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 4 added opt-in generated-project smoke tests for default and all-compatible outputs, including install, typecheck, and build verification. |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
@@ -30,6 +30,172 @@ Primary focus: Generator and template output regression coverage is strengthened
 Add entries in reverse chronological order.
 
 ### 2026-07-04
+
+Phase 7 Step 4 completed: Add generated project smoke tests
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Step 3 was complete before starting this step.
+- Kept smoke tests opt-in and out of normal fast `npm test`.
+- Did not move to Phase 7 Step 5.
+- Did not harden the API route.
+- Did not change supported product options.
+- Did not add CLI functionality.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added a root `test:smoke` script that delegates to `@launchkit/generator`.
+- Added a package-level generator `test:smoke` script backed by a dedicated `vitest.smoke.config.ts`.
+- Added generated-project smoke coverage for:
+  - default config;
+  - all-compatible MVP config with shadcn/ui, PostgreSQL, Prisma, Auth.js credentials, and Docker PostgreSQL selected.
+- Added a smoke helper that:
+  - calls `generateProject(config)` with real templates;
+  - writes generated projects only under OS temp directories;
+  - validates generated paths before writing;
+  - rejects absolute paths, empty/current/traversal segments, and any `src` path segment;
+  - writes text and binary contents without shell interpolation.
+- Smoke tests run `npm install`, `npm run typecheck`, and `npm run build` for both required configs.
+- For the all-compatible Prisma config, smoke tests also run `npm run db:generate` after install so the generated Prisma client exists before typecheck/build.
+- Confirmed smoke tests do not run `db:push`, start Docker, connect to a database, run generated app servers, or execute arbitrary user input.
+- Added useful command failure output with config name, command, exit code/signal, stdout, stderr, and generated project directory.
+- Fixed a generated Auth.js template runtime/build issue found by smoke testing:
+  - replaced the v5 `handlers` scaffold shape with the stable `next-auth` v4 App Router handler pattern;
+  - updated template assertions accordingly.
+- Documented smoke runtime/network expectations here: smoke tests are local/manual for now because generated `npm install` requires network or a warm npm cache.
+
+Files changed:
+
+- `package.json`
+- `packages/generator/package.json`
+- `packages/generator/vitest.smoke.config.ts`
+- `packages/generator/test/smoke/generated-projects.test.ts`
+- `packages/templates/features/authjs-credentials/auth.ts`
+- `packages/templates/features/authjs-credentials/app/api/auth/[...nextauth]/route.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,220p' .agents/prompts/phase-07/step-4.md
+sed -n '221,520p' .agents/prompts/phase-07/step-4.md
+git status --short
+rg --files context | sort
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,980p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '220,520p' context/progress-tracker.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+cat package.json
+cat packages/generator/package.json
+cat packages/generator/vitest.config.ts
+rg --files packages/generator/src | sort
+sed -n '1,260p' packages/generator/src/generate-project.ts
+sed -n '1,260p' packages/generator/src/file-tree.ts
+sed -n '1,260p' packages/generator/src/template-loader.ts
+sed -n '1,320p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,260p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+sed -n '260,620p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+sed -n '620,980p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+find packages/templates -maxdepth 5 -type f | sort
+cat packages/templates/package.json
+cat packages/generator/tsconfig.json
+cat tsconfig.base.json
+cat .gitignore
+npm pkg get scripts --workspaces --if-present
+cat apps/web/package.json
+sed -n '1,260p' packages/templates/base/next/package.json
+sed -n '1,260p' packages/generator/src/features/definitions.ts
+sed -n '1,220p' packages/templates/features/prisma/lib/db.ts
+sed -n '1,220p' packages/templates/features/prisma/prisma/schema.prisma
+sed -n '1,220p' packages/templates/features/prisma/prisma.config.ts
+sed -n '1,220p' packages/templates/features/authjs-credentials/auth.ts
+sed -n '1,220p' packages/templates/features/authjs-credentials/app/api/auth/[...nextauth]/route.ts
+npm test -w @launchkit/generator
+npm run typecheck -w @launchkit/generator
+npm run test:smoke
+npm run test:smoke
+cat /var/folders/wd/3v39scsn59s8zm7zmgw0cv_40000gn/T/launchkit-smoke-rBjYgl/full-smoke-app/node_modules/next-auth/package.json
+sed -n '1,220p' /var/folders/wd/3v39scsn59s8zm7zmgw0cv_40000gn/T/launchkit-smoke-rBjYgl/full-smoke-app/auth.ts
+sed -n '1,80p' /var/folders/wd/3v39scsn59s8zm7zmgw0cv_40000gn/T/launchkit-smoke-rBjYgl/full-smoke-app/app/api/auth/[...nextauth]/route.ts
+cat /var/folders/wd/3v39scsn59s8zm7zmgw0cv_40000gn/T/launchkit-smoke-rBjYgl/full-smoke-app/package.json
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/generator
+npm run typecheck -w @launchkit/templates
+sed -n '270,330p' packages/templates/src/__tests__/index.test.ts
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/templates
+npm run test:smoke
+npm test
+npm run typecheck
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff --stat
+git diff -- package.json packages/generator/package.json packages/generator/vitest.smoke.config.ts packages/generator/test/smoke/generated-projects.test.ts packages/templates/features/authjs-credentials/auth.ts packages/templates/features/authjs-credentials/app/api/auth/[...nextauth]/route.ts packages/templates/src/__tests__/index.test.ts
+sed -n '1,90p' context/progress-tracker.md
+```
+
+Verification result:
+
+- `npm test -w @launchkit/generator` passed: 11 files, 127 tests.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm test -w @launchkit/templates` initially failed because two Auth.js template assertions still expected the old v5-shaped scaffold.
+- After updating assertions, `npm test -w @launchkit/templates` passed: 1 file, 52 tests.
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test` passed across workspaces:
+  - web: 4 files, 23 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed in `apps/web` due to the known Turbopack process/port sandbox restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across all workspaces.
+
+Smoke test result:
+
+- Initial sandboxed `npm run test:smoke` failed because each generated `npm install` hit the smoke helper's 300 second timeout with `SIGTERM` and empty stdout/stderr.
+- Escalated `npm run test:smoke` then proved the default generated project installed, typechecked, and built successfully.
+- That same escalated run initially failed the all-compatible generated project at `npm run build`:
+  - `next-auth@latest` resolved to `4.24.14`;
+  - the generated template used the v5 `handlers` API;
+  - Next build failed while collecting page data for `/api/auth/[...nextauth]`.
+- After the Auth.js template fix, escalated `npm run test:smoke` passed:
+  - 1 smoke test file;
+  - 2 smoke tests;
+  - default config completed in about 15 seconds;
+  - all-compatible config completed in about 23 seconds;
+  - total duration about 38 seconds.
+
+Notes/blockers:
+
+- Smoke tests are intentionally manual/local for now through `npm run test:smoke` because generated `npm install` requires network access or a warm npm cache.
+- Smoke projects are written under OS temp directories, not tracked source directories.
+- Phase 6 manual browser/download QA remains pending.
+- `.agents/prompts/phase-07/step-4.md` is untracked and was left untouched.
+- `memory.md` had pre-existing/unrelated local modifications and was left untouched.
+
+Next suggested step:
+
+- Phase 7 Step 5: Harden API validation and safety limits
 
 Phase 7 Step 3 completed: Add generator and template snapshot tests
 

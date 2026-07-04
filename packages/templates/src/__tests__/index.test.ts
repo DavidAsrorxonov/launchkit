@@ -297,8 +297,12 @@ describe("Auth.js credentials feature template", () => {
     const auth = await readFile(join(authjsCredentialsTemplateRoot, "auth.ts"), "utf8");
 
     expect(auth).toContain('import NextAuth from "next-auth";');
-    expect(auth).toContain('import Credentials from "next-auth/providers/credentials";');
-    expect(auth).toContain("export const { handlers, signIn, signOut, auth } = NextAuth({");
+    expect(auth).toContain('import type { NextAuthOptions } from "next-auth";');
+    expect(auth).toContain('import CredentialsProvider from "next-auth/providers/credentials";');
+    expect(auth).toContain("export const authOptions = {");
+    expect(auth).toContain("CredentialsProvider({");
+    expect(auth).toContain("} satisfies NextAuthOptions;");
+    expect(auth).toContain("export default NextAuth(authOptions);");
     expect(auth).toContain("async authorize(credentials)");
     expect(auth).toContain("replace this with real user lookup and password verification");
     expect(auth).toContain("Never compare plain text passwords");
@@ -312,8 +316,10 @@ describe("Auth.js credentials feature template", () => {
       "utf8",
     );
 
-    expect(route).toContain('import { handlers } from "@/auth";');
-    expect(route).toContain("export const { GET, POST } = handlers;");
+    expect(route).toContain('import NextAuth from "next-auth";');
+    expect(route).toContain('import { authOptions } from "@/auth";');
+    expect(route).toContain("const handler = NextAuth(authOptions);");
+    expect(route).toContain("export { handler as GET, handler as POST };");
   });
 
   it("includes concise Auth.js README guidance", async () => {
