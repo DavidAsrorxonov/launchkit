@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 7 Step 7 automated completion verification passed; manual website/download QA remains pending
-Primary focus: Phase 7 remains in progress until user-run manual browser/download verification is completed
+Current phase: Phase 8 Step 1 production readiness completed by user direction; Phase 7 manual website/download QA remains pending
+Primary focus: Phase 8 launch preparation is underway, but Phase 7/Phase 6 manual browser and download verification remains unresolved
 ```
 
 ## Phase Progress
@@ -22,7 +22,7 @@ Primary focus: Phase 7 remains in progress until user-run manual browser/downloa
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
 | Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 7 verified automated schema, generator, template, API, UI failure-state, build, and smoke coverage; manual website/download QA remains before marking complete. |
-| Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
+| Phase 8 | Launch Preparation                    | In Progress | Step 1 tightened production readiness, deployment notes, metadata, Node API runtime, and security headers by user direction while manual Phase 7 QA remains pending. |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
 ## Change Log
@@ -30,6 +30,191 @@ Primary focus: Phase 7 remains in progress until user-run manual browser/downloa
 Add entries in reverse chronological order.
 
 ### 2026-07-04
+
+Phase 8 Step 1 completed: Prepare Deployment and Production Readiness
+
+Scope and prerequisite note:
+
+- Read the context files and Phase 8 Step 1 prompt before making changes.
+- The tracker still says Phase 7 is not fully complete because manual website/download QA remains pending.
+- Proceeded with Phase 8 Step 1 because the user explicitly requested it in this turn.
+- Did not mark Phase 6 or Phase 7 complete.
+- Did not move to Phase 8 Step 2.
+- Did not add CLI functionality.
+- Did not add new product options.
+- Did not add user accounts, saved presets, analytics, or provider-specific deployment files.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added minimal Next.js security headers in `apps/web/next.config.ts`:
+  - `X-Content-Type-Options: nosniff`;
+  - `Referrer-Policy: strict-origin-when-cross-origin`.
+- Added explicit viewport metadata in `apps/web/app/layout.tsx`.
+- Marked `apps/web/app/api/generate/route.ts` as `runtime = "nodejs"` because the route uses server-side template loading backed by Node filesystem APIs.
+- Replaced the stale default `apps/web/README.md` with concise LaunchKit web app notes:
+  - local run command;
+  - production build/start commands;
+  - no website MVP environment variables required;
+  - generated-project `DATABASE_URL` and `AUTH_SECRET` belong inside downloaded projects, not the LaunchKit website;
+  - the website does not install generated dependencies, execute generated code, start generated app servers, or write generated projects to disk.
+- Confirmed existing production metadata:
+  - page title: `LaunchKit`;
+  - description: `Build and download TypeScript project starters.`;
+  - favicon exists at `apps/web/app/favicon.ico`.
+- Confirmed the website first screen remains the product builder via `apps/web/app/page.tsx`.
+- Confirmed API deployment safety by code/tests:
+  - request size limit exists;
+  - schema validation runs;
+  - compatibility validation runs;
+  - generated paths are checked before response serialization;
+  - structured errors are returned;
+  - stack traces are not leaked;
+  - generated files are not written to disk by the API;
+  - generated code is not executed;
+  - generated dependencies are not installed.
+- Confirmed runtime boundary by code search:
+  - Node filesystem APIs are isolated to `apps/web/lib/api/template-loader.ts`;
+  - generation runs through `POST /api/generate`;
+  - browser ZIP creation stays in `apps/web/lib/download/create-project-zip.ts`;
+  - no generated-project install/run/server-start code exists in the website flow.
+- Confirmed no `apps/web/.env.example` is needed for the LaunchKit website MVP because no website runtime environment variables are used.
+- Reviewed web dependencies:
+  - `jszip` is in the web workspace where browser-side ZIP creation uses it;
+  - `@launchkit/generator` remains a web runtime dependency because the API route calls it;
+  - no broad dependency upgrades or removals were performed.
+
+Files changed:
+
+- `apps/web/README.md`
+- `apps/web/app/api/generate/route.ts`
+- `apps/web/app/layout.tsx`
+- `apps/web/next.config.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-08/step-1.md
+git status --short
+rg --files context
+sed -n '241,520p' context/progress-tracker.md
+sed -n '521,900p' context/progress-tracker.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,980p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+wc -l context/progress-tracker.md
+sed -n '901,1260p' context/progress-tracker.md
+find . -maxdepth 3 -name package.json -print
+rg --files apps/web | sort
+cat package.json
+cat apps/web/package.json
+cat apps/web/next.config.ts
+sed -n '1,220p' apps/web/app/layout.tsx
+sed -n '1,220p' apps/web/app/page.tsx
+sed -n '1,220p' apps/web/app/api/generate/route.ts
+sed -n '1,420p' apps/web/lib/api/generate.ts
+sed -n '1,320p' apps/web/lib/download/create-project-zip.ts
+sed -n '1,280p' apps/web/lib/api/client.ts
+sed -n '1,360p' apps/web/lib/builder/preview.ts
+rg -n "@launchkit/generator|node:|fs|path|child_process|createProjectZip|handleGenerateProjectRequest|generateProject" apps/web -g '!node_modules/**' -g '!dist/**' -g '!\\.next/**'
+find apps/web -maxdepth 2 -name '.env*' -print
+cat packages/generator/package.json
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,360p' packages/generator/src/generation-plan.ts
+sed -n '1,360p' packages/generator/src/features/definitions.ts
+sed -n '1,220p' apps/web/components/builder/builder-shell.tsx
+rg -n "createBuilderPreview|use client|from \"@/lib/builder/preview\"" apps/web/components apps/web/lib -g '!node_modules/**'
+cat tsconfig.base.json
+cat apps/web/tsconfig.json
+sed -n '1,260p' packages/generator/src/features/registry.ts
+sed -n '1,260p' packages/generator/src/package-json.ts
+sed -n '1,260p' packages/generator/src/env.ts
+sed -n '1,360p' packages/generator/src/generate-project.ts
+sed -n '1,260p' packages/generator/src/template-loader.ts
+rg -n "node:|fs|path|child_process|process|Buffer" packages/generator/src packages/templates/src packages/schema/src -g '!dist/**'
+sed -n '1,220p' apps/web/lib/api/template-loader.ts
+sed -n '1,260p' README.md
+sed -n '1,260p' apps/web/README.md
+npm ls --depth=0
+npm ls --depth=0 -w apps/web
+test -d node_modules/server-only && printf yes || printf no
+sed -n '1,380p' apps/web/lib/api/generate.test.ts
+sed -n '1,260p' apps/web/lib/api/response.ts
+sed -n '1,240p' apps/web/lib/api/types.ts
+rg -n "process\\.env|NEXT_PUBLIC|DATABASE_URL|AUTH_SECRET" apps/web -g '!node_modules/**' -g '!\\.next/**'
+git diff --stat
+rg -n "from \"shadcn\"|from 'shadcn'|shadcn|radix-ui|@radix-ui|lucide-react|class-variance-authority|tailwind-merge|tw-animate-css|clsx" apps/web -g '!node_modules/**' -g '!\\.next/**'
+rg -n "@launchkit/generator|jszip|shadcn|radix-ui|lucide-react|class-variance-authority|tailwind-merge|tw-animate-css|clsx" apps/web/package.json package-lock.json
+sed -n '1,240p' apps/web/app/globals.css
+rg -n "from \"@/components/ui|components/ui|buttonVariants|cn\\(" apps/web -g '!node_modules/**' -g '!\\.next/**'
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run test:smoke
+git status --short
+git diff --stat
+git diff -- apps/web/next.config.ts apps/web/app/layout.tsx apps/web/app/api/generate/route.ts apps/web/README.md
+sed -n '1,120p' context/progress-tracker.md
+```
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm test -w apps/web` passed: 4 files, 46 tests.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed:
+  - `/` prerendered as static content;
+  - `/api/generate` server-rendered on demand.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 4 files, 46 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Escalated `npm run build` passed across all workspaces.
+- Escalated `npm run test:smoke` passed:
+  - 1 smoke test file;
+  - 2 smoke tests;
+  - default generated project installed, typechecked, and built in about 18 seconds;
+  - all-compatible generated project installed, ran required generated checks, typechecked, and built in about 31 seconds;
+  - total duration about 49 seconds.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending.
+- Phase 8 was started by direct user request despite the tracker's previous note to wait for manual Phase 7 QA.
+- `memory.md` had pre-existing/unrelated local modifications and was left untouched.
+- `.agents/prompts/phase-08/` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- Complete the pending manual website/download QA, or continue Phase 8 Step 2 only if intentionally proceeding despite that unresolved manual verification.
 
 Phase 7 Step 7 completed: Verify Phase 7 completion
 
