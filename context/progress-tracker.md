@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 7 Step 5 API validation and safety hardening completed with Phase 6 manual QA still pending
-Primary focus: Generate API now has tighter structured error handling and regression coverage; file safety hardening is the next Phase 7 step
+Current phase: Phase 7 Step 6 user-facing error and failure-state polish completed with Phase 6 manual QA still pending
+Primary focus: Builder, preview, API-client, and download failure messages are clearer and safer; Phase 7 completion review is next
 ```
 
 ## Phase Progress
@@ -21,7 +21,7 @@ Primary focus: Generate API now has tighter structured error handling and regres
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
-| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 5 hardened generate API request validation, stable error codes, generated output safety checks, and route/helper regression coverage. |
+| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 6 improved user-facing validation, preview, API error, empty-state, loading-state, and download failure messages. |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
@@ -30,6 +30,190 @@ Primary focus: Generate API now has tighter structured error handling and regres
 Add entries in reverse chronological order.
 
 ### 2026-07-04
+
+Phase 7 Step 6 completed: Improve user-facing errors and failure states
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Step 5 was complete before starting this step.
+- Kept this step focused on `apps/web` user-facing error and failure-state polish.
+- Did not move to Phase 7 Step 7.
+- Did not add new product options.
+- Did not add CLI functionality.
+- Did not change generator behavior.
+- Did not put generator logic in `apps/web`.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Reviewed builder validation and failure states for project validation, compatibility messages, preview errors, API errors, download errors, zip creation errors, empty states, loading states, and unsafe generated output messages.
+- Added a dedicated API client error mapper:
+  - maps `invalid_content_type`, `request_too_large`, `invalid_json`, `invalid_config`, `incompatible_config`, `generation_failed`, `unsafe_generated_output`, and `method_not_allowed` to concise user-facing messages;
+  - preserves compatibility issue messages such as `Prisma requires PostgreSQL.`;
+  - avoids showing raw server messages, stack traces, internal paths, or raw error objects.
+- Updated `generateProjectRequest` to throw `GenerateProjectApiError` with friendly messages while preserving code/status/issues for programmatic handling.
+- Improved project-name validation messages:
+  - `Project name is required.`;
+  - `Project name cannot contain path separators.`;
+  - `Use lowercase letters, numbers, and hyphens only.`;
+  - `Use hyphens only between words.`
+- Improved project-name accessibility:
+  - `aria-invalid` remains tied to visible invalid state;
+  - `aria-describedby` references the error only when visible;
+  - inline error uses `role="alert"`;
+  - invalid input border uses `border-destructive`.
+- Improved preview failure state:
+  - catches preview creation failures;
+  - shows a concise alert;
+  - does not render stale preview data as current.
+- Improved download failure states:
+  - catches preview creation failures before generation;
+  - keeps selected config intact;
+  - preserves retry behavior after failure;
+  - maps API and ZIP errors to concise messages;
+  - keeps generated code execution/install behavior out of the browser flow.
+- Improved download loading/success copy:
+  - button shows `Preparing...` while disabled;
+  - status shows `Preparing project zip...`;
+  - success shows `ZIP download prepared.`
+- Added basic download status accessibility:
+  - `aria-busy` on the download button while generating;
+  - `aria-live` on status/alert output.
+- Improved preview empty states:
+  - `No optional dependencies added.`;
+  - `No optional dev dependencies added.`;
+  - `No environment variables for this selection.`;
+  - `No extra scripts for this selection.`
+- Added focused Vitest coverage for:
+  - API structured errors mapping to friendly messages;
+  - compatibility issue messages being surfaced safely;
+  - concise project-name validation messages.
+- Confirmed existing compatibility behavior remains intact:
+  - Prisma requires PostgreSQL;
+  - PostgreSQL Docker Compose requires PostgreSQL;
+  - Auth.js credentials remains valid without a database.
+
+Files changed:
+
+- `apps/web/components/builder/download/download-button.tsx`
+- `apps/web/components/builder/download/download-status.tsx`
+- `apps/web/components/builder/preview/dependency-list.tsx`
+- `apps/web/components/builder/preview/env-var-list.tsx`
+- `apps/web/components/builder/preview/script-list.tsx`
+- `apps/web/components/builder/steps/download-step.tsx`
+- `apps/web/components/builder/steps/preview-step.tsx`
+- `apps/web/components/builder/steps/project-step.tsx`
+- `apps/web/lib/api/client.ts`
+- `apps/web/lib/api/client.test.ts`
+- `apps/web/lib/api/errors.ts`
+- `apps/web/lib/builder/validation.ts`
+- `apps/web/lib/builder/phase-6-verification.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-07/step-6.md
+sed -n '261,620p' .agents/prompts/phase-07/step-6.md
+git status --short
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,980p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '1,220p' context/progress-tracker.md
+rg --files apps/web/components apps/web/lib | sort
+sed -n '1,320p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/lib/api/client.ts
+sed -n '1,260p' apps/web/lib/download/create-project-zip.ts
+sed -n '1,260p' apps/web/components/builder/steps/project-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/database-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/orm-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/extras-step.tsx
+sed -n '1,280p' apps/web/components/builder/steps/preview-step.tsx
+sed -n '1,320p' apps/web/components/builder/steps/download-step.tsx
+sed -n '1,220p' apps/web/components/builder/download/download-button.tsx
+sed -n '1,220p' apps/web/components/builder/download/download-status.tsx
+sed -n '1,220p' apps/web/components/builder/preview/dependency-list.tsx
+sed -n '1,220p' apps/web/components/builder/preview/env-var-list.tsx
+sed -n '1,220p' apps/web/components/builder/preview/script-list.tsx
+sed -n '1,260p' apps/web/lib/builder/phase-6-verification.test.ts
+sed -n '1,260p' apps/web/components/builder/steps/styling-ui-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/auth-step.tsx
+sed -n '1,260p' apps/web/lib/api/client.test.ts
+sed -n '1,260p' apps/web/lib/download/create-project-zip.test.ts
+sed -n '1,360p' apps/web/lib/builder/preview.ts
+cat apps/web/package.json
+npm test -w apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run dev -w apps/web
+npm run dev -w apps/web
+curl -I http://localhost:3000
+npm test
+npm run typecheck
+npm run lint
+npm run build
+npm run build
+git diff --check
+git diff --stat
+git diff -- apps/web/lib/api/errors.ts apps/web/lib/api/client.ts apps/web/lib/api/client.test.ts apps/web/lib/builder/validation.ts apps/web/lib/builder/phase-6-verification.test.ts apps/web/components/builder/steps/project-step.tsx apps/web/components/builder/steps/preview-step.tsx apps/web/components/builder/steps/download-step.tsx apps/web/components/builder/download/download-button.tsx apps/web/components/builder/download/download-status.tsx apps/web/components/builder/preview/dependency-list.tsx apps/web/components/builder/preview/env-var-list.tsx apps/web/components/builder/preview/script-list.tsx
+```
+
+Verification result:
+
+- `npm test -w apps/web` passed: 4 files, 46 tests.
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm test` passed across workspaces:
+  - web: 4 files, 46 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm run lint` passed.
+- `git diff --check` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack process/port sandbox restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across all workspaces.
+- `npm run test:smoke` was not rerun for this apps-only user-facing error polish step because smoke tests are manual/network-dependent and generated project output was not changed.
+
+Manual verification:
+
+- Local app startup was attempted.
+- Sandboxed `npm run dev -w apps/web` failed because binding to `0.0.0.0:3000` is not permitted in the sandbox.
+- Escalated `npm run dev -w apps/web` reported another Next dev server for this app on PID `66572` and exited instead of starting a new server.
+- `curl -I http://localhost:3000` could not connect, so browser-level manual interaction checks were not completed in this turn.
+- Code-level verification confirmed:
+  - invalid project name messages are specific and inline;
+  - Prisma and Docker PostgreSQL disabled-state copy still explains the PostgreSQL requirement;
+  - Auth.js credentials remains independent from database selection;
+  - preview failures render an alert instead of stale data;
+  - download failure state preserves retry and selected config;
+  - API and ZIP errors map to friendly messages;
+  - raw stack traces/internal paths are not rendered by the updated UI error paths.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Browser-level manual Step 6 verification remains pending because the local Next dev server state was inconsistent: Next reported an existing dev server, but `curl` could not connect to port 3000.
+- `.agents/prompts/phase-07/step-6.md` is untracked and was left untouched.
+
+Next suggested step:
+
+- Phase 7 Step 7: Verify Phase 7 completion
 
 Phase 7 Step 5 completed: Harden API validation and safety limits
 

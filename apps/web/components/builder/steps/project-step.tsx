@@ -48,8 +48,15 @@ export function ProjectStep({
           onBlur={() => setNameTouched(true)}
           onChange={(event) => updateProjectName(event.target.value)}
           aria-invalid={showNameError ? "true" : "false"}
-          aria-describedby="project-name-help project-name-error"
-          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-describedby={
+            showNameError
+              ? "project-name-help project-name-error"
+              : "project-name-help"
+          }
+          className={[
+            "h-10 w-full rounded-md border bg-background px-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            showNameError ? "border-destructive" : "border-input",
+          ].join(" ")}
           placeholder="my-app"
         />
         <p id="project-name-help" className="text-sm text-muted-foreground">
@@ -57,6 +64,7 @@ export function ProjectStep({
         </p>
         <p
           id="project-name-error"
+          role={showNameError ? "alert" : undefined}
           aria-live="polite"
           className="min-h-5 text-sm text-destructive"
         >

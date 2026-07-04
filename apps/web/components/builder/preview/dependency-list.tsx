@@ -34,7 +34,11 @@ export function DependencyList({ title, dependencies }: DependencyListProps) {
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-muted-foreground">None</p>
+        <p className="text-sm text-muted-foreground">
+          {title === "Dependencies"
+            ? "No optional dependencies added."
+            : "No optional dev dependencies added."}
+        </p>
       )}
     </section>
   );

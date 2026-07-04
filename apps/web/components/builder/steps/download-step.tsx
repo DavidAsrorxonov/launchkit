@@ -24,12 +24,25 @@ type DownloadStepProps = {
 export function DownloadStep({ config, validation }: DownloadStepProps) {
   const [status, setStatus] = useState<DownloadStatusState>("idle");
   const [message, setMessage] = useState<string | undefined>();
-  const preview = useMemo(() => createBuilderPreview(config), [config]);
-  const summaryItems = preview.stackSummary.filter((item) =>
-    ["Framework", "UI", "Database", "ORM", "Auth", "Docker"].includes(
-      item.label,
-    ),
-  );
+  const previewState = useMemo(() => {
+    try {
+      return {
+        preview: createBuilderPreview(config),
+        error: undefined,
+      };
+    } catch {
+      return {
+        preview: undefined,
+        error: "Preview is unavailable for this selection.",
+      };
+    }
+  }, [config]);
+  const summaryItems =
+    previewState.preview?.stackSummary.filter((item) =>
+      ["Framework", "UI", "Database", "ORM", "Auth", "Docker"].includes(
+        item.label,
+      ),
+    ) ?? [];
   const isGenerating = status === "generating";
 
   async function downloadProject() {
@@ -39,8 +52,14 @@ export function DownloadStep({ config, validation }: DownloadStepProps) {
       return;
     }
 
+    if (previewState.error) {
+      setStatus("error");
+      setMessage("Review the selected stack before generating.");
+      return;
+    }
+
     setStatus("generating");
-    setMessage("Generating project...");
+    setMessage("Preparing project zip...");
 
     try {
       const response = await generateProjectRequest(config);
@@ -48,7 +67,7 @@ export function DownloadStep({ config, validation }: DownloadStepProps) {
 
       triggerBrowserDownload(zipBlob, `${response.project.name}.zip`);
       setStatus("success");
-      setMessage("Download started.");
+      setMessage("ZIP download prepared.");
     } catch (error) {
       setStatus("error");
       setMessage(getErrorMessage(error));
@@ -82,18 +101,29 @@ export function DownloadStep({ config, validation }: DownloadStepProps) {
       </section>
 
       <section className="rounded-md border border-border bg-background p-4">
-        <h3 className="text-sm font-semibold text-foreground">Selected stack</h3>
+        <h3 className="text-sm font-semibold text-foreground">
+          Selected stack
+        </h3>
         <dl className="mt-3 grid gap-x-4 gap-y-2 sm:grid-cols-2">
-          {summaryItems.map((item) => (
-            <div key={item.label} className="min-w-0">
-              <dt className="text-xs font-medium text-muted-foreground">
-                {item.label}
-              </dt>
-              <dd className="mt-0.5 text-sm text-foreground break-words">
-                {item.value}
+          {summaryItems.length > 0 ? (
+            summaryItems.map((item) => (
+              <div key={item.label} className="min-w-0">
+                <dt className="text-xs font-medium text-muted-foreground">
+                  {item.label}
+                </dt>
+                <dd className="mt-0.5 text-sm text-foreground wrap-break-word">
+                  {item.value}
+                </dd>
+              </div>
+            ))
+          ) : (
+            <div className="min-w-0">
+              <dt className="sr-only">Selected stack status</dt>
+              <dd className="text-sm text-muted-foreground">
+                Review the selected stack before generating.
               </dd>
             </div>
-          ))}
+          )}
         </dl>
       </section>
 
@@ -113,9 +143,7 @@ export function DownloadStep({ config, validation }: DownloadStepProps) {
   );
 }
 
-function getValidationMessage(
-  errors: PreviewStepValidation["errors"],
-): string {
+function getValidationMessage(errors: PreviewStepValidation["errors"]): string {
   return (
     Object.values(errors).find((error): error is string => Boolean(error)) ??
     "Fix the selected stack before generating."
@@ -128,10 +156,10 @@ function getErrorMessage(error: unknown): string {
   }
 
   if (error instanceof Error && error.name === "UnsafeZipPathError") {
-    return "Generated project contained unsafe file paths.";
+    return "Generated files did not pass safety checks. Review the selection and try again.";
   }
 
-  return "Could not create the ZIP file.";
+  return "Could not create the ZIP file. Retry in a moment.";
 }
 
 function triggerBrowserDownload(blob: Blob, fileName: string): void {

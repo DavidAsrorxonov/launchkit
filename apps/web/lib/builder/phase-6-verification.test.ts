@@ -19,6 +19,7 @@ import {
 import { createBuilderPreview } from "./preview";
 import { builderSteps } from "./steps";
 import {
+  getProjectNameError,
   validateAuthStep,
   validateBuilderConfig,
   validateProjectStep,
@@ -67,6 +68,17 @@ describe("Phase 6 website wizard contract", () => {
         packageManager: "yarn",
       } as unknown as LaunchKitConfig).errors.packageManager,
     ).toBeTruthy();
+  });
+
+  it("returns concise project name validation messages", () => {
+    expect(getProjectNameError("")).toBe("Project name is required.");
+    expect(getProjectNameError("my/app")).toBe(
+      "Project name cannot contain path separators.",
+    );
+    expect(getProjectNameError("My App")).toBe(
+      "Use lowercase letters, numbers, and hyphens only.",
+    );
+    expect(getProjectNameError("-my-app")).toBe("Use hyphens only between words.");
   });
 
   it("keeps Auth.js credentials independent from database and ORM choices", () => {

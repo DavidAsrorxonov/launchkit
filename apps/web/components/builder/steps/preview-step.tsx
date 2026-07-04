@@ -29,7 +29,21 @@ export function PreviewStep({ config, validation }: PreviewStepProps) {
     );
   }
 
-  const preview = createBuilderPreview(config);
+  let preview: ReturnType<typeof createBuilderPreview>;
+
+  try {
+    preview = createBuilderPreview(config);
+  } catch {
+    return (
+      <div
+        role="alert"
+        className="rounded-md border border-destructive bg-background p-4 text-sm text-destructive"
+      >
+        Preview is unavailable for this selection. Review the selected stack and
+        try again.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
