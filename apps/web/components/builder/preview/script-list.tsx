@@ -22,7 +22,9 @@ export function ScriptList({ scripts }: ScriptListProps) {
           ))}
         </dl>
       ) : (
-        <p className="text-sm text-muted-foreground">None</p>
+        <p className="text-sm text-muted-foreground">
+          No extra scripts for this selection.
+        </p>
       )}
     </section>
   );

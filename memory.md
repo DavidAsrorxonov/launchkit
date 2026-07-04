@@ -1,104 +1,87 @@
-# Memory - Phase 6 Step 12 Website Polish
+# Memory - Phase 7 Testing And Hardening
 
-Last updated: 2026-07-03 14:44 JST
+Last updated: 2026-07-04 16:55 JST
 
 ## What was built
 
-Phase 6 Step 12 was implemented for the LaunchKit website MVP.
+Phase 7 Step 2 was completed earlier in this session:
 
-Responsive polish was applied across the wizard:
+- Strengthened schema regression tests in `packages/schema/src/__tests__/config.test.ts`.
+- Strengthened metadata regression tests in `packages/schema/src/__tests__/metadata.test.ts`.
+- Aligned compatibility tests in `packages/schema/src/__tests__/compatibility.test.ts` with the MVP-only Tailwind styling contract.
+- Updated `context/progress-tracker.md` with Step 2 results.
 
-- `apps/web/components/builder/wizard-step-panel.tsx`: removed the extra dashed inner frame and tightened mobile header spacing.
-- `apps/web/components/builder/wizard-progress.tsx`: progress cards now use short labels on mobile/tablet and full labels on large screens.
-- `apps/web/components/builder/builder-shell.tsx`: improved project-name and current-selection wrapping.
-- Preview components now wrap long names or scroll exact command text safely:
-  - `dependency-list.tsx`
-  - `env-var-list.tsx`
-  - `script-list.tsx`
-  - `stack-summary.tsx`
-- Step option cards now wrap badges/radio indicators cleanly on narrow viewports:
-  - `project-step.tsx`
-  - `framework-step.tsx`
-  - `styling-ui-step.tsx`
-  - `database-step.tsx`
-  - `orm-step.tsx`
-  - `auth-step.tsx`
-  - `extras-step.tsx`
-- `apps/web/components/builder/steps/download-step.tsx`: project name and selected stack values wrap instead of truncating.
+Phase 7 Step 3 was completed:
 
-Added `apps/web/lib/builder/phase-6-verification.test.ts` with focused Vitest coverage for:
-
-- required 9-step wizard order;
-- supported MVP option values only;
-- project-name validation;
-- unsupported package manager rejection;
-- Auth.js credentials compatibility without PostgreSQL;
-- Prisma and Docker PostgreSQL rejection without PostgreSQL;
-- preview data for selected stack, dependencies, dev dependencies, scripts, env vars, and file tree;
-- unselected optional feature exclusion;
-- `src/` path exclusion;
-- full-stack preview additions for shadcn, PostgreSQL, Prisma, Auth.js credentials, and Docker.
-
-Updated `context/progress-tracker.md` with the Step 12 change log, verification results, and manual-QA handoff.
+- Added `packages/generator/src/__tests__/generated-output-snapshots.test.ts`.
+- Added real-template generator output coverage for the required MVP matrix:
+  - default config;
+  - shadcn;
+  - PostgreSQL;
+  - PostgreSQL + Prisma;
+  - Auth.js credentials without PostgreSQL;
+  - PostgreSQL + Docker;
+  - all compatible MVP features together.
+- Added targeted inline snapshots for generated path lists, parsed `package.json`, and `.env.example` line output.
+- Added generated-project path safety checks, feature inclusion/exclusion checks, selected/unselected dependency and script checks, and generator-boundary incompatible config checks.
+- Added template file-list boundary snapshots in `packages/templates/src/__tests__/index.test.ts`.
+- Updated `context/progress-tracker.md` with Step 3 results.
 
 ## Decisions made
 
-Phase 6 remains `In Progress` until manual browser/download QA is completed by the user. Step 12 code and automated verification are complete, but the phase should not be marked complete until the user confirms the website MVP works end to end in a real browser.
+Phase 7 work stayed narrow:
 
-No CLI work was started. No new product options were added. Generator logic remains outside UI components.
+- No generated-project smoke tests were added yet.
+- No API hardening was done.
+- No supported product options were changed.
+- No CLI functionality was added.
+- Vitest remains the test runner for schema, generator, and template tests.
 
-The new verification test follows the current generator contract: Prisma scripts include `db:push`, not `db:migrate`.
+The Step 3 generator snapshots are intentionally targeted, not full-project snapshots. They lock file paths, package metadata, dependency/script/env output, and feature boundaries without snapshotting every file body.
+
+Phase 6 remains `In Progress` because manual browser/download QA is still pending.
 
 ## Problems solved
 
-The first Step 12 web test run failed because the new verification test expected `db:migrate`; the generator currently exposes `db:push`. The test was corrected.
+The first generator snapshot run failed because multiline `.env.example` strings were represented differently in Vitest inline snapshots than expected. The snapshot summary now stores env output as `envLines`, which made the snapshot stable and readable.
 
-The first Step 12 web typecheck failed because an intentionally invalid `packageManager: "yarn"` test value needed to be cast through `unknown` before `LaunchKitConfig`. The test was corrected.
-
-`npm run build -w apps/web` fails inside the sandbox because Turbopack cannot create/bind worker processes. Rerunning the web build with elevated permissions passed.
-
-Browser QA could not be completed in-session:
-
-- the in-app browser connector failed with an internal `sandbox-state-meta` Node REPL error;
-- the workspace has no Playwright or `@playwright/test`;
-- sandboxed localhost `curl` could not connect;
-- elevated localhost `curl` was not allowed;
-- elevated `npm run dev -w apps/web` found another Next dev server lock/process;
-- the user said they will do manual browser/download QA themselves.
+Sandboxed `npm run build` still fails in `apps/web` because Next/Turbopack tries to create a process and bind to a port during CSS processing. Running the same build with escalation passed. This is an environment constraint, not a code failure.
 
 ## Current state
 
-Automated verification passed:
+The latest recorded verification passed:
 
-- `npm run test -w apps/web`: 4 files, 23 tests.
-- `npm run typecheck -w apps/web`.
-- `npm run lint -w apps/web`.
-- `npm run build -w apps/web` passed when rerun elevated after the sandbox Turbopack failure.
+- `npm test -w @launchkit/schema`: 5 files, 87 tests.
+- `npm run typecheck -w @launchkit/schema`.
+- `npm test -w @launchkit/generator`: 11 files, 127 tests.
+- `npm test -w @launchkit/templates`: 1 file, 52 tests.
+- `npm run typecheck -w @launchkit/generator`.
+- `npm run typecheck -w @launchkit/templates`.
+- `npm test` across workspaces:
+  - web: 4 files, 23 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
 - `npm run typecheck` across workspaces.
-- `npm run test` across workspaces: web 23 tests, generator 111 tests, schema 73 tests, templates 51 tests.
 - `npm run lint`.
-- `git diff --check`.
+- `npm run build` passed when rerun elevated after the known Turbopack sandbox failure.
 
-The progress tracker says Phase 6 Step 12 responsive polish and automated verification are complete, but Phase 6 is still `In Progress` pending user-run manual browser/download QA.
+At memory-save time, `git status --short` showed only:
 
-At the time memory was saved, `git status --short` was clean before writing this memory file.
+```txt
+?? .agents/prompts/phase-07/step-4.md
+```
+
+The current progress tracker says Phase 7 Step 3 is complete and suggests Step 4 next.
 
 ## Next session starts with
 
-Wait for the user to report results from manual QA, or ask them to run the website flow at 375px, 768px, 1280px, and 1440px+ widths:
+Read `context/progress-tracker.md`, then implement `.agents/prompts/phase-07/step-4.md`.
 
-1. Enter a valid project name.
-2. Choose npm or pnpm.
-3. Walk through all 9 wizard steps.
-4. Try invalid project names and blocked Prisma/Docker combinations.
-5. Verify Preview content and no `src/` paths.
-6. Click `Generate ZIP`.
-7. Confirm the ZIP downloads, is named from the project name, contains a top-level folder, contains expected files, and excludes unsafe/`src/` paths.
-
-If manual QA passes, update `context/progress-tracker.md` to mark Phase 6 complete. If QA finds issues, make focused fixes in `apps/web/` only.
+Expected next work is Phase 7 Step 4: add generated project smoke tests. Keep it scoped to the Step 4 prompt. Do not start API hardening, CLI work, or product-option expansion unless that prompt explicitly requires it.
 
 ## Open questions
 
-Did the user-run browser/download QA pass on mobile, tablet, desktop, and wide desktop?
+Phase 6 browser/download QA is still unresolved. The user may still need to manually verify the website wizard and ZIP download flow before Phase 6 can be marked complete.
 
-Should the repo add a browser automation dependency later for repeatable responsive/download QA, or keep this manual until Phase 7?
+Step 4 may require dependency installation or generated-project package-manager execution. If network or sandbox restrictions block those smoke tests, request escalation and document exactly what passed, failed, or was skipped in `context/progress-tracker.md`.

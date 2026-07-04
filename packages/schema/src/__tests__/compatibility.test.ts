@@ -6,7 +6,6 @@ import {
   LaunchKitCompatibilityError,
   validateCompatibility,
 } from "../index";
-import type { LaunchKitConfig } from "../index";
 
 describe("compatibility rules", () => {
   it("returns no issues for the default config", () => {
@@ -119,20 +118,6 @@ describe("compatibility rules", () => {
       code: "authjs_credentials_prisma_requires_postgresql",
       message: "Auth.js credentials with Prisma requires Prisma and PostgreSQL.",
       path: ["auth", "orm", "database"],
-    });
-  });
-
-  it("returns an issue when shadcn/ui is selected without Tailwind CSS", () => {
-    const configWithoutTailwind = {
-      ...defaultLaunchKitConfig,
-      ui: "shadcn",
-      styling: "css",
-    } as unknown as LaunchKitConfig;
-
-    expect(validateCompatibility(configWithoutTailwind)).toContainEqual({
-      code: "shadcn_requires_tailwind",
-      message: "shadcn/ui requires Tailwind CSS.",
-      path: ["ui", "styling"],
     });
   });
 

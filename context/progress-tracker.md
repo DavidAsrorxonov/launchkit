@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 6 in progress
-Primary focus: Phase 6 Step 12 responsive polish and automated verification are complete; user-run browser/download QA remains before marking Phase 6 complete
+Current phase: Phase 7 Step 7 automated completion verification passed; manual website/download QA remains pending
+Primary focus: Phase 7 remains in progress until user-run manual browser/download verification is completed
 ```
 
 ## Phase Progress
@@ -21,13 +21,1110 @@ Primary focus: Phase 6 Step 12 responsive polish and automated verification are 
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
-| Phase 7 | Testing, Validation, and Hardening    | Not Started | Will add tests, smoke checks, and API safety.                                                           |
+| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 7 verified automated schema, generator, template, API, UI failure-state, build, and smoke coverage; manual website/download QA remains before marking complete. |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-04
+
+Phase 7 Step 7 completed: Verify Phase 7 completion
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Steps 1-6 are documented as complete in this tracker before starting this step.
+- Kept this step limited to verification and tracker updates.
+- Did not start Phase 8.
+- Did not add CLI functionality.
+- Did not add new product options.
+- Did not perform broad refactors.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+- Manual browser/download verification was left for the user to perform.
+
+Changes made:
+
+- Verified test tooling:
+  - Vitest is used by workspace test scripts.
+  - Root `test` delegates to workspace test scripts.
+  - Root `test:smoke` delegates to `@launchkit/generator`.
+  - `@launchkit/generator` exposes `test:smoke` through `vitest.smoke.config.ts`.
+  - `rg -n "node:test|node --test|jest|mocha" package.json apps packages -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'` returned no matches.
+  - A broader repo search only found historical tracker references to those terms.
+- Verified schema regression coverage for:
+  - MVP option arrays;
+  - `LaunchKitConfigSchema`;
+  - project name validation;
+  - default config;
+  - option metadata;
+  - public schema exports where practical;
+  - compatibility rules for Prisma/PostgreSQL, Docker/PostgreSQL, Auth.js credentials without a database, Auth.js credentials with Prisma/PostgreSQL, and shadcn/Tailwind.
+- Verified generator and template coverage for:
+  - default output;
+  - shadcn/ui output;
+  - PostgreSQL output;
+  - Prisma output;
+  - Auth.js credentials output;
+  - Docker PostgreSQL output;
+  - all compatible MVP features selected together;
+  - optional feature files appearing only when selected;
+  - valid generated `package.json`;
+  - selected `.env.example` output;
+  - safe generated paths;
+  - generated output and templates not using `src/`.
+- Verified focused snapshot coverage:
+  - generated path lists;
+  - generated `package.json`;
+  - generated `.env.example`;
+  - template file-list boundaries.
+- Verified generated project smoke coverage:
+  - default generated project;
+  - all-compatible MVP generated project;
+  - smoke writes only to OS temp directories;
+  - smoke validates generated paths before writing;
+  - smoke runs `npm install`, generated `npm run typecheck`, and generated `npm run build`;
+  - all-compatible smoke also runs `npm run db:generate`;
+  - smoke does not start Docker, connect to a real database, or run generated app servers.
+- Verified API hardening for `POST /api/generate`:
+  - rejects non-JSON requests where practical;
+  - rejects oversized requests;
+  - handles malformed JSON safely;
+  - validates config using `@launchkit/schema`;
+  - validates compatibility using shared schema helpers;
+  - returns structured schema and compatibility errors;
+  - handles generator failures without leaking stack traces;
+  - validates generated output paths before response;
+  - does not write generated project files to disk;
+  - does not execute generated code;
+  - does not install generated dependencies.
+- Verified website failure-state coverage by code/test inspection for:
+  - invalid project name;
+  - incompatible selections;
+  - preview errors;
+  - API validation errors;
+  - API compatibility errors;
+  - API unexpected failures;
+  - download errors;
+  - ZIP creation errors;
+  - retry after failure;
+  - visible loading/success/error status;
+  - avoiding raw stack traces and internal paths in user-facing error paths;
+  - basic error accessibility where practical.
+- No small in-scope implementation issues were found that required code changes.
+- Did not mark Phase 7 complete because manual website/download QA remains pending.
+
+Files changed:
+
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-07/step-7.md
+sed -n '261,520p' .agents/prompts/phase-07/step-7.md
+git status --short
+rg --files context | sort
+find . -maxdepth 3 -name package.json -print | sort
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,980p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,520p' context/ui-rules.md
+sed -n '221,520p' context/progress-tracker.md
+sed -n '521,900p' context/progress-tracker.md
+cat package.json
+npm pkg get scripts --workspaces --if-present
+sed -n '1,260p' /Users/dovudxonasrorxonov/.codex/plugins/cache/openai-bundled/browser/26.608.12217/skills/control-in-app-browser/SKILL.md
+rg -n "node:test|node --test|jest|mocha" . -g '!node_modules/**' -g '!.git/**' -g '!apps/web/.next/**' -g '!dist/**' -g '!*.tsbuildinfo'
+rg --files packages apps | sort
+find . -path './node_modules' -prune -o -path './.git' -prune -o -name 'vitest.config.*' -print | sort
+find packages apps -path '*/node_modules' -prune -o -name '*test.ts' -print | sort
+rg -n "node:test|node --test|jest|mocha" package.json apps packages -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+sed -n '1,260p' packages/schema/src/__tests__/compatibility.test.ts
+sed -n '1,320p' packages/schema/src/__tests__/config.test.ts
+sed -n '1,300p' packages/schema/src/__tests__/options.test.ts
+sed -n '1,300p' packages/schema/src/__tests__/defaults.test.ts
+sed -n '1,360p' packages/schema/src/__tests__/metadata.test.ts
+sed -n '1,360p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+sed -n '361,760p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+sed -n '1,360p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,360p' packages/templates/src/__tests__/index.test.ts
+sed -n '1,320p' packages/generator/test/smoke/generated-projects.test.ts
+sed -n '1,420p' apps/web/lib/api/generate.test.ts
+sed -n '1,420p' apps/web/lib/api/generate.ts
+sed -n '1,340p' apps/web/lib/builder/phase-6-verification.test.ts
+sed -n '1,300p' apps/web/lib/api/client.test.ts
+sed -n '1,260p' apps/web/lib/download/create-project-zip.test.ts
+sed -n '1,340p' apps/web/components/builder/steps/download-step.tsx
+sed -n '1,280p' apps/web/components/builder/steps/preview-step.tsx
+sed -n '1,280p' apps/web/components/builder/steps/project-step.tsx
+sed -n '1,260p' apps/web/components/builder/download/download-status.tsx
+sed -n '1,220p' apps/web/components/builder/download/download-button.tsx
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run build
+npm test -w @launchkit/schema
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/schema
+npm run typecheck -w @launchkit/generator
+npm run typecheck -w @launchkit/templates
+npm run build -w apps/web
+npm run build -w apps/web
+npm run test:smoke
+npm run test:smoke
+npm run dev -w apps/web
+npm run dev -w apps/web
+curl -I http://localhost:3000
+npm run start -w apps/web -- -p 3001
+npm run start -w apps/web -- -p 3001
+```
+
+Verification result:
+
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 4 files, 46 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across all workspaces.
+- `npm test -w @launchkit/schema` passed: 5 files, 87 tests.
+- `npm test -w @launchkit/generator` passed: 11 files, 127 tests.
+- `npm test -w @launchkit/templates` passed: 1 file, 52 tests.
+- `npm run typecheck -w @launchkit/schema` passed.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm run typecheck -w @launchkit/templates` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction.
+- Escalated `npm run build -w apps/web` passed.
+
+Smoke test result:
+
+- Initial sandboxed `npm run test:smoke` stayed silent beyond the expected helper timeout window during generated dependency work and was interrupted with `Ctrl-C`.
+- Escalated `npm run test:smoke` passed:
+  - 1 smoke test file;
+  - 2 smoke tests;
+  - default generated project installed, typechecked, and built in about 25 seconds;
+  - all-compatible generated project installed, ran `db:generate`, typechecked, and built in about 33 seconds;
+  - total duration about 59 seconds.
+
+Manual verification:
+
+- Manual browser/download QA was not completed by the assistant because the user said they will do it themselves.
+- Sandboxed `npm run dev -w apps/web` failed because binding to `0.0.0.0:3000` is not permitted in the sandbox.
+- Escalated `npm run dev -w apps/web` reported a stale existing Next dev server for this app on PID `66572` and exited:
+  - Next reported `http://localhost:3000`;
+  - `curl -I http://localhost:3000` could not connect.
+- Sandboxed `npm run start -w apps/web -- -p 3001` failed because binding to `0.0.0.0:3001` is not permitted in the sandbox.
+- Escalated `npm run start -w apps/web -- -p 3001` was requested for manual verification but not run because the user chose to do manual verification themselves.
+
+Blocked/missing:
+
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending:
+  - complete the wizard with default options;
+  - preview generated output;
+  - download and inspect the ZIP;
+  - repeat with all compatible MVP features selected;
+  - confirm invalid combinations are prevented or clearly explained;
+  - confirm download error/retry behavior where practical.
+
+Notes:
+
+- Phase 7 remains `In Progress`.
+- Phase 8 remains `Not Started`; do not begin Phase 8 until the pending manual verification is complete.
+- `.agents/prompts/phase-07/step-7.md` is untracked and was left untouched.
+
+Next suggested step:
+
+- Complete the listed manual website/download QA, then mark Phase 7 complete only if it passes.
+
+Phase 7 Step 6 completed: Improve user-facing errors and failure states
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Step 5 was complete before starting this step.
+- Kept this step focused on `apps/web` user-facing error and failure-state polish.
+- Did not move to Phase 7 Step 7.
+- Did not add new product options.
+- Did not add CLI functionality.
+- Did not change generator behavior.
+- Did not put generator logic in `apps/web`.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Reviewed builder validation and failure states for project validation, compatibility messages, preview errors, API errors, download errors, zip creation errors, empty states, loading states, and unsafe generated output messages.
+- Added a dedicated API client error mapper:
+  - maps `invalid_content_type`, `request_too_large`, `invalid_json`, `invalid_config`, `incompatible_config`, `generation_failed`, `unsafe_generated_output`, and `method_not_allowed` to concise user-facing messages;
+  - preserves compatibility issue messages such as `Prisma requires PostgreSQL.`;
+  - avoids showing raw server messages, stack traces, internal paths, or raw error objects.
+- Updated `generateProjectRequest` to throw `GenerateProjectApiError` with friendly messages while preserving code/status/issues for programmatic handling.
+- Improved project-name validation messages:
+  - `Project name is required.`;
+  - `Project name cannot contain path separators.`;
+  - `Use lowercase letters, numbers, and hyphens only.`;
+  - `Use hyphens only between words.`
+- Improved project-name accessibility:
+  - `aria-invalid` remains tied to visible invalid state;
+  - `aria-describedby` references the error only when visible;
+  - inline error uses `role="alert"`;
+  - invalid input border uses `border-destructive`.
+- Improved preview failure state:
+  - catches preview creation failures;
+  - shows a concise alert;
+  - does not render stale preview data as current.
+- Improved download failure states:
+  - catches preview creation failures before generation;
+  - keeps selected config intact;
+  - preserves retry behavior after failure;
+  - maps API and ZIP errors to concise messages;
+  - keeps generated code execution/install behavior out of the browser flow.
+- Improved download loading/success copy:
+  - button shows `Preparing...` while disabled;
+  - status shows `Preparing project zip...`;
+  - success shows `ZIP download prepared.`
+- Added basic download status accessibility:
+  - `aria-busy` on the download button while generating;
+  - `aria-live` on status/alert output.
+- Improved preview empty states:
+  - `No optional dependencies added.`;
+  - `No optional dev dependencies added.`;
+  - `No environment variables for this selection.`;
+  - `No extra scripts for this selection.`
+- Added focused Vitest coverage for:
+  - API structured errors mapping to friendly messages;
+  - compatibility issue messages being surfaced safely;
+  - concise project-name validation messages.
+- Confirmed existing compatibility behavior remains intact:
+  - Prisma requires PostgreSQL;
+  - PostgreSQL Docker Compose requires PostgreSQL;
+  - Auth.js credentials remains valid without a database.
+
+Files changed:
+
+- `apps/web/components/builder/download/download-button.tsx`
+- `apps/web/components/builder/download/download-status.tsx`
+- `apps/web/components/builder/preview/dependency-list.tsx`
+- `apps/web/components/builder/preview/env-var-list.tsx`
+- `apps/web/components/builder/preview/script-list.tsx`
+- `apps/web/components/builder/steps/download-step.tsx`
+- `apps/web/components/builder/steps/preview-step.tsx`
+- `apps/web/components/builder/steps/project-step.tsx`
+- `apps/web/lib/api/client.ts`
+- `apps/web/lib/api/client.test.ts`
+- `apps/web/lib/api/errors.ts`
+- `apps/web/lib/builder/validation.ts`
+- `apps/web/lib/builder/phase-6-verification.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-07/step-6.md
+sed -n '261,620p' .agents/prompts/phase-07/step-6.md
+git status --short
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,980p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '1,220p' context/progress-tracker.md
+rg --files apps/web/components apps/web/lib | sort
+sed -n '1,320p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/builder/validation.ts
+sed -n '1,260p' apps/web/lib/api/client.ts
+sed -n '1,260p' apps/web/lib/download/create-project-zip.ts
+sed -n '1,260p' apps/web/components/builder/steps/project-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/database-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/orm-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/extras-step.tsx
+sed -n '1,280p' apps/web/components/builder/steps/preview-step.tsx
+sed -n '1,320p' apps/web/components/builder/steps/download-step.tsx
+sed -n '1,220p' apps/web/components/builder/download/download-button.tsx
+sed -n '1,220p' apps/web/components/builder/download/download-status.tsx
+sed -n '1,220p' apps/web/components/builder/preview/dependency-list.tsx
+sed -n '1,220p' apps/web/components/builder/preview/env-var-list.tsx
+sed -n '1,220p' apps/web/components/builder/preview/script-list.tsx
+sed -n '1,260p' apps/web/lib/builder/phase-6-verification.test.ts
+sed -n '1,260p' apps/web/components/builder/steps/styling-ui-step.tsx
+sed -n '1,260p' apps/web/components/builder/steps/auth-step.tsx
+sed -n '1,260p' apps/web/lib/api/client.test.ts
+sed -n '1,260p' apps/web/lib/download/create-project-zip.test.ts
+sed -n '1,360p' apps/web/lib/builder/preview.ts
+cat apps/web/package.json
+npm test -w apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm run dev -w apps/web
+npm run dev -w apps/web
+curl -I http://localhost:3000
+npm test
+npm run typecheck
+npm run lint
+npm run build
+npm run build
+git diff --check
+git diff --stat
+git diff -- apps/web/lib/api/errors.ts apps/web/lib/api/client.ts apps/web/lib/api/client.test.ts apps/web/lib/builder/validation.ts apps/web/lib/builder/phase-6-verification.test.ts apps/web/components/builder/steps/project-step.tsx apps/web/components/builder/steps/preview-step.tsx apps/web/components/builder/steps/download-step.tsx apps/web/components/builder/download/download-button.tsx apps/web/components/builder/download/download-status.tsx apps/web/components/builder/preview/dependency-list.tsx apps/web/components/builder/preview/env-var-list.tsx apps/web/components/builder/preview/script-list.tsx
+```
+
+Verification result:
+
+- `npm test -w apps/web` passed: 4 files, 46 tests.
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm test` passed across workspaces:
+  - web: 4 files, 46 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm run lint` passed.
+- `git diff --check` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack process/port sandbox restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across all workspaces.
+- `npm run test:smoke` was not rerun for this apps-only user-facing error polish step because smoke tests are manual/network-dependent and generated project output was not changed.
+
+Manual verification:
+
+- Local app startup was attempted.
+- Sandboxed `npm run dev -w apps/web` failed because binding to `0.0.0.0:3000` is not permitted in the sandbox.
+- Escalated `npm run dev -w apps/web` reported another Next dev server for this app on PID `66572` and exited instead of starting a new server.
+- `curl -I http://localhost:3000` could not connect, so browser-level manual interaction checks were not completed in this turn.
+- Code-level verification confirmed:
+  - invalid project name messages are specific and inline;
+  - Prisma and Docker PostgreSQL disabled-state copy still explains the PostgreSQL requirement;
+  - Auth.js credentials remains independent from database selection;
+  - preview failures render an alert instead of stale data;
+  - download failure state preserves retry and selected config;
+  - API and ZIP errors map to friendly messages;
+  - raw stack traces/internal paths are not rendered by the updated UI error paths.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Browser-level manual Step 6 verification remains pending because the local Next dev server state was inconsistent: Next reported an existing dev server, but `curl` could not connect to port 3000.
+- `.agents/prompts/phase-07/step-6.md` is untracked and was left untouched.
+
+Next suggested step:
+
+- Phase 7 Step 7: Verify Phase 7 completion
+
+Phase 7 Step 5 completed: Harden API validation and safety limits
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Step 4 was complete before starting this step.
+- Kept this step limited to `apps/web` generate API hardening and tests.
+- Did not move to Phase 7 Step 6.
+- Did not add broad UI error polishing.
+- Did not change supported product options.
+- Did not add CLI functionality.
+- Did not run generated project code on the LaunchKit server.
+- Did not install generated project dependencies from the API route.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Hardened `POST /api/generate` helper behavior with Step 5 stable error codes:
+  - non-JSON requests now return `415` with `invalid_content_type`;
+  - oversized requests now return `413` with `request_too_large`;
+  - unsafe generated output now returns `500` with `unsafe_generated_output`.
+- Verified the route supports `POST /api/generate` and rejects `GET` with a structured `method_not_allowed` error.
+- Added route-level tests for `POST` and `GET` exports.
+- Added/expanded request validation tests for:
+  - valid JSON config;
+  - `application/json; charset=utf-8`;
+  - non-JSON content type;
+  - malformed JSON;
+  - oversized body content;
+  - oversized `content-length`;
+  - invalid config shape.
+- Added/expanded compatibility tests for:
+  - Prisma requiring PostgreSQL;
+  - Docker PostgreSQL requiring PostgreSQL;
+  - Auth.js credentials working without a database;
+  - unsupported non-Tailwind styling being rejected by schema before shadcn compatibility can run.
+- Added generated output safety regression coverage for:
+  - traversal paths;
+  - absolute paths;
+  - empty path segments;
+  - `.` and `..`;
+  - current-directory path segments;
+  - `src` as the first path segment;
+  - `src` as a nested path segment.
+- Added a helper-level test that unsafe generated output is converted to a structured API error instead of leaking internals.
+- Confirmed binary generated contents serialize as base64 strings and are not returned as raw `Uint8Array` or buffer objects.
+- Existing generator failure handling remains generic and does not expose stack traces, absolute paths, internal source paths, or raw error objects.
+- Existing API response shapes remain JSON-safe and stable:
+  - success response uses `project.name`, `project.packageManager`, and serialized `files`;
+  - error response uses `{ error: { code, message, issues? } }`.
+- Confirmed by code inspection and tests that the API route only validates input, calls the generator, validates/serializes output, and returns JSON; it does not write generated files to disk, execute generated code, install dependencies, run shell commands, start dev servers, start Docker, or connect to databases.
+
+Files changed:
+
+- `apps/web/lib/api/generate.ts`
+- `apps/web/lib/api/generate.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-07/step-5.md
+sed -n '261,620p' .agents/prompts/phase-07/step-5.md
+git status --short
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,980p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '1,220p' context/progress-tracker.md
+rg --files apps/web/app apps/web/lib | sort
+sed -n '1,260p' apps/web/app/api/generate/route.ts
+sed -n '1,360p' apps/web/lib/api/generate.ts
+sed -n '1,320p' apps/web/lib/api/generate.test.ts
+sed -n '1,220p' apps/web/lib/api/client.ts
+sed -n '1,220p' apps/web/lib/api/client.test.ts
+sed -n '1,220p' apps/web/lib/api/response.ts
+sed -n '1,220p' apps/web/lib/api/types.ts
+sed -n '1,260p' packages/schema/src/compatibility.ts
+sed -n '1,260p' packages/schema/src/config.ts
+sed -n '1,180p' packages/schema/src/index.ts
+npm test -w apps/web
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+npm test
+npm run typecheck
+npm run lint
+git diff -- apps/web/lib/api/generate.ts apps/web/lib/api/generate.test.ts apps/web/app/api/generate/route.ts
+npm test -w apps/web
+npm run build -w apps/web
+npm run build -w apps/web
+npm run build
+git status --short
+git diff --stat
+git diff -- apps/web/lib/api/generate.ts apps/web/lib/api/generate.test.ts
+git diff -- context/progress-tracker.md | head -80
+```
+
+Verification result:
+
+- `npm test -w apps/web` passed: 4 files, 38 tests.
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm test` passed across workspaces:
+  - web: 4 files, 38 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack process/port sandbox restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed.
+- Escalated `npm run build` passed across all workspaces.
+- `npm run test:smoke` was not rerun for this apps-only API hardening step because smoke tests are manual/network-dependent and generated project output was not changed.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- `.agents/prompts/phase-07/step-5.md` is untracked and was left untouched.
+
+Next suggested step:
+
+- Phase 7 Step 6: Improve user-facing errors and failure states
+
+Phase 7 Step 4 completed: Add generated project smoke tests
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Step 3 was complete before starting this step.
+- Kept smoke tests opt-in and out of normal fast `npm test`.
+- Did not move to Phase 7 Step 5.
+- Did not harden the API route.
+- Did not change supported product options.
+- Did not add CLI functionality.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added a root `test:smoke` script that delegates to `@launchkit/generator`.
+- Added a package-level generator `test:smoke` script backed by a dedicated `vitest.smoke.config.ts`.
+- Added generated-project smoke coverage for:
+  - default config;
+  - all-compatible MVP config with shadcn/ui, PostgreSQL, Prisma, Auth.js credentials, and Docker PostgreSQL selected.
+- Added a smoke helper that:
+  - calls `generateProject(config)` with real templates;
+  - writes generated projects only under OS temp directories;
+  - validates generated paths before writing;
+  - rejects absolute paths, empty/current/traversal segments, and any `src` path segment;
+  - writes text and binary contents without shell interpolation.
+- Smoke tests run `npm install`, `npm run typecheck`, and `npm run build` for both required configs.
+- For the all-compatible Prisma config, smoke tests also run `npm run db:generate` after install so the generated Prisma client exists before typecheck/build.
+- Confirmed smoke tests do not run `db:push`, start Docker, connect to a database, run generated app servers, or execute arbitrary user input.
+- Added useful command failure output with config name, command, exit code/signal, stdout, stderr, and generated project directory.
+- Fixed a generated Auth.js template runtime/build issue found by smoke testing:
+  - replaced the v5 `handlers` scaffold shape with the stable `next-auth` v4 App Router handler pattern;
+  - updated template assertions accordingly.
+- Documented smoke runtime/network expectations here: smoke tests are local/manual for now because generated `npm install` requires network or a warm npm cache.
+
+Files changed:
+
+- `package.json`
+- `packages/generator/package.json`
+- `packages/generator/vitest.smoke.config.ts`
+- `packages/generator/test/smoke/generated-projects.test.ts`
+- `packages/templates/features/authjs-credentials/auth.ts`
+- `packages/templates/features/authjs-credentials/app/api/auth/[...nextauth]/route.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,220p' .agents/prompts/phase-07/step-4.md
+sed -n '221,520p' .agents/prompts/phase-07/step-4.md
+git status --short
+rg --files context | sort
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,980p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '220,520p' context/progress-tracker.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+cat package.json
+cat packages/generator/package.json
+cat packages/generator/vitest.config.ts
+rg --files packages/generator/src | sort
+sed -n '1,260p' packages/generator/src/generate-project.ts
+sed -n '1,260p' packages/generator/src/file-tree.ts
+sed -n '1,260p' packages/generator/src/template-loader.ts
+sed -n '1,320p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,260p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+sed -n '260,620p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+sed -n '620,980p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+find packages/templates -maxdepth 5 -type f | sort
+cat packages/templates/package.json
+cat packages/generator/tsconfig.json
+cat tsconfig.base.json
+cat .gitignore
+npm pkg get scripts --workspaces --if-present
+cat apps/web/package.json
+sed -n '1,260p' packages/templates/base/next/package.json
+sed -n '1,260p' packages/generator/src/features/definitions.ts
+sed -n '1,220p' packages/templates/features/prisma/lib/db.ts
+sed -n '1,220p' packages/templates/features/prisma/prisma/schema.prisma
+sed -n '1,220p' packages/templates/features/prisma/prisma.config.ts
+sed -n '1,220p' packages/templates/features/authjs-credentials/auth.ts
+sed -n '1,220p' packages/templates/features/authjs-credentials/app/api/auth/[...nextauth]/route.ts
+npm test -w @launchkit/generator
+npm run typecheck -w @launchkit/generator
+npm run test:smoke
+npm run test:smoke
+cat /var/folders/wd/3v39scsn59s8zm7zmgw0cv_40000gn/T/launchkit-smoke-rBjYgl/full-smoke-app/node_modules/next-auth/package.json
+sed -n '1,220p' /var/folders/wd/3v39scsn59s8zm7zmgw0cv_40000gn/T/launchkit-smoke-rBjYgl/full-smoke-app/auth.ts
+sed -n '1,80p' /var/folders/wd/3v39scsn59s8zm7zmgw0cv_40000gn/T/launchkit-smoke-rBjYgl/full-smoke-app/app/api/auth/[...nextauth]/route.ts
+cat /var/folders/wd/3v39scsn59s8zm7zmgw0cv_40000gn/T/launchkit-smoke-rBjYgl/full-smoke-app/package.json
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/generator
+npm run typecheck -w @launchkit/templates
+sed -n '270,330p' packages/templates/src/__tests__/index.test.ts
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/templates
+npm run test:smoke
+npm test
+npm run typecheck
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff --stat
+git diff -- package.json packages/generator/package.json packages/generator/vitest.smoke.config.ts packages/generator/test/smoke/generated-projects.test.ts packages/templates/features/authjs-credentials/auth.ts packages/templates/features/authjs-credentials/app/api/auth/[...nextauth]/route.ts packages/templates/src/__tests__/index.test.ts
+sed -n '1,90p' context/progress-tracker.md
+```
+
+Verification result:
+
+- `npm test -w @launchkit/generator` passed: 11 files, 127 tests.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm test -w @launchkit/templates` initially failed because two Auth.js template assertions still expected the old v5-shaped scaffold.
+- After updating assertions, `npm test -w @launchkit/templates` passed: 1 file, 52 tests.
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test` passed across workspaces:
+  - web: 4 files, 23 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed in `apps/web` due to the known Turbopack process/port sandbox restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across all workspaces.
+
+Smoke test result:
+
+- Initial sandboxed `npm run test:smoke` failed because each generated `npm install` hit the smoke helper's 300 second timeout with `SIGTERM` and empty stdout/stderr.
+- Escalated `npm run test:smoke` then proved the default generated project installed, typechecked, and built successfully.
+- That same escalated run initially failed the all-compatible generated project at `npm run build`:
+  - `next-auth@latest` resolved to `4.24.14`;
+  - the generated template used the v5 `handlers` API;
+  - Next build failed while collecting page data for `/api/auth/[...nextauth]`.
+- After the Auth.js template fix, escalated `npm run test:smoke` passed:
+  - 1 smoke test file;
+  - 2 smoke tests;
+  - default config completed in about 15 seconds;
+  - all-compatible config completed in about 23 seconds;
+  - total duration about 38 seconds.
+
+Notes/blockers:
+
+- Smoke tests are intentionally manual/local for now through `npm run test:smoke` because generated `npm install` requires network access or a warm npm cache.
+- Smoke projects are written under OS temp directories, not tracked source directories.
+- Phase 6 manual browser/download QA remains pending.
+- `.agents/prompts/phase-07/step-4.md` is untracked and was left untouched.
+- `memory.md` had pre-existing/unrelated local modifications and was left untouched.
+
+Next suggested step:
+
+- Phase 7 Step 5: Harden API validation and safety limits
+
+Phase 7 Step 3 completed: Add generator and template snapshot tests
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Step 2 was complete before starting this step.
+- Kept this step limited to generator/template regression coverage.
+- Did not add generated project smoke tests.
+- Did not harden the API route.
+- Did not change supported product options.
+- Did not add CLI functionality.
+- Confirmed generator/template tests use Vitest, not Node's built-in test runner.
+
+Changes made:
+
+- Added a focused generator real-template output matrix covering:
+  - default config;
+  - `ui: "shadcn"`;
+  - `database: "postgres"`;
+  - `database: "postgres", orm: "prisma"`;
+  - `auth: "authjs-credentials"`;
+  - `database: "postgres", docker: "postgres"`;
+  - all compatible MVP features together.
+- Added targeted inline snapshots for generated path lists, parsed `package.json`, and `.env.example` line output across the matrix.
+- Added generated-project path safety checks across the matrix:
+  - paths are non-empty relative paths;
+  - paths do not start with `/`;
+  - paths do not contain empty, `.`, or `..` segments;
+  - paths do not include `src/`.
+- Added feature inclusion/exclusion tests for base, shadcn/ui, PostgreSQL, Prisma, Auth.js credentials, Docker PostgreSQL, and full-compatible outputs.
+- Added package assertions that parse generated `package.json` with `JSON.parse` and verify selected/unselected dependencies, dev dependencies, scripts, and package names.
+- Added generator-boundary compatibility tests for Prisma without PostgreSQL and Docker PostgreSQL without PostgreSQL.
+- Added template file-list inline snapshots for base and feature template boundaries.
+- No generator or template runtime bug fix was needed.
+
+Files changed:
+
+- `packages/generator/src/__tests__/generated-output-snapshots.test.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-07/step-3.md
+sed -n '261,620p' .agents/prompts/phase-07/step-3.md
+git status --short
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,360p' context/architecture.md
+sed -n '361,760p' context/architecture.md
+sed -n '761,1120p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,320p' context/ui-rules.md
+sed -n '321,680p' context/ui-rules.md
+rg --files packages/generator/src | sort
+rg --files packages/templates | sort
+cat packages/generator/package.json
+cat packages/templates/package.json
+sed -n '1,320p' packages/generator/src/generate-project.ts
+sed -n '1,360p' packages/generator/src/generation-plan.ts
+sed -n '1,420p' packages/generator/src/features/definitions.ts
+sed -n '1,260p' packages/generator/src/file-tree.ts
+sed -n '1,360p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,320p' packages/generator/src/__tests__/feature-registry.test.ts
+sed -n '1,320p' packages/generator/src/__tests__/phase-5-completion.test.ts
+sed -n '1,360p' packages/templates/src/__tests__/index.test.ts
+sed -n '361,760p' packages/templates/src/__tests__/index.test.ts
+sed -n '321,760p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,280p' packages/generator/src/__tests__/file-tree.test.ts
+sed -n '1,260p' packages/generator/src/__tests__/template-loader.test.ts
+rg -n "node:test|jest|mocha" packages/generator packages/templates -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+find packages/templates -type f | sort
+sed -n '1,260p' packages/generator/src/template-loader.ts
+sed -n '1,220p' packages/generator/src/package-json.ts
+sed -n '1,220p' packages/generator/src/features/registry.ts
+node -e '...generated output inspection script...'
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm test -w @launchkit/generator -- -u
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/generator
+npm run typecheck -w @launchkit/templates
+npm test
+npm run typecheck
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff --stat
+git diff -- packages/templates/src/__tests__/index.test.ts
+sed -n '1,240p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+```
+
+Verification result:
+
+- `npm test -w @launchkit/generator -- -u` passed and mechanically updated the new inline snapshot.
+- `npm test -w @launchkit/generator` passed: 11 files, 127 tests.
+- `npm test -w @launchkit/templates` passed: 1 file, 52 tests.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test` passed across workspaces:
+  - web: 4 files, 23 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed in `apps/web` due to the known Turbopack process/port sandbox restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across all workspaces.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Generated project smoke tests were intentionally not added in this step.
+- `.agents/prompts/phase-07/step-3.md` is untracked and was left untouched.
+
+Next suggested step:
+
+- Phase 7 Step 4: Add generated project smoke tests.
+
+Phase 7 Step 2 completed: Add schema and compatibility regression tests
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Step 1 audit notes were already present in this tracker.
+- Kept this step limited to `packages/schema` test coverage.
+- Did not add generator snapshot tests.
+- Did not add generated project smoke tests.
+- Did not change supported product options.
+- Did not add CLI functionality.
+- Kept Vitest as the only schema test runner.
+
+Changes made:
+
+- Strengthened `LaunchKitConfigSchema` regression tests for the required invalid project name examples:
+  - empty project name;
+  - uppercase/spaced names;
+  - path traversal and path separators;
+  - underscores and special characters.
+- Added schema rejection coverage for all unsupported MVP option fields listed in the Step 2 prompt:
+  - framework;
+  - language;
+  - router;
+  - project structure;
+  - styling;
+  - UI;
+  - database;
+  - ORM;
+  - auth;
+  - Docker;
+  - package manager.
+- Added metadata regression coverage confirming `recommended`, when present, is a boolean.
+- Removed the compatibility test that fabricated unsupported `styling: "css"` through a type cast; the MVP schema only supports Tailwind, so shadcn/Tailwind compatibility remains covered by the valid positive regression case.
+
+Files changed:
+
+- `packages/schema/src/__tests__/config.test.ts`
+- `packages/schema/src/__tests__/metadata.test.ts`
+- `packages/schema/src/__tests__/compatibility.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-07/step-2.md
+git status --short
+rg --files context | sort
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,300p' context/architecture.md
+sed -n '301,680p' context/architecture.md
+sed -n '681,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+rg --files packages/schema/src | sort
+sed -n '1,260p' packages/schema/src/options.ts
+sed -n '1,260p' packages/schema/src/config.ts
+sed -n '1,300p' packages/schema/src/compatibility.ts
+sed -n '1,260p' packages/schema/src/defaults.ts
+sed -n '1,360p' packages/schema/src/metadata.ts
+sed -n '1,220p' packages/schema/src/index.ts
+cat packages/schema/package.json
+cat packages/schema/vitest.config.ts
+sed -n '1,260p' packages/schema/src/__tests__/options.test.ts
+sed -n '1,320p' packages/schema/src/__tests__/config.test.ts
+sed -n '1,260p' packages/schema/src/__tests__/defaults.test.ts
+sed -n '1,340p' packages/schema/src/__tests__/metadata.test.ts
+sed -n '1,340p' packages/schema/src/__tests__/compatibility.test.ts
+rg -n "node:test|jest|mocha" packages/schema apps packages -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+npm test -w @launchkit/schema
+npm run typecheck -w @launchkit/schema
+git diff -- packages/schema/src/__tests__/config.test.ts packages/schema/src/__tests__/metadata.test.ts packages/schema/src/__tests__/compatibility.test.ts
+npm test
+```
+
+Verification result:
+
+- `npm test -w @launchkit/schema` passed: 5 files, 87 tests.
+- `npm run typecheck -w @launchkit/schema` passed.
+- `npm test` passed across workspaces:
+  - web: 4 files, 23 tests;
+  - generator: 10 files, 111 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 51 tests.
+
+Phase 7 Step 1 completed: Audit test coverage and hardening gaps
+
+Scope and prerequisite note:
+
+- Audited the current repo without adding broad tests or refactoring implementation code.
+- The Step 1 prompt asks to confirm Phase 6 is complete, but the tracker still has Phase 6 `In Progress` because user-run browser/download QA remains pending.
+- Phase 7 is marked `In Progress` only for the completed audit; deeper Phase 7 hardening steps should wait until Phase 6 manual QA is resolved.
+
+Current test tooling:
+
+- Vitest is the only test runner used by package scripts.
+- Root `test` delegates to workspace test scripts with `npm run test --workspaces --if-present`.
+- `packages/schema` and `packages/generator` have `vitest.config.ts` files using Node environment and `src/**/*.test.ts`.
+- `apps/web` and `packages/templates` use `vitest run` without local Vitest config files.
+- `packages/shared` has no `test` script.
+- No real `node:test`, `node --test`, Jest, or Mocha usage was found in source/package files.
+- Historical tracker text mentions `node:test`, Jest, and Mocha, but source/package searches were clean.
+
+Commands available:
+
+- Root: `dev`, `build`, `lint`, `test`, `typecheck`.
+- `apps/web`: `dev`, `build`, `start`, `lint`, `test`, `typecheck`.
+- `@launchkit/schema`: `build`, `test`, `typecheck`.
+- `@launchkit/generator`: `build`, `test`, `typecheck`.
+- `@launchkit/templates`: `build`, `test`, `typecheck`.
+- `@launchkit/shared`: `build`, `typecheck`; no `test` script.
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-07/step-1.md
+git status --short
+sed -n '1,340p' context/project-overview.md
+sed -n '341,760p' context/project-overview.md
+sed -n '1,420p' context/architecture.md
+sed -n '421,940p' context/architecture.md
+sed -n '1,520p' context/build-plan.md
+sed -n '521,1120p' context/build-plan.md
+sed -n '1,380p' context/ui-rules.md
+sed -n '381,760p' context/ui-rules.md
+npm run
+npm pkg get scripts
+find . -path './node_modules' -prune -o -path './.git' -prune -o -name 'package.json' -print | sort
+find . -path './node_modules' -prune -o -path './.git' -prune -o -name 'vitest.config.*' -print | sort
+find . -path './node_modules' -prune -o -path './.git' -prune -o \( -name '*test.ts' -o -name '*test.tsx' -o -name '*.test.ts' -o -name '*.spec.ts' \) -print | sort
+cat package.json
+cat apps/web/package.json
+cat packages/schema/package.json
+cat packages/generator/package.json
+cat packages/templates/package.json
+cat packages/shared/package.json
+rg -n "node:test|jest|mocha|node --test|vitest|describe\(|it\(|test\(" . -g '!node_modules/**' -g '!.git/**' -g '!apps/web/.next/**'
+rg -n "node:test|node --test|jest|mocha" package.json apps packages -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+rg -n "npm install|pnpm install|child_process|exec\(|spawn\(|writeFile|mkdir|createWriteStream|unlink|rm\(" apps packages -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+rg -n "smoke|snapshot|toMatchSnapshot|install.*build|npm run build|typecheck" apps packages package.json -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+cat packages/schema/vitest.config.ts && cat packages/generator/vitest.config.ts
+find packages/templates -maxdepth 5 -type f | sort
+sed -n '1,240p' packages/schema/src/__tests__/config.test.ts
+sed -n '1,240p' packages/schema/src/__tests__/compatibility.test.ts
+sed -n '1,200p' packages/schema/src/__tests__/options.test.ts
+sed -n '1,180p' packages/schema/src/__tests__/defaults.test.ts
+sed -n '1,220p' packages/schema/src/__tests__/metadata.test.ts
+sed -n '1,240p' packages/generator/src/__tests__/file-tree.test.ts
+sed -n '1,220p' packages/generator/src/__tests__/package-json.test.ts
+sed -n '1,220p' packages/generator/src/__tests__/env.test.ts
+sed -n '1,180p' packages/generator/src/__tests__/template-loader.test.ts
+sed -n '1,240p' packages/generator/src/__tests__/phase-5-completion.test.ts
+sed -n '1,260p' apps/web/lib/api/generate.test.ts
+sed -n '1,180p' apps/web/lib/api/client.test.ts
+sed -n '1,180p' apps/web/lib/download/create-project-zip.test.ts
+sed -n '1,220p' apps/web/lib/builder/phase-6-verification.test.ts
+sed -n '1,280p' apps/web/lib/api/generate.ts
+sed -n '1,180p' apps/web/lib/api/template-loader.ts
+sed -n '1,240p' apps/web/lib/builder/validation.ts
+sed -n '1,160p' apps/web/components/builder/steps/database-step.tsx
+sed -n '1,170p' apps/web/components/builder/steps/orm-step.tsx
+sed -n '1,170p' apps/web/components/builder/steps/extras-step.tsx
+npm run typecheck
+npm test
+npm run lint
+npm test -w @launchkit/schema
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm run build
+npm run build -w apps/web
+npm run build -w @launchkit/schema
+npm run build -w @launchkit/generator
+npm run build -w @launchkit/templates
+npm run build -w apps/web
+npm run build
+npm test -w @launchkit/shared
+```
+
+Verification result:
+
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 4 files, 23 tests;
+  - generator: 10 files, 111 tests;
+  - schema: 5 files, 73 tests;
+  - templates: 1 file, 51 tests.
+- `npm run lint` passed.
+- `npm test -w @launchkit/schema` passed: 5 files, 73 tests.
+- `npm test -w @launchkit/generator` passed: 10 files, 111 tests.
+- `npm test -w @launchkit/templates` passed: 1 file, 51 tests.
+- `npm test -w @launchkit/shared` failed because `@launchkit/shared` has no `test` script.
+- Package builds passed for `@launchkit/schema`, `@launchkit/generator`, and `@launchkit/templates`.
+- Initial parallel `npm run build` and `npm run build -w apps/web` produced noisy failures:
+  - root build hit a concurrent Next build lock because the web build was running separately;
+  - web build hit the known Turbopack sandbox worker/port restriction.
+- Sequential elevated `npm run build -w apps/web` passed.
+- Sequential elevated `npm run build` passed across all workspaces.
+
+Existing coverage:
+
+- Schema:
+  - option arrays and option union alignment;
+  - `LaunchKitConfigSchema` valid default and full MVP configs;
+  - invalid project names and valid lowercase/hyphen names;
+  - unknown option values and unknown object keys;
+  - default config;
+  - option metadata categories, exact value alignment, uniqueness, supported values, and non-empty labels/descriptions;
+  - compatibility rules for Prisma/PostgreSQL, Docker/PostgreSQL, Auth.js credentials without database, Auth.js credentials with PostgreSQL, Auth.js credentials with Prisma/PostgreSQL, Auth.js credentials with Prisma but no PostgreSQL, and shadcn/Tailwind.
+- Generator:
+  - generated file tree model, path normalization, backslash normalization, leading slash rejection, `..` traversal rejection, empty segment rejection, empty/current-directory rejection, and Windows absolute path rejection;
+  - generated project path validation;
+  - generation plan defaults;
+  - feature registry IDs, feature enablement, and package/env/file/README contributions;
+  - package.json merge success, duplicate compatible values, conflicting dependencies/dev dependencies/scripts/metadata, and non-mutation;
+  - env var merge success, duplicate compatible values, conflicting env vars, descriptions, required propagation, order, rendering, quote escaping, and placeholder secret values;
+  - template placeholders, binary preservation, unknown template IDs, unsafe target path rejection, and non-mutation;
+  - `generateProject(config)` for default, selected feature outputs, README/package/env content, invalid schema configs, incompatible configs, and real-template MVP combinations.
+- Templates:
+  - base Next.js required files, no `src` directory, and supported placeholders;
+  - Tailwind, shadcn/ui, PostgreSQL, Prisma, Auth.js credentials, and Docker PostgreSQL required files;
+  - selected template contents such as Tailwind v4 imports, shadcn config/helper/button, PostgreSQL `DATABASE_URL`, Prisma schema/config/client helper, Auth.js scaffold/route, Docker Compose service, README guidance, no unrelated optional files, no `src`, and supported placeholders.
+- API:
+  - successful valid config response;
+  - invalid config, incompatible config, malformed JSON, oversized bodies, and non-JSON requests;
+  - structured errors and no stack trace leakage for unexpected generator errors;
+  - unsafe generated response paths and generated `src/` response paths;
+  - binary file serialization as base64;
+  - code validates configs with schema and compatibility before generation and calls `@launchkit/generator`.
+- Website:
+  - API client success and structured non-2xx errors;
+  - browser ZIP helper top-level folder, UTF-8 contents, base64 contents, unsafe path rejection, and `src/` path rejection;
+  - wizard contract at a logic level: 9 steps, supported MVP options, project validation, Auth.js independence, Prisma/Docker compatibility, preview data, optional file exclusion, full-stack preview additions, and no `src` preview paths.
+- Smoke tests:
+  - no generated-project smoke test harness exists yet;
+  - no tests currently generate a project, install dependencies, and run generated `typecheck` or `build`;
+  - adding smoke tests will require network/package-manager strategy and should be separated from normal fast unit tests.
+
+Hardening gaps:
+
+- Phase 6 manual browser/download QA is still pending, so Phase 7 deeper work should not assume the website MVP is fully complete.
+- No generated-project smoke tests exist for minimal, shadcn, PostgreSQL + Prisma, Auth.js, Docker, or full-stack outputs.
+- No snapshot tests exist for generated file trees; current file-list assertions cover important combinations but are not snapshot-based.
+- API tests target helper functions, but there is no direct route-module test for `POST`/`GET` exports or method-not-allowed behavior.
+- API path-safety tests cover `../outside.txt` and `src/app/page.tsx`, but not every response-path edge case such as leading slash, empty segments, trailing slash, current-directory segment, or Windows absolute paths at the API boundary.
+- Web template loader has path normalization in code but no focused tests for unexpected template IDs, unsafe source paths, unsafe target paths, or binary-file handling from real web template loading.
+- Download flow has helper tests, but no component/integration tests for button disabled state, loading state, success state, rendered error state, or browser download trigger behavior.
+- Wizard dependent option reset/disable behavior is covered partly by logic tests and code inspection, but not by component-level interaction tests.
+- Mobile responsiveness is documented and partially polished, but no automated viewport/layout checks exist.
+- Source search found no generated-code execution, dependency installation, or generated filesystem writes in app/package code; this remains mostly code-inspection coverage rather than dedicated regression tests.
 
 ### 2026-07-03
 

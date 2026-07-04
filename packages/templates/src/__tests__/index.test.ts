@@ -110,6 +110,65 @@ describe("@launchkit/templates package foundation", () => {
   });
 });
 
+describe("template file list snapshots", () => {
+  it("locks base and feature template file boundaries", async () => {
+    await expect({
+      baseNext: await listRelativeTemplateFiles(baseNextTemplateRoot),
+      tailwind: await listRelativeTemplateFiles(tailwindTemplateRoot),
+      shadcn: await listRelativeTemplateFiles(shadcnTemplateRoot),
+      postgres: await listRelativeTemplateFiles(postgresTemplateRoot),
+      prisma: await listRelativeTemplateFiles(prismaTemplateRoot),
+      authjsCredentials: await listRelativeTemplateFiles(authjsCredentialsTemplateRoot),
+      dockerPostgres: await listRelativeTemplateFiles(dockerPostgresTemplateRoot),
+    }).toMatchInlineSnapshot(`
+      {
+        "authjsCredentials": [
+          "README.md",
+          "app/api/auth/[...nextauth]/route.ts",
+          "auth.ts",
+        ],
+        "baseNext": [
+          ".gitignore",
+          "README.md",
+          "app/globals.css",
+          "app/layout.tsx",
+          "app/page.tsx",
+          "components/.gitkeep",
+          "lib/.gitkeep",
+          "next.config.ts",
+          "package.json",
+          "postcss.config.mjs",
+          "tsconfig.json",
+        ],
+        "dockerPostgres": [
+          "README.md",
+          "docker-compose.yml",
+        ],
+        "postgres": [
+          ".env.example",
+          "README.md",
+        ],
+        "prisma": [
+          "README.md",
+          "lib/db.ts",
+          "prisma.config.ts",
+          "prisma/schema.prisma",
+        ],
+        "shadcn": [
+          "app/globals.css",
+          "components.json",
+          "components/ui/button.tsx",
+          "lib/utils.ts",
+        ],
+        "tailwind": [
+          "app/globals.css",
+          "postcss.config.mjs",
+        ],
+      }
+    `);
+  });
+});
+
 describe("base Next.js template", () => {
   it("includes the required App Router and project files", async () => {
     await expect(
@@ -238,8 +297,12 @@ describe("Auth.js credentials feature template", () => {
     const auth = await readFile(join(authjsCredentialsTemplateRoot, "auth.ts"), "utf8");
 
     expect(auth).toContain('import NextAuth from "next-auth";');
-    expect(auth).toContain('import Credentials from "next-auth/providers/credentials";');
-    expect(auth).toContain("export const { handlers, signIn, signOut, auth } = NextAuth({");
+    expect(auth).toContain('import type { NextAuthOptions } from "next-auth";');
+    expect(auth).toContain('import CredentialsProvider from "next-auth/providers/credentials";');
+    expect(auth).toContain("export const authOptions = {");
+    expect(auth).toContain("CredentialsProvider({");
+    expect(auth).toContain("} satisfies NextAuthOptions;");
+    expect(auth).toContain("export default NextAuth(authOptions);");
     expect(auth).toContain("async authorize(credentials)");
     expect(auth).toContain("replace this with real user lookup and password verification");
     expect(auth).toContain("Never compare plain text passwords");
@@ -253,8 +316,10 @@ describe("Auth.js credentials feature template", () => {
       "utf8",
     );
 
-    expect(route).toContain('import { handlers } from "@/auth";');
-    expect(route).toContain("export const { GET, POST } = handlers;");
+    expect(route).toContain('import NextAuth from "next-auth";');
+    expect(route).toContain('import { authOptions } from "@/auth";');
+    expect(route).toContain("const handler = NextAuth(authOptions);");
+    expect(route).toContain("export { handler as GET, handler as POST };");
   });
 
   it("includes concise Auth.js README guidance", async () => {
@@ -639,4 +704,10 @@ async function listTemplateFiles(root: string): Promise<string[]> {
   }
 
   return files;
+}
+
+async function listRelativeTemplateFiles(root: string): Promise<string[]> {
+  return (await listTemplateFiles(root))
+    .map((filePath) => relative(root, filePath).replaceAll("\\", "/"))
+    .sort();
 }

@@ -29,6 +29,7 @@ type MetadataItem = {
   value: string;
   label: string;
   description: string;
+  recommended?: boolean;
 };
 
 const metadataCases: {
@@ -147,6 +148,17 @@ describe("option metadata", () => {
       for (const item of metadata) {
         expect(item.label.trim()).not.toBe("");
         expect(item.description.trim()).not.toBe("");
+      }
+    },
+  );
+
+  it.each(metadataCases)(
+    "uses boolean recommended flags for $category metadata when present",
+    ({ metadata }) => {
+      for (const item of metadata) {
+        if ("recommended" in item) {
+          expect(typeof item.recommended).toBe("boolean");
+        }
       }
     },
   );

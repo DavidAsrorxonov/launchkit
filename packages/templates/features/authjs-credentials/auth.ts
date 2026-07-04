@@ -1,9 +1,10 @@
+import type { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import CredentialsProvider from "next-auth/providers/credentials";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const authOptions = {
   providers: [
-    Credentials({
+    CredentialsProvider({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
@@ -17,4 +18,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-});
+} satisfies NextAuthOptions;
+
+export default NextAuth(authOptions);

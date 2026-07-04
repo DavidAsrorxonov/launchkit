@@ -13,6 +13,7 @@ export function DownloadStatus({ status, message }: DownloadStatusProps) {
   return (
     <div
       role={isError ? "alert" : "status"}
+      aria-live={isError ? "assertive" : "polite"}
       className={[
         "rounded-md border bg-background p-4 text-sm",
         isError
@@ -27,11 +28,11 @@ export function DownloadStatus({ status, message }: DownloadStatusProps) {
 
 function getDefaultMessage(status: DownloadStatusProps["status"]): string {
   if (status === "generating") {
-    return "Generating project...";
+    return "Preparing project zip...";
   }
 
   if (status === "success") {
-    return "Download started.";
+    return "ZIP download prepared.";
   }
 
   return "";

@@ -33,7 +33,9 @@ export function EnvVarList({ envVars }: EnvVarListProps) {
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-muted-foreground">None</p>
+        <p className="text-sm text-muted-foreground">
+          No environment variables for this selection.
+        </p>
       )}
       <p className="mt-3 text-xs text-muted-foreground">
         Values are placeholders in `.env.example`; set real secrets yourself.

@@ -36,9 +36,13 @@ describe("LaunchKitConfigSchema", () => {
   it("rejects invalid project names", () => {
     const invalidNames = [
       "",
+      "My App",
       "my app",
       "My-App",
+      "../app",
+      "app/name",
       "my_app",
+      "app!",
       "my/app",
       "my.app",
       "-my-app",
@@ -70,6 +74,10 @@ describe("LaunchKitConfigSchema", () => {
 
   it.each([
     ["framework", "react"],
+    ["language", "javascript"],
+    ["router", "pages"],
+    ["projectStructure", "src"],
+    ["styling", "css"],
     ["ui", "material-ui"],
     ["database", "mysql"],
     ["orm", "drizzle"],

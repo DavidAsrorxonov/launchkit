@@ -62,7 +62,8 @@ export function validateBuilderConfig(config: LaunchKitConfig): {
       const field = issue.path[0];
 
       if (typeof field === "string" && !(field in errors)) {
-        errors[field as keyof LaunchKitConfig] = issue.message;
+        errors[field as keyof LaunchKitConfig] =
+          field === "name" ? getProjectNameError(config.name) : issue.message;
       }
     }
 
@@ -88,6 +89,26 @@ export function validateBuilderConfig(config: LaunchKitConfig): {
     isValid: Object.keys(errors).length === 0,
     errors,
   };
+}
+
+export function getProjectNameError(name: string): string | undefined {
+  if (name.length === 0 || name.trim().length === 0) {
+    return "Project name is required.";
+  }
+
+  if (name.includes("/") || name.includes("\\")) {
+    return "Project name cannot contain path separators.";
+  }
+
+  if (/[^a-z0-9-]/.test(name)) {
+    return "Use lowercase letters, numbers, and hyphens only.";
+  }
+
+  if (name.startsWith("-") || name.endsWith("-") || name.includes("--")) {
+    return "Use hyphens only between words.";
+  }
+
+  return undefined;
 }
 
 export function validateProjectStep(

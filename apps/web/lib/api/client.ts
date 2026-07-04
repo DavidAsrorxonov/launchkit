@@ -1,5 +1,6 @@
 import type { LaunchKitConfig } from "@launchkit/schema";
 
+import { getFriendlyApiErrorMessage } from "./errors";
 import type { ApiErrorResponse, GenerateProjectResponse } from "./types";
 
 export class GenerateProjectApiError extends Error {
@@ -42,7 +43,11 @@ export async function generateProjectRequest(
     throw new GenerateProjectApiError({
       status: response.status,
       code: error?.code ?? "request_failed",
-      message: error?.message ?? "Project generation failed.",
+      message: getFriendlyApiErrorMessage({
+        code: error?.code ?? "request_failed",
+        message: error?.message,
+        issues: error?.issues,
+      }),
       issues: error?.issues,
     });
   }
