@@ -110,6 +110,65 @@ describe("@launchkit/templates package foundation", () => {
   });
 });
 
+describe("template file list snapshots", () => {
+  it("locks base and feature template file boundaries", async () => {
+    await expect({
+      baseNext: await listRelativeTemplateFiles(baseNextTemplateRoot),
+      tailwind: await listRelativeTemplateFiles(tailwindTemplateRoot),
+      shadcn: await listRelativeTemplateFiles(shadcnTemplateRoot),
+      postgres: await listRelativeTemplateFiles(postgresTemplateRoot),
+      prisma: await listRelativeTemplateFiles(prismaTemplateRoot),
+      authjsCredentials: await listRelativeTemplateFiles(authjsCredentialsTemplateRoot),
+      dockerPostgres: await listRelativeTemplateFiles(dockerPostgresTemplateRoot),
+    }).toMatchInlineSnapshot(`
+      {
+        "authjsCredentials": [
+          "README.md",
+          "app/api/auth/[...nextauth]/route.ts",
+          "auth.ts",
+        ],
+        "baseNext": [
+          ".gitignore",
+          "README.md",
+          "app/globals.css",
+          "app/layout.tsx",
+          "app/page.tsx",
+          "components/.gitkeep",
+          "lib/.gitkeep",
+          "next.config.ts",
+          "package.json",
+          "postcss.config.mjs",
+          "tsconfig.json",
+        ],
+        "dockerPostgres": [
+          "README.md",
+          "docker-compose.yml",
+        ],
+        "postgres": [
+          ".env.example",
+          "README.md",
+        ],
+        "prisma": [
+          "README.md",
+          "lib/db.ts",
+          "prisma.config.ts",
+          "prisma/schema.prisma",
+        ],
+        "shadcn": [
+          "app/globals.css",
+          "components.json",
+          "components/ui/button.tsx",
+          "lib/utils.ts",
+        ],
+        "tailwind": [
+          "app/globals.css",
+          "postcss.config.mjs",
+        ],
+      }
+    `);
+  });
+});
+
 describe("base Next.js template", () => {
   it("includes the required App Router and project files", async () => {
     await expect(
@@ -639,4 +698,10 @@ async function listTemplateFiles(root: string): Promise<string[]> {
   }
 
   return files;
+}
+
+async function listRelativeTemplateFiles(root: string): Promise<string[]> {
+  return (await listTemplateFiles(root))
+    .map((filePath) => relative(root, filePath).replaceAll("\\", "/"))
+    .sort();
 }

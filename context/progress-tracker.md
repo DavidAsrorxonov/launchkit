@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 7 Step 2 schema regression tests completed with Phase 6 manual QA still pending
-Primary focus: Schema regression coverage is strengthened; next work should still resolve Phase 6 browser/download QA before deeper hardening steps
+Current phase: Phase 7 Step 3 generator/template snapshot tests completed with Phase 6 manual QA still pending
+Primary focus: Generator and template output regression coverage is strengthened; generated project smoke tests remain the next Phase 7 hardening step
 ```
 
 ## Phase Progress
@@ -21,7 +21,7 @@ Primary focus: Schema regression coverage is strengthened; next work should stil
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
-| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 2 strengthened schema regression coverage for MVP options, config validation, metadata, and compatibility while keeping Phase 6 manual QA pending. |
+| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 3 added generator/template output snapshots, feature inclusion/exclusion coverage, generated path safety checks, and generator compatibility-boundary tests. |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
@@ -30,6 +30,134 @@ Primary focus: Schema regression coverage is strengthened; next work should stil
 Add entries in reverse chronological order.
 
 ### 2026-07-04
+
+Phase 7 Step 3 completed: Add generator and template snapshot tests
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Step 2 was complete before starting this step.
+- Kept this step limited to generator/template regression coverage.
+- Did not add generated project smoke tests.
+- Did not harden the API route.
+- Did not change supported product options.
+- Did not add CLI functionality.
+- Confirmed generator/template tests use Vitest, not Node's built-in test runner.
+
+Changes made:
+
+- Added a focused generator real-template output matrix covering:
+  - default config;
+  - `ui: "shadcn"`;
+  - `database: "postgres"`;
+  - `database: "postgres", orm: "prisma"`;
+  - `auth: "authjs-credentials"`;
+  - `database: "postgres", docker: "postgres"`;
+  - all compatible MVP features together.
+- Added targeted inline snapshots for generated path lists, parsed `package.json`, and `.env.example` line output across the matrix.
+- Added generated-project path safety checks across the matrix:
+  - paths are non-empty relative paths;
+  - paths do not start with `/`;
+  - paths do not contain empty, `.`, or `..` segments;
+  - paths do not include `src/`.
+- Added feature inclusion/exclusion tests for base, shadcn/ui, PostgreSQL, Prisma, Auth.js credentials, Docker PostgreSQL, and full-compatible outputs.
+- Added package assertions that parse generated `package.json` with `JSON.parse` and verify selected/unselected dependencies, dev dependencies, scripts, and package names.
+- Added generator-boundary compatibility tests for Prisma without PostgreSQL and Docker PostgreSQL without PostgreSQL.
+- Added template file-list inline snapshots for base and feature template boundaries.
+- No generator or template runtime bug fix was needed.
+
+Files changed:
+
+- `packages/generator/src/__tests__/generated-output-snapshots.test.ts`
+- `packages/templates/src/__tests__/index.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-07/step-3.md
+sed -n '261,620p' .agents/prompts/phase-07/step-3.md
+git status --short
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,360p' context/architecture.md
+sed -n '361,760p' context/architecture.md
+sed -n '761,1120p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,320p' context/ui-rules.md
+sed -n '321,680p' context/ui-rules.md
+rg --files packages/generator/src | sort
+rg --files packages/templates | sort
+cat packages/generator/package.json
+cat packages/templates/package.json
+sed -n '1,320p' packages/generator/src/generate-project.ts
+sed -n '1,360p' packages/generator/src/generation-plan.ts
+sed -n '1,420p' packages/generator/src/features/definitions.ts
+sed -n '1,260p' packages/generator/src/file-tree.ts
+sed -n '1,360p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,320p' packages/generator/src/__tests__/feature-registry.test.ts
+sed -n '1,320p' packages/generator/src/__tests__/phase-5-completion.test.ts
+sed -n '1,360p' packages/templates/src/__tests__/index.test.ts
+sed -n '361,760p' packages/templates/src/__tests__/index.test.ts
+sed -n '321,760p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,280p' packages/generator/src/__tests__/file-tree.test.ts
+sed -n '1,260p' packages/generator/src/__tests__/template-loader.test.ts
+rg -n "node:test|jest|mocha" packages/generator packages/templates -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+find packages/templates -type f | sort
+sed -n '1,260p' packages/generator/src/template-loader.ts
+sed -n '1,220p' packages/generator/src/package-json.ts
+sed -n '1,220p' packages/generator/src/features/registry.ts
+node -e '...generated output inspection script...'
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm test -w @launchkit/generator -- -u
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm run typecheck -w @launchkit/generator
+npm run typecheck -w @launchkit/templates
+npm test
+npm run typecheck
+npm run lint
+npm run build
+npm run build
+git status --short
+git diff --stat
+git diff -- packages/templates/src/__tests__/index.test.ts
+sed -n '1,240p' packages/generator/src/__tests__/generated-output-snapshots.test.ts
+```
+
+Verification result:
+
+- `npm test -w @launchkit/generator -- -u` passed and mechanically updated the new inline snapshot.
+- `npm test -w @launchkit/generator` passed: 11 files, 127 tests.
+- `npm test -w @launchkit/templates` passed: 1 file, 52 tests.
+- `npm run typecheck -w @launchkit/generator` passed.
+- `npm run typecheck -w @launchkit/templates` passed.
+- `npm test` passed across workspaces:
+  - web: 4 files, 23 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed in `apps/web` due to the known Turbopack process/port sandbox restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across all workspaces.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Generated project smoke tests were intentionally not added in this step.
+- `.agents/prompts/phase-07/step-3.md` is untracked and was left untouched.
+
+Next suggested step:
+
+- Phase 7 Step 4: Add generated project smoke tests.
 
 Phase 7 Step 2 completed: Add schema and compatibility regression tests
 
