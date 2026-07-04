@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 7 Step 1 audit completed with Phase 6 manual QA still pending
-Primary focus: Phase 7 test coverage and hardening audit is documented; next work should resolve Phase 6 browser/download QA before deeper hardening steps
+Current phase: Phase 7 Step 2 schema regression tests completed with Phase 6 manual QA still pending
+Primary focus: Schema regression coverage is strengthened; next work should still resolve Phase 6 browser/download QA before deeper hardening steps
 ```
 
 ## Phase Progress
@@ -21,7 +21,7 @@ Primary focus: Phase 7 test coverage and hardening audit is documented; next wor
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
-| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 1 audit documented current coverage, commands, verification results, and hardening gaps; broad new tests are next only after Phase 6 manual QA is resolved. |
+| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 2 strengthened schema regression coverage for MVP options, config validation, metadata, and compatibility while keeping Phase 6 manual QA pending. |
 | Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
@@ -30,6 +30,96 @@ Primary focus: Phase 7 test coverage and hardening audit is documented; next wor
 Add entries in reverse chronological order.
 
 ### 2026-07-04
+
+Phase 7 Step 2 completed: Add schema and compatibility regression tests
+
+Scope and prerequisite note:
+
+- Confirmed Phase 7 Step 1 audit notes were already present in this tracker.
+- Kept this step limited to `packages/schema` test coverage.
+- Did not add generator snapshot tests.
+- Did not add generated project smoke tests.
+- Did not change supported product options.
+- Did not add CLI functionality.
+- Kept Vitest as the only schema test runner.
+
+Changes made:
+
+- Strengthened `LaunchKitConfigSchema` regression tests for the required invalid project name examples:
+  - empty project name;
+  - uppercase/spaced names;
+  - path traversal and path separators;
+  - underscores and special characters.
+- Added schema rejection coverage for all unsupported MVP option fields listed in the Step 2 prompt:
+  - framework;
+  - language;
+  - router;
+  - project structure;
+  - styling;
+  - UI;
+  - database;
+  - ORM;
+  - auth;
+  - Docker;
+  - package manager.
+- Added metadata regression coverage confirming `recommended`, when present, is a boolean.
+- Removed the compatibility test that fabricated unsupported `styling: "css"` through a type cast; the MVP schema only supports Tailwind, so shadcn/Tailwind compatibility remains covered by the valid positive regression case.
+
+Files changed:
+
+- `packages/schema/src/__tests__/config.test.ts`
+- `packages/schema/src/__tests__/metadata.test.ts`
+- `packages/schema/src/__tests__/compatibility.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-07/step-2.md
+git status --short
+rg --files context | sort
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,300p' context/architecture.md
+sed -n '301,680p' context/architecture.md
+sed -n '681,1040p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '361,760p' context/build-plan.md
+sed -n '761,1160p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+rg --files packages/schema/src | sort
+sed -n '1,260p' packages/schema/src/options.ts
+sed -n '1,260p' packages/schema/src/config.ts
+sed -n '1,300p' packages/schema/src/compatibility.ts
+sed -n '1,260p' packages/schema/src/defaults.ts
+sed -n '1,360p' packages/schema/src/metadata.ts
+sed -n '1,220p' packages/schema/src/index.ts
+cat packages/schema/package.json
+cat packages/schema/vitest.config.ts
+sed -n '1,260p' packages/schema/src/__tests__/options.test.ts
+sed -n '1,320p' packages/schema/src/__tests__/config.test.ts
+sed -n '1,260p' packages/schema/src/__tests__/defaults.test.ts
+sed -n '1,340p' packages/schema/src/__tests__/metadata.test.ts
+sed -n '1,340p' packages/schema/src/__tests__/compatibility.test.ts
+rg -n "node:test|jest|mocha" packages/schema apps packages -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+npm test -w @launchkit/schema
+npm run typecheck -w @launchkit/schema
+git diff -- packages/schema/src/__tests__/config.test.ts packages/schema/src/__tests__/metadata.test.ts packages/schema/src/__tests__/compatibility.test.ts
+npm test
+```
+
+Verification result:
+
+- `npm test -w @launchkit/schema` passed: 5 files, 87 tests.
+- `npm run typecheck -w @launchkit/schema` passed.
+- `npm test` passed across workspaces:
+  - web: 4 files, 23 tests;
+  - generator: 10 files, 111 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 51 tests.
 
 Phase 7 Step 1 completed: Audit test coverage and hardening gaps
 
