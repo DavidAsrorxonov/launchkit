@@ -36,7 +36,7 @@ Routes:
 - `/` is the dedicated landing page.
 - `/builder` is the working project builder.
 - `/api/generate` validates a builder config and returns generated project data.
-- `/docs` is reserved for future documentation work.
+- `/docs` is the dedicated documentation page.
 
 ## Production
 

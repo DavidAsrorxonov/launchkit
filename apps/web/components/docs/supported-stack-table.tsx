@@ -28,15 +28,23 @@ const rows: readonly StackRow[] = [
   { category: "UI", options: uiMetadata },
   { category: "Database", options: databaseMetadata },
   { category: "ORM", options: ormMetadata },
-  { category: "Auth", options: authMetadata, note: "Credentials scaffold only." },
-  { category: "Docker", options: dockerMetadata, note: "Local PostgreSQL only." },
+  {
+    category: "Auth",
+    options: authMetadata,
+    note: "Credentials scaffold only.",
+  },
+  {
+    category: "Docker",
+    options: dockerMetadata,
+    note: "Local PostgreSQL only.",
+  },
   { category: "Package manager", options: packageManagerMetadata },
 ];
 
 export function SupportedStackTable() {
   return (
     <div className="max-w-full overflow-x-auto rounded-lg border border-border">
-      <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
+      <table className="w-full min-w-176 border-collapse text-left text-sm">
         <thead className="bg-muted text-foreground">
           <tr>
             <th className="border-b border-border px-4 py-3 font-semibold">
@@ -52,7 +60,10 @@ export function SupportedStackTable() {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.category} className="border-b border-border last:border-b-0">
+            <tr
+              key={row.category}
+              className="border-b border-border last:border-b-0"
+            >
               <th className="bg-card px-4 py-3 align-top font-medium text-foreground">
                 {row.category}
               </th>
