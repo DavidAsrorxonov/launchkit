@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 8 Step 2 docs completed by user direction; Phase 7 manual website/download QA remains pending
-Primary focus: Phase 8 launch preparation is underway with MVP docs added, but Phase 7/Phase 6 manual browser and download verification remains unresolved
+Current phase: Phase 8 Step 3 landing page completed by user direction; Phase 7 manual website/download QA remains pending
+Primary focus: Phase 8 launch preparation is underway with a dedicated landing page and separate builder route, but Phase 7/Phase 6 manual browser and download verification remains unresolved
 ```
 
 ## Phase Progress
@@ -22,12 +22,182 @@ Primary focus: Phase 8 launch preparation is underway with MVP docs added, but P
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
 | Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 7 verified automated schema, generator, template, API, UI failure-state, build, and smoke coverage; manual website/download QA remains before marking complete. |
-| Phase 8 | Launch Preparation                    | In Progress | Step 2 added README/web docs, supported stack, limitations, generated-project usage notes, roadmap notes, and a compact in-app supported-stack section by user direction while manual Phase 7 QA remains pending. |
+| Phase 8 | Launch Preparation                    | In Progress | Step 3 created a dedicated landing page at `/`, moved the builder to `/builder`, and preserved API/generator behavior by user direction while manual Phase 7 QA remains pending. Revised next steps: dedicated docs page, then final launch QA. |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-05
+
+Phase 8 Step 3 completed: Create Dedicated Landing Page
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 8 Step 3 prompt before making changes.
+- Confirmed Phase 8 Step 2 is documented as complete.
+- Treated the Step 3 prompt as the revised Phase 8 direction:
+  - Step 1: deployment and production readiness;
+  - Step 2: docs, supported stack, and limitations;
+  - Step 3: dedicated landing page;
+  - Step 4: dedicated documentation page;
+  - Step 5: final launch QA and Phase 8 verification.
+- Reviewed the attached landing-page inspiration screenshot and used it as high-level visual direction, not a direct copy.
+- Used the provided GitHub URL in the landing nav: `https://github.com/DavidAsrorxonov/launchkit`.
+- Proceeded with Phase 8 Step 3 because the user explicitly requested it despite unresolved manual Phase 6/7 website/download QA.
+- Did not implement the dedicated documentation page.
+- Did not start final launch QA.
+- Did not add CLI functionality.
+- Did not claim the CLI is available.
+- Did not add new generator options.
+- Did not change generator behavior.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Changed `apps/web/app/page.tsx` so `/` now renders a dedicated landing page instead of the builder.
+- Added `apps/web/app/builder/page.tsx` so `/builder` renders the existing `BuilderShell` wizard.
+- Added landing components under `apps/web/components/landing/`:
+  - `landing-page.tsx`;
+  - `landing-nav.tsx`;
+  - `landing-hero.tsx`;
+  - `command-card.tsx`;
+  - `hero-orbit-lines.tsx`;
+  - `logo-strip.tsx`.
+- Built the landing page around the requested visual direction:
+  - dark app-themed surface;
+  - large rounded hero frame;
+  - restrained green/cyan-style lighting through token-backed CSS gradients;
+  - translucent compact navigation;
+  - centered headline and concise product copy;
+  - subtle technical grid/line details and floating labels;
+  - compact CTA buttons;
+  - supported-stack section below the hero.
+- Added a command-style UI block with:
+  - `CLI coming soon`;
+  - `npx create-launchkit@latest`;
+  - explicit copy that the website builder works today and the CLI is not released yet.
+- Added landing navigation links:
+  - LaunchKit home;
+  - Builder;
+  - Supported Stack;
+  - Docs soon placeholder;
+  - GitHub link using the user-provided repository URL.
+- Updated `apps/web/README.md` with route notes:
+  - `/` dedicated landing page;
+  - `/builder` working project builder;
+  - `/api/generate` generation API;
+  - `/docs` reserved for future documentation work.
+
+Files changed:
+
+- `apps/web/README.md`
+- `apps/web/app/page.tsx`
+- `apps/web/app/builder/page.tsx`
+- `apps/web/components/landing/command-card.tsx`
+- `apps/web/components/landing/hero-orbit-lines.tsx`
+- `apps/web/components/landing/landing-hero.tsx`
+- `apps/web/components/landing/landing-nav.tsx`
+- `apps/web/components/landing/landing-page.tsx`
+- `apps/web/components/landing/logo-strip.tsx`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-08/step-3.md
+find . -maxdepth 3 -type f | sed 's#^./##' | sort | head -240
+sed -n '1,360p' context/project-overview.md
+sed -n '1,420p' context/architecture.md
+sed -n '1,520p' context/build-plan.md
+sed -n '1,360p' context/ui-rules.md
+sed -n '261,620p' context/progress-tracker.md
+sed -n '361,760p' context/project-overview.md
+sed -n '421,940p' context/architecture.md
+sed -n '521,1120p' context/build-plan.md
+sed -n '361,760p' context/ui-rules.md
+sed -n '621,1260p' context/progress-tracker.md
+git status --short
+find apps/web/app apps/web/components apps/web/lib -maxdepth 4 -type f | sort
+sed -n '1,260p' apps/web/app/layout.tsx
+sed -n '1,320p' apps/web/app/globals.css
+sed -n '1,280p' apps/web/components/builder/builder-shell.tsx
+cat apps/web/package.json
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+node -e "const icons=require('lucide-react'); console.log(['Github','GitBranch','FileTree','FileCode2','FolderTree'].map(k=>[k,Boolean(icons[k])]))"
+npm run build -w apps/web
+npm run build -w apps/web
+sed -n '1,260p' /Users/dovudxonasrorxonov/.codex/plugins/cache/openai-bundled/browser/26.608.12217/skills/control-in-app-browser/SKILL.md
+npm run dev -w apps/web -- -p 3002
+npm run dev -w apps/web -- -p 3002
+npm run dev -w apps/web -- -H 127.0.0.1 -p 3002
+npm run typecheck
+npm test
+npm run lint
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+git diff --check
+git status --short
+git diff -- apps/web/README.md apps/web/app/page.tsx
+find apps/web/app/builder apps/web/components/landing -type f -maxdepth 3 -print | sort
+sed -n '1,220p' apps/web/app/builder/page.tsx
+sed -n '1,260p' apps/web/components/landing/landing-page.tsx
+sed -n '1,260p' apps/web/components/landing/landing-hero.tsx
+sed -n '1,260p' apps/web/components/landing/landing-nav.tsx
+sed -n '1,240p' apps/web/components/landing/command-card.tsx
+sed -n '1,260p' apps/web/components/landing/hero-orbit-lines.tsx
+sed -n '1,180p' apps/web/components/landing/logo-strip.tsx
+```
+
+Verification result:
+
+- Initial `npm run typecheck -w apps/web` failed because the installed `lucide-react` version does not export `Github` or `FileTree`.
+- Verified available lucide exports and replaced them with `GitBranch` and `FolderTree`.
+- `npm run typecheck -w apps/web` passed after the icon fix.
+- `npm test -w apps/web` passed: 4 files, 46 tests.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed:
+  - `/` prerendered as static content;
+  - `/builder` prerendered as static content;
+  - `/api/generate` server-rendered on demand.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 4 files, 46 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+
+Manual/browser verification:
+
+- Browser workflow instructions were read for the in-app browser plugin.
+- Sandboxed `npm run dev -w apps/web -- -p 3002` failed because binding to `0.0.0.0:3002` is not permitted in the sandbox.
+- Escalated `npm run dev -w apps/web -- -p 3002` was requested for responsive browser verification but was rejected by the user.
+- Sandboxed `npm run dev -w apps/web -- -H 127.0.0.1 -p 3002` also failed because binding to `127.0.0.1:3002` is not permitted in the sandbox.
+- The user said they will run the dev server themselves.
+- Browser-level responsive verification at 375px, 768px, 1280px, and 1440px+ remains pending for the user-run dev server.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending.
+- Step 3 browser-level responsive QA remains pending because the local dev server was not available to the assistant.
+- `.agents/prompts/phase-08/step-3.md` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- User-run browser verification for `/` and `/builder`, then Phase 8 Step 4: create the dedicated documentation page.
 
 ### 2026-07-04
 
