@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 8 Step 1 production readiness completed by user direction; Phase 7 manual website/download QA remains pending
-Primary focus: Phase 8 launch preparation is underway, but Phase 7/Phase 6 manual browser and download verification remains unresolved
+Current phase: Phase 8 Step 2 docs completed by user direction; Phase 7 manual website/download QA remains pending
+Primary focus: Phase 8 launch preparation is underway with MVP docs added, but Phase 7/Phase 6 manual browser and download verification remains unresolved
 ```
 
 ## Phase Progress
@@ -22,7 +22,7 @@ Primary focus: Phase 8 launch preparation is underway, but Phase 7/Phase 6 manua
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
 | Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 7 verified automated schema, generator, template, API, UI failure-state, build, and smoke coverage; manual website/download QA remains before marking complete. |
-| Phase 8 | Launch Preparation                    | In Progress | Step 1 tightened production readiness, deployment notes, metadata, Node API runtime, and security headers by user direction while manual Phase 7 QA remains pending. |
+| Phase 8 | Launch Preparation                    | In Progress | Step 2 added README/web docs, supported stack, limitations, generated-project usage notes, roadmap notes, and a compact in-app supported-stack section by user direction while manual Phase 7 QA remains pending. |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
 ## Change Log
@@ -30,6 +30,134 @@ Primary focus: Phase 8 launch preparation is underway, but Phase 7/Phase 6 manua
 Add entries in reverse chronological order.
 
 ### 2026-07-04
+
+Phase 8 Step 2 completed: Add Docs, Supported Stack, and Limitations
+
+Scope and prerequisite note:
+
+- Read the context files, progress tracker, and Phase 8 Step 2 prompt before making changes.
+- Confirmed Phase 8 Step 1 is documented as complete.
+- Proceeded with Phase 8 Step 2 because the user explicitly requested it despite unresolved manual Phase 6/7 website/download QA.
+- Did not mark Phase 6 or Phase 7 complete.
+- Did not move to Phase 8 Step 3.
+- Did not add CLI functionality.
+- Did not add new product options.
+- Did not add user accounts, saved presets, or marketing-only pages.
+- Did not change generator behavior.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Expanded root `README.md` with concise MVP documentation:
+  - LaunchKit is a TypeScript-first developer project generator.
+  - The MVP is website-first: configure, preview, and download a zip.
+  - The future CLI is deferred and not claimed as existing.
+  - Supported MVP stack options are documented exactly from `@launchkit/schema`.
+  - Downloaded-project npm and pnpm usage commands are documented.
+  - Feature notes are documented for PostgreSQL, Prisma, Auth.js credentials, and Docker PostgreSQL.
+  - Roadmap notes are limited to stabilizing the website MVP, adding a shared-generator CLI later, and adding more stack options after the core flow is reliable.
+  - MVP limitations are listed precisely.
+- Expanded `apps/web/README.md` with matching website-focused documentation:
+  - supported stack table;
+  - generated-project usage;
+  - feature-specific setup notes;
+  - roadmap;
+  - limitations;
+  - existing production/runtime safety notes preserved.
+- Added `apps/web/components/builder/supported-stack-section.tsx`:
+  - compact supported-stack section below the builder;
+  - dense developer-tool layout using token-based classes;
+  - after-download commands;
+  - limitations focused on deferred CLI, narrow MVP stack, auth scaffold, local Docker, and no server-side install/run of generated code.
+- Rendered the supported-stack section from `apps/web/components/builder/builder-shell.tsx` below the existing wizard/current-selection layout so the first screen remains the product builder.
+
+Files changed:
+
+- `README.md`
+- `apps/web/README.md`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/components/builder/supported-stack-section.tsx`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-08/step-2.md
+find . -maxdepth 2 -type f | sed 's#^./##' | sort | head -200
+sed -n '1,260p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/project-overview.md
+sed -n '321,700p' context/architecture.md
+sed -n '361,980p' context/build-plan.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '241,620p' context/progress-tracker.md
+sed -n '621,980p' context/progress-tracker.md
+sed -n '981,1340p' context/progress-tracker.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '1,260p' README.md
+sed -n '1,260p' apps/web/README.md
+sed -n '1,280p' packages/schema/src/options.ts
+sed -n '1,260p' packages/schema/src/config.ts
+sed -n '1,360p' packages/schema/src/metadata.ts
+sed -n '1,220p' apps/web/app/page.tsx
+sed -n '1,360p' apps/web/components/builder/builder-shell.tsx
+find apps/web/components -maxdepth 3 -type f | sort
+sed -n '1,360p' apps/web/lib/builder/phase-6-verification.test.ts
+sed -n '1,260p' apps/web/lib/builder/preview.ts
+sed -n '1,220p' apps/web/lib/builder/builder-state.ts
+sed -n '1,220p' apps/web/lib/builder/steps.ts
+cat apps/web/package.json
+cat package.json
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm test
+npm run lint
+git status --short
+git diff --stat
+git diff -- README.md apps/web/README.md apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/components/builder/supported-stack-section.tsx
+```
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm test -w apps/web` passed: 4 files, 46 tests.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed:
+  - `/` prerendered as static content;
+  - `/api/generate` server-rendered on demand.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 4 files, 46 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending.
+- Phase 8 Step 2 was started by direct user request despite the unresolved manual Phase 7 QA.
+- `.agents/prompts/phase-08/step-2.md` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- Complete the pending manual website/download QA, or continue Phase 8 Step 3 only if intentionally proceeding despite that unresolved manual verification.
 
 Phase 8 Step 1 completed: Prepare Deployment and Production Readiness
 
