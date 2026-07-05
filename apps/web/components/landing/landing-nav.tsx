@@ -34,9 +34,12 @@ export function LandingNav() {
           >
             Supported Stack
           </a>
-          <span className="rounded-md px-3 py-2 text-muted-foreground/80">
-            Docs soon
-          </span>
+          <Link
+            href="/docs"
+            className="rounded-md px-3 py-2 transition hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Docs
+          </Link>
           <a
             href={githubUrl}
             target="_blank"

@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 8 Step 3 landing page completed by user direction; Phase 7 manual website/download QA remains pending
-Primary focus: Phase 8 launch preparation is underway with a dedicated landing page and separate builder route, but Phase 7/Phase 6 manual browser and download verification remains unresolved
+Current phase: Phase 8 Step 4 dedicated documentation page completed by user direction; Phase 7 manual website/download QA remains pending
+Primary focus: Phase 8 launch preparation now has separate landing, builder, and docs routes, but Phase 7/Phase 6 manual browser and download verification remains unresolved
 ```
 
 ## Phase Progress
@@ -22,7 +22,7 @@ Primary focus: Phase 8 launch preparation is underway with a dedicated landing p
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
 | Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 7 verified automated schema, generator, template, API, UI failure-state, build, and smoke coverage; manual website/download QA remains before marking complete. |
-| Phase 8 | Launch Preparation                    | In Progress | Step 3 created a dedicated landing page at `/`, moved the builder to `/builder`, and preserved API/generator behavior by user direction while manual Phase 7 QA remains pending. Revised next steps: dedicated docs page, then final launch QA. |
+| Phase 8 | Launch Preparation                    | In Progress | Step 4 added a dedicated `/docs` page with structured MVP documentation and navigation between landing, builder, and docs. Manual browser QA remains pending by user direction. Next step: final launch QA. |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
 ## Change Log
@@ -30,6 +30,205 @@ Primary focus: Phase 8 launch preparation is underway with a dedicated landing p
 Add entries in reverse chronological order.
 
 ### 2026-07-05
+
+Phase 8 Step 4 completed: Create Dedicated Documentation Page
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 8 Step 4 prompt before making changes.
+- Confirmed Phase 8 Step 3 is documented as complete.
+- Implemented only the dedicated documentation page step.
+- Did not move to final Phase 8 QA.
+- Did not add CLI functionality.
+- Did not claim the CLI is available.
+- Did not add new product options.
+- Did not replace the landing page or builder.
+- Cross-checked documentation against `@launchkit/schema`, `@launchkit/generator`, `packages/templates`, and the current builder step order.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added a dedicated `/docs` route.
+- Added structured LaunchKit documentation with sections in the requested order:
+  - Overview;
+  - Quick Start;
+  - Website Builder Flow;
+  - Supported Stack;
+  - Generated Project Structure;
+  - Optional Features;
+  - Environment Variables;
+  - Scripts;
+  - Downloaded Project Usage;
+  - Compatibility Rules;
+  - Limitations;
+  - Future CLI;
+  - Troubleshooting.
+- Added docs components under `apps/web/components/docs/`:
+  - `docs-page.tsx`;
+  - `docs-sidebar.tsx`;
+  - `docs-section.tsx`;
+  - `code-block.tsx`;
+  - `supported-stack-table.tsx`;
+  - `generated-files-section.tsx`;
+  - `feature-notes.tsx`.
+- Built the supported-stack table from `@launchkit/schema` metadata so the visible docs stay aligned with supported MVP options.
+- Documented website builder flow:
+  - Project;
+  - Framework;
+  - Styling and UI;
+  - Database;
+  - ORM;
+  - Auth;
+  - Extras;
+  - Preview;
+  - Download.
+- Documented generated project structure and explicitly stated generated projects do not use `src/`.
+- Documented optional feature behavior for shadcn/ui, PostgreSQL, Prisma, Auth.js credentials, and Docker PostgreSQL.
+- Documented generated environment variables and when they appear:
+  - `DATABASE_URL`;
+  - `AUTH_SECRET`.
+- Documented generated scripts:
+  - `dev`;
+  - `build`;
+  - `start`;
+  - `typecheck`;
+  - optional Prisma scripts `db:generate`, `db:push`, and `db:studio`.
+- Documented downloaded project usage with npm commands and a clearly separated pnpm variant.
+- Documented compatibility rules and MVP limitations.
+- Documented the future CLI as planned/coming later and labeled `npx create-launchkit@latest` as planned, not available today.
+- Added troubleshooting guidance for invalid names, disabled options, download failures, install failures, build failures, and Auth.js scaffold expectations.
+- Updated landing navigation so the Docs link points to `/docs` instead of showing a placeholder.
+- Added focused Vitest coverage for docs source contracts and navigation links.
+
+Files changed:
+
+- `apps/web/app/docs/page.tsx`
+- `apps/web/components/docs/code-block.tsx`
+- `apps/web/components/docs/docs-page.test.tsx`
+- `apps/web/components/docs/docs-page.tsx`
+- `apps/web/components/docs/docs-section.tsx`
+- `apps/web/components/docs/docs-sidebar.tsx`
+- `apps/web/components/docs/feature-notes.tsx`
+- `apps/web/components/docs/generated-files-section.tsx`
+- `apps/web/components/docs/supported-stack-table.tsx`
+- `apps/web/components/landing/landing-nav.tsx`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-08/step-4.md
+find . -maxdepth 2 -type f | sed 's#^./##' | sort | head -200
+sed -n '1,260p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,420p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '241,520p' .agents/prompts/phase-08/step-4.md
+sed -n '321,760p' context/architecture.md
+sed -n '421,980p' context/build-plan.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '521,880p' .agents/prompts/phase-08/step-4.md
+find apps/web packages/schema packages/generator packages/templates -maxdepth 4 -type f | sort
+sed -n '121,320p' context/project-overview.md
+sed -n '1,260p' packages/schema/src/options.ts
+sed -n '1,320p' packages/schema/src/metadata.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+sed -n '1,360p' packages/generator/src/features/definitions.ts
+sed -n '1,280p' apps/web/lib/builder/preview.ts
+sed -n '1,260p' apps/web/components/landing/landing-nav.tsx
+sed -n '1,340p' apps/web/components/landing/landing-page.tsx
+sed -n '1,260p' apps/web/app/layout.tsx
+sed -n '1,260p' apps/web/app/globals.css
+sed -n '1,220p' apps/web/app/page.tsx
+sed -n '1,220p' apps/web/app/builder/page.tsx
+sed -n '1,220p' apps/web/lib/builder/phase-6-verification.test.ts
+cat apps/web/package.json
+sed -n '1,360p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/builder/steps.ts
+sed -n '1,260p' packages/schema/src/defaults.ts
+sed -n '1,260p' packages/schema/src/config.ts
+sed -n '1,240p' packages/templates/base/next/package.json
+find packages/templates/features -maxdepth 4 -type f | sort
+mkdir -p apps/web/app/docs apps/web/components/docs
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run build -w apps/web
+cat package.json
+npm run typecheck
+npm test
+npm run lint
+npm run build
+sed -n '1,260p' /Users/dovudxonasrorxonov/.codex/plugins/cache/openai-bundled/browser/26.608.12217/skills/control-in-app-browser/SKILL.md
+npm run dev -w apps/web -- -H 127.0.0.1 -p 3002
+npm run dev -w apps/web -- -H 127.0.0.1 -p 3002
+rg -n "JavaScript output|Pages Router|Drizzle|Clerk|yarn|bun|available today|CLI is available|Docs soon" apps/web/app apps/web/components apps/web/lib
+git status --short
+find apps/web/app/docs apps/web/components/docs -type f | sort
+git diff -- apps/web/components/landing/landing-nav.tsx apps/web/app/docs/page.tsx apps/web/components/docs
+```
+
+Verification result:
+
+- Initial `npm run typecheck -w apps/web` failed because `feature-notes.tsx` needed an explicit optional `code` field in the feature note type.
+- Initial `npm test -w apps/web` failed because the app's `@/` alias is not configured for component imports in the current Vitest setup.
+- Fixed both issues by typing feature notes explicitly and converting the docs test to a source-level contract test that fits the current Vitest setup.
+- `npm run typecheck -w apps/web` passed.
+- `npm test -w apps/web` passed: 5 files, 49 tests.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed:
+  - `/` prerendered as static content;
+  - `/builder` prerendered as static content;
+  - `/docs` prerendered as static content;
+  - `/api/generate` server-rendered on demand.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Escalated `npm run build` passed across workspaces.
+- Static source search found no remaining `Docs soon` placeholder and no docs claims that unsupported JavaScript output, Pages Router, Drizzle, Clerk, yarn, or bun are available.
+
+Manual/browser verification:
+
+- Browser workflow instructions were read for the in-app browser plugin.
+- Sandboxed `npm run dev -w apps/web -- -H 127.0.0.1 -p 3002` failed because binding to `127.0.0.1:3002` is not permitted in the sandbox.
+- Escalated `npm run dev -w apps/web -- -H 127.0.0.1 -p 3002` was requested for responsive browser verification but was rejected because the user said they will run it themselves.
+- Browser-level verification of `/docs` at 375px, 768px, 1280px, and 1440px+ remains pending for the user-run dev server.
+- User-run checks should confirm:
+  - `/docs` renders separately from `/` and `/builder`;
+  - Landing, Builder, and Docs navigation works;
+  - docs match actual wizard options;
+  - unsupported options are not advertised;
+  - the CLI command is clearly labeled future/planned;
+  - code blocks and tables scroll instead of overflowing;
+  - no text overlaps controls on mobile, tablet, desktop, or wide desktop.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending.
+- Phase 8 Step 4 browser-level responsive QA remains pending by user direction.
+- `.agents/prompts/phase-08/step-4.md` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- User-run browser verification for `/docs`, `/`, and `/builder`, then Phase 8 Step 5: final launch QA and Phase 8 verification.
 
 Phase 8 Step 3 completed: Create Dedicated Landing Page
 
