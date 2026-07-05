@@ -31,6 +31,7 @@ import {
 import { WizardNavigation } from "./wizard-navigation";
 import { WizardProgress } from "./wizard-progress";
 import { WizardStepPanel } from "./wizard-step-panel";
+import { ArrowLeft } from "lucide-react";
 
 export function BuilderShell() {
   const [builderState, setBuilderState] = useState(createInitialBuilderState);
@@ -103,13 +104,21 @@ export function BuilderShell() {
     <main className="flex-1 bg-background">
       <div className="mx-auto flex min-h-dvh w-full max-w-7xl flex-col px-4 py-5 sm:px-6 lg:px-8">
         <header className="mb-5 flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">
-              LaunchKit
-            </p>
-            <h1 className="mt-1 text-2xl font-semibold text-foreground">
-              Project builder
-            </h1>
+          <div className="flex items-center gap-2">
+            <div
+              className="flex h-8 w-8 items-center justify-center rounded-full hover:cursor-pointer"
+              onClick={() => (window.location.href = "/")}
+            >
+              <ArrowLeft className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                LaunchKit
+              </p>
+              <h1 className="mt-1 text-2xl font-semibold text-foreground">
+                Project builder
+              </h1>
+            </div>
           </div>
           <div className="max-w-full rounded-md border border-border bg-card px-3 py-2 font-mono text-sm text-muted-foreground break-all">
             {builderState.config.name}
