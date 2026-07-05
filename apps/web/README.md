@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LaunchKit Web
 
-## Getting Started
+Next.js website for the LaunchKit project builder.
 
-First, run the development server:
+LaunchKit is a TypeScript-first developer project generator. The MVP is a
+website-first generator where users configure a project, preview the output, and
+download a zip. The future CLI is deferred.
+
+## Supported MVP Stack
+
+| Area | Supported options |
+| --- | --- |
+| Framework | Next.js |
+| Language | TypeScript |
+| Router | App Router |
+| Project structure | No `src/` folder |
+| Styling | Tailwind CSS |
+| UI | none, shadcn/ui |
+| Database | none, PostgreSQL |
+| ORM | none, Prisma |
+| Auth | none, Auth.js credentials scaffold |
+| Docker | none, PostgreSQL Docker Compose |
+| Package manager | npm, pnpm instructions/generated metadata where supported |
+
+## Local Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev -w apps/web
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Routes:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/` is the dedicated landing page.
+- `/builder` is the working project builder.
+- `/api/generate` validates a builder config and returns generated project data.
+- `/docs` is the dedicated documentation page.
 
-## Learn More
+## Production
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+npm run build -w apps/web
+npm run start -w apps/web
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The website MVP does not require environment variables. Generated-project values such as `DATABASE_URL` and `AUTH_SECRET` belong inside downloaded projects, not this web app.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`POST /api/generate` validates requests, calls the shared generator, and returns generated file data for browser-side ZIP creation. The website does not install generated dependencies, execute generated code, start generated app servers, or write generated projects to disk.
 
-## Deploy on Vercel
+## Downloaded Project Usage
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+For npm output:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+unzip my-app.zip
+cd my-app
+npm install
+npm run dev
+npm run typecheck
+npm run build
+```
+
+For pnpm output, use the equivalent generated instructions:
+
+```bash
+pnpm install
+pnpm dev
+pnpm typecheck
+pnpm build
+```
+
+Feature-specific notes:
+
+- PostgreSQL: configure `DATABASE_URL` before using database-backed features.
+- Prisma: run `npm run db:generate`, `npm run db:push`, and `npm run db:studio` as needed.
+- Auth.js credentials: replace `AUTH_SECRET`, implement real user lookup, and add secure password verification.
+- Docker PostgreSQL: use `docker compose up -d` and `docker compose down` for local development only.
+
+## Roadmap
+
+- Keep the website MVP stable first.
+- Add a shared-generator CLI later.
+- Add more stack options only after the core generation flow is reliable.
+
+## Limitations
+
+- CLI generation is not part of the MVP.
+- Only Next.js is supported.
+- Only TypeScript is supported.
+- Only App Router is supported.
+- Generated projects do not use `src/`.
+- Only Tailwind CSS is supported.
+- Auth.js credentials output is a scaffold, not production-ready auth.
+- PostgreSQL Docker Compose is for local development only.
+- LaunchKit does not install dependencies for generated projects.
+- LaunchKit does not run generated project code on the server.
+- Users must configure real secrets and production environment variables.

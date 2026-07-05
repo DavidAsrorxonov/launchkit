@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 7 Step 7 automated completion verification passed; manual website/download QA remains pending
-Primary focus: Phase 7 remains in progress until user-run manual browser/download verification is completed
+Current phase: Phase 8 Step 5 final launch QA automated checks completed; Phase 8 remains in progress pending user-run browser/responsive/download QA
+Primary focus: Phase 8 launch preparation has landing, builder, and docs routes with passing automated verification, but Phase 7/Phase 6 manual browser and download verification remains unresolved
 ```
 
 ## Phase Progress
@@ -22,14 +22,874 @@ Primary focus: Phase 7 remains in progress until user-run manual browser/downloa
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
 | Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
 | Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 7 verified automated schema, generator, template, API, UI failure-state, build, and smoke coverage; manual website/download QA remains before marking complete. |
-| Phase 8 | Launch Preparation                    | Not Started | Will prepare docs, deployment, and final MVP review.                                                    |
+| Phase 8 | Launch Preparation                    | In Progress | Step 5 automated final QA passed, including build, unit tests, package tests, smoke tests, API/download safety checks, and docs accuracy scan. Not complete until user-run browser/responsive/download QA is finished. |
 | Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
 
 ## Change Log
 
 Add entries in reverse chronological order.
 
+### 2026-07-05
+
+Phase 8 Step 5 QA run: Final launch QA and Phase 8 verification
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 8 Step 5 prompt before making changes.
+- Confirmed Phase 8 Steps 1-4 are documented as complete.
+- Implemented only this final QA and verification step.
+- Did not start Phase 9.
+- Did not add CLI functionality.
+- Did not add new product options.
+- Did not perform broad redesigns or refactors.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+- Did not mark Phase 8 complete because required live browser/responsive/download QA remains user-run pending.
+
+Changes made:
+
+- Fixed one small launch-docs mismatch in `apps/web/README.md`:
+  - changed `/docs` from "reserved for future documentation work" to "the dedicated documentation page."
+- Verified landing page source and navigation links:
+  - `/` landing route exists and is statically built;
+  - primary builder links point to `/builder`;
+  - docs link points to `/docs`;
+  - command-style UI labels `npx create-launchkit@latest` as `CLI coming soon`;
+  - landing copy says the website builder works today and the CLI is not released yet.
+- Verified builder contracts through existing tests:
+  - required 9-step flow;
+  - state/validation contract helpers;
+  - compatibility rules;
+  - preview output;
+  - generated file tree excludes `src/`.
+- Verified documentation page source and docs contract tests:
+  - required sections exist;
+  - supported stack is derived from `@launchkit/schema` metadata;
+  - unsupported options are not advertised;
+  - future CLI is labeled planned/coming later.
+- Verified API and download safety through tests and static source scan:
+  - `POST /api/generate` validates schema;
+  - compatibility validation runs;
+  - malformed, oversized, incompatible, and non-JSON requests return structured errors;
+  - unsafe generated paths are rejected;
+  - stack traces/internal paths are not leaked in API error responses;
+  - generated code is not executed by the web app;
+  - generated dependencies are not installed by the web app;
+  - generated project files are not written to server disk by the web app;
+  - browser ZIP helper rejects unsafe paths and generated `src/` paths.
+- Verified production build readiness:
+  - `/`, `/builder`, and `/docs` prerender as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - workspace build passes.
+- Verified generated-project smoke tests outside the sandbox:
+  - default generated project installs, typechecks, and builds;
+  - all-compatible generated project installs, runs Prisma client generation, typechecks, and builds.
+
+Files changed:
+
+- `apps/web/README.md`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-08/step-5.md
+find context -maxdepth 1 -type f | sort
+sed -n '261,620p' .agents/prompts/phase-08/step-5.md
+sed -n '1,260p' context/project-overview.md
+sed -n '1,360p' context/architecture.md
+sed -n '1,440p' context/build-plan.md
+sed -n '1,300p' context/ui-rules.md
+sed -n '261,620p' context/project-overview.md
+sed -n '361,760p' context/architecture.md
+sed -n '441,980p' context/build-plan.md
+sed -n '301,620p' context/ui-rules.md
+rg -n "Phase 8 Step [1-4] completed|Step 1|Step 2|Step 3|Step 4" context/progress-tracker.md
+sed -n '1,280p' apps/web/app/api/generate/route.ts
+sed -n '1,340p' apps/web/lib/api/generate.ts
+sed -n '1,320p' apps/web/lib/api/generate.test.ts
+sed -n '1,260p' apps/web/components/builder/download/download-button.tsx
+sed -n '1,260p' apps/web/lib/download/create-project-zip.ts
+sed -n '1,260p' apps/web/lib/download/create-project-zip.test.ts
+sed -n '1,260p' packages/generator/src/generate-project.ts
+sed -n '1,280p' packages/generator/test/smoke/generated-projects.test.ts
+sed -n '1,280p' apps/web/components/landing/command-card.tsx
+sed -n '1,340p' apps/web/components/docs/docs-page.tsx
+sed -n '1,260p' apps/web/README.md
+sed -n '1,280p' README.md
+cat package.json
+cat apps/web/package.json
+cat packages/generator/package.json
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+rg -n "reserved for future documentation|Docs soon|CLI is available|available today|JavaScript output|Pages Router|Drizzle|Clerk|yarn|bun" README.md apps/web/README.md apps/web/app apps/web/components apps/web/lib
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm test
+npm run lint
+npm test -w @launchkit/schema
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm run build
+npm run test:smoke
+npm run test:smoke
+rg -n "child_process|exec\\(|execFile|spawn\\(|npm install|pnpm install|writeFile|mkdir\\(|createWriteStream|fs/promises" apps/web/app apps/web/lib packages/generator/src packages/templates/src
+rg -n "href=\\\"/|href=\\{\\\"/|/builder|/docs|#supported-stack" apps/web/components/landing apps/web/components/docs apps/web/app
+git status --short
+git diff -- apps/web/README.md context/progress-tracker.md
+git diff -- apps/web/components/docs/supported-stack-table.tsx
+sed -n '1,180p' apps/web/components/docs/supported-stack-table.tsx
+git diff --stat
+```
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm test -w apps/web` passed: 5 files, 49 tests.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- Static docs/source scan found no remaining stale `/docs` README text and no active claims that unsupported JavaScript output, Pages Router, Drizzle, Clerk, yarn, or bun are available.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed:
+  - `/` prerendered as static content;
+  - `/builder` prerendered as static content;
+  - `/docs` prerendered as static content;
+  - `/api/generate` server-rendered on demand.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- `npm test -w @launchkit/schema` passed: 5 files, 87 tests.
+- `npm test -w @launchkit/generator` passed: 11 files, 127 tests.
+- `npm test -w @launchkit/templates` passed: 1 file, 52 tests.
+- Escalated `npm run build` passed across workspaces.
+- Initial sandboxed `npm run test:smoke` failed after 600 seconds because generated-project `npm install` commands were terminated by timeout with empty stdout/stderr.
+- Escalated `npm run test:smoke` passed:
+  - default generated project: install, typecheck, build;
+  - all-compatible generated project: install, `db:generate`, typecheck, build.
+- Static safety scan found only expected template-loader reads and test files; no web-app generated-code execution, dependency installation, or generated-project server disk writes were found.
+
+Manual/browser verification:
+
+- Not completed by the assistant in this step.
+- Prior local dev server startup attempts are known to fail in the sandbox because binding to `127.0.0.1` is not permitted.
+- The user previously said they will run the dev server/browser QA themselves, so this step did not request another dev-server escalation.
+- Required user-run manual QA remains:
+  - open `/` and verify landing page polish, command card, CTA, docs link, and no overlap;
+  - open `/builder` and complete the 9-step builder flow;
+  - confirm validation, compatibility behavior, state persistence, preview, and download;
+  - inspect default generated zip and all-compatible generated zip from the browser flow;
+  - confirm generated zip output has no `src/`;
+  - open `/docs` and verify required docs sections and accuracy;
+  - check mobile 375px, tablet 768px, desktop 1280px, and wide desktop 1440px+;
+  - confirm nav does not overflow, code blocks/tables scroll correctly, buttons remain usable, and no text overlaps or clips.
+
+Notes/blockers:
+
+- Phase 8 remains `In Progress`.
+- Phase 8 is not marked complete because responsive browser QA and actual browser download inspection remain pending.
+- Website MVP is not marked ready yet for the same reason.
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending.
+- Phase 9 remains deferred.
+- `.agents/prompts/phase-08/step-5.md` is untracked prompt context and was left untouched.
+- `apps/web/components/docs/supported-stack-table.tsx` was already modified in the working tree during this QA pass; it was inspected but not reverted.
+
+Next suggested step:
+
+- Run the listed manual browser/responsive/download QA locally. If it passes, update the tracker to mark Phase 8 complete and Website MVP ready; if it fails, fix the specific blocker before marking the website MVP ready.
+
+Phase 8 Step 4 completed: Create Dedicated Documentation Page
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 8 Step 4 prompt before making changes.
+- Confirmed Phase 8 Step 3 is documented as complete.
+- Implemented only the dedicated documentation page step.
+- Did not move to final Phase 8 QA.
+- Did not add CLI functionality.
+- Did not claim the CLI is available.
+- Did not add new product options.
+- Did not replace the landing page or builder.
+- Cross-checked documentation against `@launchkit/schema`, `@launchkit/generator`, `packages/templates`, and the current builder step order.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added a dedicated `/docs` route.
+- Added structured LaunchKit documentation with sections in the requested order:
+  - Overview;
+  - Quick Start;
+  - Website Builder Flow;
+  - Supported Stack;
+  - Generated Project Structure;
+  - Optional Features;
+  - Environment Variables;
+  - Scripts;
+  - Downloaded Project Usage;
+  - Compatibility Rules;
+  - Limitations;
+  - Future CLI;
+  - Troubleshooting.
+- Added docs components under `apps/web/components/docs/`:
+  - `docs-page.tsx`;
+  - `docs-sidebar.tsx`;
+  - `docs-section.tsx`;
+  - `code-block.tsx`;
+  - `supported-stack-table.tsx`;
+  - `generated-files-section.tsx`;
+  - `feature-notes.tsx`.
+- Built the supported-stack table from `@launchkit/schema` metadata so the visible docs stay aligned with supported MVP options.
+- Documented website builder flow:
+  - Project;
+  - Framework;
+  - Styling and UI;
+  - Database;
+  - ORM;
+  - Auth;
+  - Extras;
+  - Preview;
+  - Download.
+- Documented generated project structure and explicitly stated generated projects do not use `src/`.
+- Documented optional feature behavior for shadcn/ui, PostgreSQL, Prisma, Auth.js credentials, and Docker PostgreSQL.
+- Documented generated environment variables and when they appear:
+  - `DATABASE_URL`;
+  - `AUTH_SECRET`.
+- Documented generated scripts:
+  - `dev`;
+  - `build`;
+  - `start`;
+  - `typecheck`;
+  - optional Prisma scripts `db:generate`, `db:push`, and `db:studio`.
+- Documented downloaded project usage with npm commands and a clearly separated pnpm variant.
+- Documented compatibility rules and MVP limitations.
+- Documented the future CLI as planned/coming later and labeled `npx create-launchkit@latest` as planned, not available today.
+- Added troubleshooting guidance for invalid names, disabled options, download failures, install failures, build failures, and Auth.js scaffold expectations.
+- Updated landing navigation so the Docs link points to `/docs` instead of showing a placeholder.
+- Added focused Vitest coverage for docs source contracts and navigation links.
+
+Files changed:
+
+- `apps/web/app/docs/page.tsx`
+- `apps/web/components/docs/code-block.tsx`
+- `apps/web/components/docs/docs-page.test.tsx`
+- `apps/web/components/docs/docs-page.tsx`
+- `apps/web/components/docs/docs-section.tsx`
+- `apps/web/components/docs/docs-sidebar.tsx`
+- `apps/web/components/docs/feature-notes.tsx`
+- `apps/web/components/docs/generated-files-section.tsx`
+- `apps/web/components/docs/supported-stack-table.tsx`
+- `apps/web/components/landing/landing-nav.tsx`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-08/step-4.md
+find . -maxdepth 2 -type f | sed 's#^./##' | sort | head -200
+sed -n '1,260p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,420p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '241,520p' .agents/prompts/phase-08/step-4.md
+sed -n '321,760p' context/architecture.md
+sed -n '421,980p' context/build-plan.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '521,880p' .agents/prompts/phase-08/step-4.md
+find apps/web packages/schema packages/generator packages/templates -maxdepth 4 -type f | sort
+sed -n '121,320p' context/project-overview.md
+sed -n '1,260p' packages/schema/src/options.ts
+sed -n '1,320p' packages/schema/src/metadata.ts
+sed -n '1,320p' packages/schema/src/compatibility.ts
+sed -n '1,360p' packages/generator/src/features/definitions.ts
+sed -n '1,280p' apps/web/lib/builder/preview.ts
+sed -n '1,260p' apps/web/components/landing/landing-nav.tsx
+sed -n '1,340p' apps/web/components/landing/landing-page.tsx
+sed -n '1,260p' apps/web/app/layout.tsx
+sed -n '1,260p' apps/web/app/globals.css
+sed -n '1,220p' apps/web/app/page.tsx
+sed -n '1,220p' apps/web/app/builder/page.tsx
+sed -n '1,220p' apps/web/lib/builder/phase-6-verification.test.ts
+cat apps/web/package.json
+sed -n '1,360p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/lib/builder/steps.ts
+sed -n '1,260p' packages/schema/src/defaults.ts
+sed -n '1,260p' packages/schema/src/config.ts
+sed -n '1,240p' packages/templates/base/next/package.json
+find packages/templates/features -maxdepth 4 -type f | sort
+mkdir -p apps/web/app/docs apps/web/components/docs
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run build -w apps/web
+cat package.json
+npm run typecheck
+npm test
+npm run lint
+npm run build
+sed -n '1,260p' /Users/dovudxonasrorxonov/.codex/plugins/cache/openai-bundled/browser/26.608.12217/skills/control-in-app-browser/SKILL.md
+npm run dev -w apps/web -- -H 127.0.0.1 -p 3002
+npm run dev -w apps/web -- -H 127.0.0.1 -p 3002
+rg -n "JavaScript output|Pages Router|Drizzle|Clerk|yarn|bun|available today|CLI is available|Docs soon" apps/web/app apps/web/components apps/web/lib
+git status --short
+find apps/web/app/docs apps/web/components/docs -type f | sort
+git diff -- apps/web/components/landing/landing-nav.tsx apps/web/app/docs/page.tsx apps/web/components/docs
+```
+
+Verification result:
+
+- Initial `npm run typecheck -w apps/web` failed because `feature-notes.tsx` needed an explicit optional `code` field in the feature note type.
+- Initial `npm test -w apps/web` failed because the app's `@/` alias is not configured for component imports in the current Vitest setup.
+- Fixed both issues by typing feature notes explicitly and converting the docs test to a source-level contract test that fits the current Vitest setup.
+- `npm run typecheck -w apps/web` passed.
+- `npm test -w apps/web` passed: 5 files, 49 tests.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed:
+  - `/` prerendered as static content;
+  - `/builder` prerendered as static content;
+  - `/docs` prerendered as static content;
+  - `/api/generate` server-rendered on demand.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Escalated `npm run build` passed across workspaces.
+- Static source search found no remaining `Docs soon` placeholder and no docs claims that unsupported JavaScript output, Pages Router, Drizzle, Clerk, yarn, or bun are available.
+
+Manual/browser verification:
+
+- Browser workflow instructions were read for the in-app browser plugin.
+- Sandboxed `npm run dev -w apps/web -- -H 127.0.0.1 -p 3002` failed because binding to `127.0.0.1:3002` is not permitted in the sandbox.
+- Escalated `npm run dev -w apps/web -- -H 127.0.0.1 -p 3002` was requested for responsive browser verification but was rejected because the user said they will run it themselves.
+- Browser-level verification of `/docs` at 375px, 768px, 1280px, and 1440px+ remains pending for the user-run dev server.
+- User-run checks should confirm:
+  - `/docs` renders separately from `/` and `/builder`;
+  - Landing, Builder, and Docs navigation works;
+  - docs match actual wizard options;
+  - unsupported options are not advertised;
+  - the CLI command is clearly labeled future/planned;
+  - code blocks and tables scroll instead of overflowing;
+  - no text overlaps controls on mobile, tablet, desktop, or wide desktop.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending.
+- Phase 8 Step 4 browser-level responsive QA remains pending by user direction.
+- `.agents/prompts/phase-08/step-4.md` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- User-run browser verification for `/docs`, `/`, and `/builder`, then Phase 8 Step 5: final launch QA and Phase 8 verification.
+
+Phase 8 Step 3 completed: Create Dedicated Landing Page
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 8 Step 3 prompt before making changes.
+- Confirmed Phase 8 Step 2 is documented as complete.
+- Treated the Step 3 prompt as the revised Phase 8 direction:
+  - Step 1: deployment and production readiness;
+  - Step 2: docs, supported stack, and limitations;
+  - Step 3: dedicated landing page;
+  - Step 4: dedicated documentation page;
+  - Step 5: final launch QA and Phase 8 verification.
+- Reviewed the attached landing-page inspiration screenshot and used it as high-level visual direction, not a direct copy.
+- Used the provided GitHub URL in the landing nav: `https://github.com/DavidAsrorxonov/launchkit`.
+- Proceeded with Phase 8 Step 3 because the user explicitly requested it despite unresolved manual Phase 6/7 website/download QA.
+- Did not implement the dedicated documentation page.
+- Did not start final launch QA.
+- Did not add CLI functionality.
+- Did not claim the CLI is available.
+- Did not add new generator options.
+- Did not change generator behavior.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Changed `apps/web/app/page.tsx` so `/` now renders a dedicated landing page instead of the builder.
+- Added `apps/web/app/builder/page.tsx` so `/builder` renders the existing `BuilderShell` wizard.
+- Added landing components under `apps/web/components/landing/`:
+  - `landing-page.tsx`;
+  - `landing-nav.tsx`;
+  - `landing-hero.tsx`;
+  - `command-card.tsx`;
+  - `hero-orbit-lines.tsx`;
+  - `logo-strip.tsx`.
+- Built the landing page around the requested visual direction:
+  - dark app-themed surface;
+  - large rounded hero frame;
+  - restrained green/cyan-style lighting through token-backed CSS gradients;
+  - translucent compact navigation;
+  - centered headline and concise product copy;
+  - subtle technical grid/line details and floating labels;
+  - compact CTA buttons;
+  - supported-stack section below the hero.
+- Added a command-style UI block with:
+  - `CLI coming soon`;
+  - `npx create-launchkit@latest`;
+  - explicit copy that the website builder works today and the CLI is not released yet.
+- Added landing navigation links:
+  - LaunchKit home;
+  - Builder;
+  - Supported Stack;
+  - Docs soon placeholder;
+  - GitHub link using the user-provided repository URL.
+- Updated `apps/web/README.md` with route notes:
+  - `/` dedicated landing page;
+  - `/builder` working project builder;
+  - `/api/generate` generation API;
+  - `/docs` reserved for future documentation work.
+
+Files changed:
+
+- `apps/web/README.md`
+- `apps/web/app/page.tsx`
+- `apps/web/app/builder/page.tsx`
+- `apps/web/components/landing/command-card.tsx`
+- `apps/web/components/landing/hero-orbit-lines.tsx`
+- `apps/web/components/landing/landing-hero.tsx`
+- `apps/web/components/landing/landing-nav.tsx`
+- `apps/web/components/landing/landing-page.tsx`
+- `apps/web/components/landing/logo-strip.tsx`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-08/step-3.md
+find . -maxdepth 3 -type f | sed 's#^./##' | sort | head -240
+sed -n '1,360p' context/project-overview.md
+sed -n '1,420p' context/architecture.md
+sed -n '1,520p' context/build-plan.md
+sed -n '1,360p' context/ui-rules.md
+sed -n '261,620p' context/progress-tracker.md
+sed -n '361,760p' context/project-overview.md
+sed -n '421,940p' context/architecture.md
+sed -n '521,1120p' context/build-plan.md
+sed -n '361,760p' context/ui-rules.md
+sed -n '621,1260p' context/progress-tracker.md
+git status --short
+find apps/web/app apps/web/components apps/web/lib -maxdepth 4 -type f | sort
+sed -n '1,260p' apps/web/app/layout.tsx
+sed -n '1,320p' apps/web/app/globals.css
+sed -n '1,280p' apps/web/components/builder/builder-shell.tsx
+cat apps/web/package.json
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+node -e "const icons=require('lucide-react'); console.log(['Github','GitBranch','FileTree','FileCode2','FolderTree'].map(k=>[k,Boolean(icons[k])]))"
+npm run build -w apps/web
+npm run build -w apps/web
+sed -n '1,260p' /Users/dovudxonasrorxonov/.codex/plugins/cache/openai-bundled/browser/26.608.12217/skills/control-in-app-browser/SKILL.md
+npm run dev -w apps/web -- -p 3002
+npm run dev -w apps/web -- -p 3002
+npm run dev -w apps/web -- -H 127.0.0.1 -p 3002
+npm run typecheck
+npm test
+npm run lint
+npm run typecheck -w apps/web
+npm run lint -w apps/web
+git diff --check
+git status --short
+git diff -- apps/web/README.md apps/web/app/page.tsx
+find apps/web/app/builder apps/web/components/landing -type f -maxdepth 3 -print | sort
+sed -n '1,220p' apps/web/app/builder/page.tsx
+sed -n '1,260p' apps/web/components/landing/landing-page.tsx
+sed -n '1,260p' apps/web/components/landing/landing-hero.tsx
+sed -n '1,260p' apps/web/components/landing/landing-nav.tsx
+sed -n '1,240p' apps/web/components/landing/command-card.tsx
+sed -n '1,260p' apps/web/components/landing/hero-orbit-lines.tsx
+sed -n '1,180p' apps/web/components/landing/logo-strip.tsx
+```
+
+Verification result:
+
+- Initial `npm run typecheck -w apps/web` failed because the installed `lucide-react` version does not export `Github` or `FileTree`.
+- Verified available lucide exports and replaced them with `GitBranch` and `FolderTree`.
+- `npm run typecheck -w apps/web` passed after the icon fix.
+- `npm test -w apps/web` passed: 4 files, 46 tests.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed:
+  - `/` prerendered as static content;
+  - `/builder` prerendered as static content;
+  - `/api/generate` server-rendered on demand.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 4 files, 46 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+
+Manual/browser verification:
+
+- Browser workflow instructions were read for the in-app browser plugin.
+- Sandboxed `npm run dev -w apps/web -- -p 3002` failed because binding to `0.0.0.0:3002` is not permitted in the sandbox.
+- Escalated `npm run dev -w apps/web -- -p 3002` was requested for responsive browser verification but was rejected by the user.
+- Sandboxed `npm run dev -w apps/web -- -H 127.0.0.1 -p 3002` also failed because binding to `127.0.0.1:3002` is not permitted in the sandbox.
+- The user said they will run the dev server themselves.
+- Browser-level responsive verification at 375px, 768px, 1280px, and 1440px+ remains pending for the user-run dev server.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending.
+- Step 3 browser-level responsive QA remains pending because the local dev server was not available to the assistant.
+- `.agents/prompts/phase-08/step-3.md` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- User-run browser verification for `/` and `/builder`, then Phase 8 Step 4: create the dedicated documentation page.
+
 ### 2026-07-04
+
+Phase 8 Step 2 completed: Add Docs, Supported Stack, and Limitations
+
+Scope and prerequisite note:
+
+- Read the context files, progress tracker, and Phase 8 Step 2 prompt before making changes.
+- Confirmed Phase 8 Step 1 is documented as complete.
+- Proceeded with Phase 8 Step 2 because the user explicitly requested it despite unresolved manual Phase 6/7 website/download QA.
+- Did not mark Phase 6 or Phase 7 complete.
+- Did not move to Phase 8 Step 3.
+- Did not add CLI functionality.
+- Did not add new product options.
+- Did not add user accounts, saved presets, or marketing-only pages.
+- Did not change generator behavior.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Expanded root `README.md` with concise MVP documentation:
+  - LaunchKit is a TypeScript-first developer project generator.
+  - The MVP is website-first: configure, preview, and download a zip.
+  - The future CLI is deferred and not claimed as existing.
+  - Supported MVP stack options are documented exactly from `@launchkit/schema`.
+  - Downloaded-project npm and pnpm usage commands are documented.
+  - Feature notes are documented for PostgreSQL, Prisma, Auth.js credentials, and Docker PostgreSQL.
+  - Roadmap notes are limited to stabilizing the website MVP, adding a shared-generator CLI later, and adding more stack options after the core flow is reliable.
+  - MVP limitations are listed precisely.
+- Expanded `apps/web/README.md` with matching website-focused documentation:
+  - supported stack table;
+  - generated-project usage;
+  - feature-specific setup notes;
+  - roadmap;
+  - limitations;
+  - existing production/runtime safety notes preserved.
+- Added `apps/web/components/builder/supported-stack-section.tsx`:
+  - compact supported-stack section below the builder;
+  - dense developer-tool layout using token-based classes;
+  - after-download commands;
+  - limitations focused on deferred CLI, narrow MVP stack, auth scaffold, local Docker, and no server-side install/run of generated code.
+- Rendered the supported-stack section from `apps/web/components/builder/builder-shell.tsx` below the existing wizard/current-selection layout so the first screen remains the product builder.
+
+Files changed:
+
+- `README.md`
+- `apps/web/README.md`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/components/builder/supported-stack-section.tsx`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-08/step-2.md
+find . -maxdepth 2 -type f | sed 's#^./##' | sort | head -200
+sed -n '1,260p' context/project-overview.md
+sed -n '1,320p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/project-overview.md
+sed -n '321,700p' context/architecture.md
+sed -n '361,980p' context/build-plan.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '241,620p' context/progress-tracker.md
+sed -n '621,980p' context/progress-tracker.md
+sed -n '981,1340p' context/progress-tracker.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '1,260p' README.md
+sed -n '1,260p' apps/web/README.md
+sed -n '1,280p' packages/schema/src/options.ts
+sed -n '1,260p' packages/schema/src/config.ts
+sed -n '1,360p' packages/schema/src/metadata.ts
+sed -n '1,220p' apps/web/app/page.tsx
+sed -n '1,360p' apps/web/components/builder/builder-shell.tsx
+find apps/web/components -maxdepth 3 -type f | sort
+sed -n '1,360p' apps/web/lib/builder/phase-6-verification.test.ts
+sed -n '1,260p' apps/web/lib/builder/preview.ts
+sed -n '1,220p' apps/web/lib/builder/builder-state.ts
+sed -n '1,220p' apps/web/lib/builder/steps.ts
+cat apps/web/package.json
+cat package.json
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm test
+npm run lint
+git status --short
+git diff --stat
+git diff -- README.md apps/web/README.md apps/web/components/builder/builder-shell.tsx
+sed -n '1,260p' apps/web/components/builder/supported-stack-section.tsx
+```
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm test -w apps/web` passed: 4 files, 46 tests.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed:
+  - `/` prerendered as static content;
+  - `/api/generate` server-rendered on demand.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 4 files, 46 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending.
+- Phase 8 Step 2 was started by direct user request despite the unresolved manual Phase 7 QA.
+- `.agents/prompts/phase-08/step-2.md` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- Complete the pending manual website/download QA, or continue Phase 8 Step 3 only if intentionally proceeding despite that unresolved manual verification.
+
+Phase 8 Step 1 completed: Prepare Deployment and Production Readiness
+
+Scope and prerequisite note:
+
+- Read the context files and Phase 8 Step 1 prompt before making changes.
+- The tracker still says Phase 7 is not fully complete because manual website/download QA remains pending.
+- Proceeded with Phase 8 Step 1 because the user explicitly requested it in this turn.
+- Did not mark Phase 6 or Phase 7 complete.
+- Did not move to Phase 8 Step 2.
+- Did not add CLI functionality.
+- Did not add new product options.
+- Did not add user accounts, saved presets, analytics, or provider-specific deployment files.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added minimal Next.js security headers in `apps/web/next.config.ts`:
+  - `X-Content-Type-Options: nosniff`;
+  - `Referrer-Policy: strict-origin-when-cross-origin`.
+- Added explicit viewport metadata in `apps/web/app/layout.tsx`.
+- Marked `apps/web/app/api/generate/route.ts` as `runtime = "nodejs"` because the route uses server-side template loading backed by Node filesystem APIs.
+- Replaced the stale default `apps/web/README.md` with concise LaunchKit web app notes:
+  - local run command;
+  - production build/start commands;
+  - no website MVP environment variables required;
+  - generated-project `DATABASE_URL` and `AUTH_SECRET` belong inside downloaded projects, not the LaunchKit website;
+  - the website does not install generated dependencies, execute generated code, start generated app servers, or write generated projects to disk.
+- Confirmed existing production metadata:
+  - page title: `LaunchKit`;
+  - description: `Build and download TypeScript project starters.`;
+  - favicon exists at `apps/web/app/favicon.ico`.
+- Confirmed the website first screen remains the product builder via `apps/web/app/page.tsx`.
+- Confirmed API deployment safety by code/tests:
+  - request size limit exists;
+  - schema validation runs;
+  - compatibility validation runs;
+  - generated paths are checked before response serialization;
+  - structured errors are returned;
+  - stack traces are not leaked;
+  - generated files are not written to disk by the API;
+  - generated code is not executed;
+  - generated dependencies are not installed.
+- Confirmed runtime boundary by code search:
+  - Node filesystem APIs are isolated to `apps/web/lib/api/template-loader.ts`;
+  - generation runs through `POST /api/generate`;
+  - browser ZIP creation stays in `apps/web/lib/download/create-project-zip.ts`;
+  - no generated-project install/run/server-start code exists in the website flow.
+- Confirmed no `apps/web/.env.example` is needed for the LaunchKit website MVP because no website runtime environment variables are used.
+- Reviewed web dependencies:
+  - `jszip` is in the web workspace where browser-side ZIP creation uses it;
+  - `@launchkit/generator` remains a web runtime dependency because the API route calls it;
+  - no broad dependency upgrades or removals were performed.
+
+Files changed:
+
+- `apps/web/README.md`
+- `apps/web/app/api/generate/route.ts`
+- `apps/web/app/layout.tsx`
+- `apps/web/next.config.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-08/step-1.md
+git status --short
+rg --files context
+sed -n '241,520p' context/progress-tracker.md
+sed -n '521,900p' context/progress-tracker.md
+sed -n '1,260p' context/project-overview.md
+sed -n '261,620p' context/project-overview.md
+sed -n '621,980p' context/project-overview.md
+sed -n '1,260p' context/architecture.md
+sed -n '261,620p' context/architecture.md
+sed -n '621,980p' context/architecture.md
+sed -n '1,260p' context/build-plan.md
+sed -n '261,620p' context/build-plan.md
+sed -n '621,980p' context/build-plan.md
+sed -n '981,1340p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/ui-rules.md
+wc -l context/progress-tracker.md
+sed -n '901,1260p' context/progress-tracker.md
+find . -maxdepth 3 -name package.json -print
+rg --files apps/web | sort
+cat package.json
+cat apps/web/package.json
+cat apps/web/next.config.ts
+sed -n '1,220p' apps/web/app/layout.tsx
+sed -n '1,220p' apps/web/app/page.tsx
+sed -n '1,220p' apps/web/app/api/generate/route.ts
+sed -n '1,420p' apps/web/lib/api/generate.ts
+sed -n '1,320p' apps/web/lib/download/create-project-zip.ts
+sed -n '1,280p' apps/web/lib/api/client.ts
+sed -n '1,360p' apps/web/lib/builder/preview.ts
+rg -n "@launchkit/generator|node:|fs|path|child_process|createProjectZip|handleGenerateProjectRequest|generateProject" apps/web -g '!node_modules/**' -g '!dist/**' -g '!\\.next/**'
+find apps/web -maxdepth 2 -name '.env*' -print
+cat packages/generator/package.json
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,360p' packages/generator/src/generation-plan.ts
+sed -n '1,360p' packages/generator/src/features/definitions.ts
+sed -n '1,220p' apps/web/components/builder/builder-shell.tsx
+rg -n "createBuilderPreview|use client|from \"@/lib/builder/preview\"" apps/web/components apps/web/lib -g '!node_modules/**'
+cat tsconfig.base.json
+cat apps/web/tsconfig.json
+sed -n '1,260p' packages/generator/src/features/registry.ts
+sed -n '1,260p' packages/generator/src/package-json.ts
+sed -n '1,260p' packages/generator/src/env.ts
+sed -n '1,360p' packages/generator/src/generate-project.ts
+sed -n '1,260p' packages/generator/src/template-loader.ts
+rg -n "node:|fs|path|child_process|process|Buffer" packages/generator/src packages/templates/src packages/schema/src -g '!dist/**'
+sed -n '1,220p' apps/web/lib/api/template-loader.ts
+sed -n '1,260p' README.md
+sed -n '1,260p' apps/web/README.md
+npm ls --depth=0
+npm ls --depth=0 -w apps/web
+test -d node_modules/server-only && printf yes || printf no
+sed -n '1,380p' apps/web/lib/api/generate.test.ts
+sed -n '1,260p' apps/web/lib/api/response.ts
+sed -n '1,240p' apps/web/lib/api/types.ts
+rg -n "process\\.env|NEXT_PUBLIC|DATABASE_URL|AUTH_SECRET" apps/web -g '!node_modules/**' -g '!\\.next/**'
+git diff --stat
+rg -n "from \"shadcn\"|from 'shadcn'|shadcn|radix-ui|@radix-ui|lucide-react|class-variance-authority|tailwind-merge|tw-animate-css|clsx" apps/web -g '!node_modules/**' -g '!\\.next/**'
+rg -n "@launchkit/generator|jszip|shadcn|radix-ui|lucide-react|class-variance-authority|tailwind-merge|tw-animate-css|clsx" apps/web/package.json package-lock.json
+sed -n '1,240p' apps/web/app/globals.css
+rg -n "from \"@/components/ui|components/ui|buttonVariants|cn\\(" apps/web -g '!node_modules/**' -g '!\\.next/**'
+npm run typecheck -w apps/web
+npm test -w apps/web
+npm run lint -w apps/web
+git diff --check
+npm run build -w apps/web
+npm run build -w apps/web
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run test:smoke
+git status --short
+git diff --stat
+git diff -- apps/web/next.config.ts apps/web/app/layout.tsx apps/web/app/api/generate/route.ts apps/web/README.md
+sed -n '1,120p' context/progress-tracker.md
+```
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm test -w apps/web` passed: 4 files, 46 tests.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- Initial sandboxed `npm run build -w apps/web` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build -w apps/web` passed:
+  - `/` prerendered as static content;
+  - `/api/generate` server-rendered on demand.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 4 files, 46 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Escalated `npm run build` passed across all workspaces.
+- Escalated `npm run test:smoke` passed:
+  - 1 smoke test file;
+  - 2 smoke tests;
+  - default generated project installed, typechecked, and built in about 18 seconds;
+  - all-compatible generated project installed, ran required generated checks, typechecked, and built in about 31 seconds;
+  - total duration about 49 seconds.
+
+Notes/blockers:
+
+- Phase 6 manual browser/download QA remains pending.
+- Phase 7 manual website/download completion verification remains pending.
+- Phase 8 was started by direct user request despite the tracker's previous note to wait for manual Phase 7 QA.
+- `memory.md` had pre-existing/unrelated local modifications and was left untouched.
+- `.agents/prompts/phase-08/` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- Complete the pending manual website/download QA, or continue Phase 8 Step 2 only if intentionally proceeding despite that unresolved manual verification.
 
 Phase 7 Step 7 completed: Verify Phase 7 completion
 
