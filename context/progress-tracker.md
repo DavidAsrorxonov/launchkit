@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 9 Step 8 existing-directory safety completed
-Primary focus: CLI now detects target directory state, rejects unsafe non-empty --yes writes, prompts interactively for non-empty directories, detects file conflicts before writing, and handles current-directory next steps; next scope is optional dependency install prompt
+Current phase: Phase 9 Step 9 optional dependency install prompt completed
+Primary focus: CLI now optionally installs dependencies after safe project writes, supports --install/--no-install, keeps --yes non-installing by default, and adjusts next steps based on install status; next scope is CLI tests and smoke checks
 ```
 
 ## Phase Progress
@@ -23,11 +23,179 @@ Primary focus: CLI now detects target directory state, rejects unsafe non-empty 
 | Phase 6 | Website MVP                           | Complete    | Step 12 automated checks passed; user reported localhost browser/download QA works. |
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
-| Phase 9 | Future CLI                            | In Progress | Step 8 adds robust existing-directory safety, interactive confirmation, conflict detection before writes, and current-directory next steps; dependency install remains future work. |
+| Phase 9 | Future CLI                            | In Progress | Step 9 adds optional dependency installation after writes, --install/--no-install flags, package-manager-aware install commands, and install-aware next steps. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-06
+
+Phase 9 Step 9 completed: Add optional dependency install prompt
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 9 Step 9 prompt before making changes.
+- Confirmed Phase 9 Step 8 is documented as complete.
+- Implemented only this optional dependency install prompt step.
+- Did not move to Phase 9 Step 10.
+- Did not run generated project code.
+- Did not start dev servers.
+- Did not start Docker containers.
+- Did not connect to databases.
+- Did not duplicate generator logic.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added optional dependency install prompt after successful file writes.
+- Added install command helper in `packages/cli/src/install.ts`.
+- Added safe process execution with `spawn(command, args, { cwd })` and inherited stdio.
+- Added injectable `CommandRunner` so tests do not run real package manager installs.
+- Added `--install` and `--no-install` flags.
+- Added `--yes` behavior:
+  - skips prompts;
+  - does not install dependencies by default;
+  - can install only when `--install` is explicitly passed.
+- Added package-manager-aware install commands:
+  - `npm install`;
+  - `pnpm install`.
+- Ensured install commands run in the generated project directory returned by the writer, not the LaunchKit repo root.
+- Added install failure handling:
+  - generated files are kept;
+  - CLI exits non-zero;
+  - prints a clear failure message;
+  - prints the manual install command;
+  - prints next steps with the install command still included.
+- Updated next-step output:
+  - install skipped: include install command;
+  - install succeeded: omit install command;
+  - current-directory target still omits `cd .`.
+- Added Vitest coverage for install flags, command construction, install cwd, prompt default skip behavior, `--yes` skip behavior, `--install` success behavior, `--no-install` skip behavior, install failure output, current-directory next steps, and no real installs in tests.
+- Confirmed generated app code is not run.
+
+Files changed:
+
+- `packages/cli/src/install.ts`
+- `packages/cli/src/install.test.ts`
+- `packages/cli/src/args.ts`
+- `packages/cli/src/args.test.ts`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/index.test.ts`
+- `packages/cli/src/write-project.ts`
+- `packages/cli/src/write-project.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-09/step-9.md
+git status --short
+sed -n '261,560p' .agents/prompts/phase-09/step-9.md
+rg --files context
+sed -n '1,1200p' context/architecture.md
+sed -n '1,1500p' context/build-plan.md
+sed -n '1,1200p' context/project-overview.md
+sed -n '1,900p' context/ui-rules.md
+sed -n '1,360p' packages/cli/src/args.ts
+sed -n '1,420p' packages/cli/src/index.ts
+sed -n '1,460p' packages/cli/src/index.test.ts
+sed -n '1,340p' packages/cli/src/args.test.ts
+sed -n '1,340p' packages/cli/src/prompts.ts
+sed -n '1,320p' packages/cli/src/write-project.ts
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run build
+mktemp -d /private/tmp/launchkit-cli-step9.XXXXXX
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js my-app --yes
+find my-app -maxdepth 2 -type f -print
+find . -name node_modules -print
+find . -name package-lock.json -print
+find . -name pnpm-lock.yaml -print
+rg -n "node:test|node --test|npm run dev|pnpm dev|next dev|docker|prisma|spawn\\(|exec\\(|execFile|child_process|execa|npm install|pnpm install" packages/cli/src
+git diff --check
+git status --short
+git diff --stat
+git diff -- packages/cli/src/install.ts packages/cli/src/args.ts packages/cli/src/index.ts packages/cli/src/write-project.ts
+git diff -- packages/cli/src/install.test.ts packages/cli/src/args.test.ts packages/cli/src/index.test.ts packages/cli/src/write-project.test.ts
+git diff --stat
+```
+
+Verification result:
+
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 8 files, 122 tests.
+- `npm run build -w create-launchkit` passed.
+- `npm run typecheck` passed across workspaces, including `create-launchkit`.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 8 files, 122 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/_not-found`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit` built with `tsc -p tsconfig.json`;
+  - generator, schema, shared, and templates built successfully.
+- Static scan found no Node built-in test runner usage.
+- Static scan found process execution only in `packages/cli/src/install.ts`, where `spawn` is used with argument arrays for package-manager install commands.
+- Static scan found install/dev command strings in install helpers, next-step output, and tests; no generated app dev command execution is implemented.
+- Static scan found Docker/Prisma mentions only in existing option parsing, validation, and tests; no Docker, Prisma, or database command execution is implemented.
+- `git diff --check` passed.
+
+Manual verification:
+
+- Created temporary manual verification directory:
+  - `/private/tmp/launchkit-cli-step9.kyOq7D`
+- Ran the built CLI from that directory:
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js my-app --yes`
+- CLI exited `0` and printed:
+  - `Created my-app in ./my-app`;
+  - next steps with `cd my-app`;
+  - `npm install`;
+  - `npm run dev`.
+- Verified generated files:
+  - `my-app/package.json`;
+  - `my-app/.env.example`;
+  - `my-app/README.md`.
+- Verified dependency installation did not run by default with `--yes`:
+  - `find . -name node_modules -print` produced no output;
+  - `find . -name package-lock.json -print` produced no output;
+  - `find . -name pnpm-lock.yaml -print` produced no output.
+- Did not run manual `--install` because it would perform a real network-dependent package installation.
+- Did not run `npm install`.
+- Did not run generated project code.
+- Did not run `npm run dev`.
+- Did not start Docker containers.
+- Did not run Prisma commands.
+- Did not connect to databases.
+
+Notes/blockers:
+
+- `--install` and `--no-install` were both implemented because the existing `node:util` parser supports these flags cleanly.
+- `--install` is covered with mocked command runners in tests; no tests run real package manager installs.
+- Real `--install` manual verification was skipped intentionally to avoid network-dependent dependency installation.
+- The generated file list reflects the current default generator API output used by the CLI in this phase: `package.json`, `.env.example`, and `README.md`.
+- `packages/cli/dist/` was generated by the build and remains ignored by the root `dist` gitignore rule.
+- `.agents/prompts/phase-09/step-9.md` is untracked prompt context and was left untouched.
+- The temporary manual verification directory under `/private/tmp` was left in place for inspection.
+
+Next suggested step:
+
+- Phase 9 Step 10: Add CLI tests and smoke checks.
 
 ### 2026-07-06
 

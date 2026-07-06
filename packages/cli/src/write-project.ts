@@ -58,11 +58,16 @@ export function formatTargetDirForDisplay(targetDir: string): string {
 export function formatNextSteps(input: {
   targetDir: string;
   packageManager: GeneratedProject["packageManager"];
+  dependenciesInstalled?: boolean;
 }): string[] {
+  const installStep = input.dependenciesInstalled
+    ? []
+    : [`  ${input.packageManager} install`];
+
   if (input.targetDir === ".") {
     return [
       "Next steps:",
-      `  ${input.packageManager} install`,
+      ...installStep,
       input.packageManager === "pnpm" ? "  pnpm dev" : "  npm run dev",
     ];
   }
@@ -70,7 +75,7 @@ export function formatNextSteps(input: {
   return [
     "Next steps:",
     `  cd ${input.targetDir}`,
-    `  ${input.packageManager} install`,
+    ...installStep,
     input.packageManager === "pnpm" ? "  pnpm dev" : "  npm run dev",
   ];
 }

@@ -13,6 +13,11 @@ import {
   type CliProjectGenerator,
 } from "./generate.js";
 import {
+  formatInstallCommand,
+  installDependencies,
+  type CommandRunner,
+} from "./install.js";
+import {
   defaultPromptFunctions,
   promptForConfig,
   type PromptFunctions,
@@ -36,6 +41,7 @@ export type CliMainOptions = {
   promptFunctions?: PromptFunctions;
   projectGenerator?: CliProjectGenerator;
   projectWriter?: CliProjectWriter;
+  installCommandRunner?: CommandRunner;
   cwd?: string;
 };
 
@@ -82,7 +88,7 @@ export async function main(
       targetDir: args.targetDir,
       projectName: validation.config.name,
     });
-    await (options.projectWriter ?? writeGeneratedProject)({
+    const writeResult = await (options.projectWriter ?? writeGeneratedProject)({
       project,
       targetDir,
       cwd: options.cwd,
@@ -97,9 +103,45 @@ export async function main(
     output.log(`Created ${project.name} in ${formatTargetDirForDisplay(targetDir)}`);
     output.log("");
 
+    const shouldInstall = await shouldInstallDependencies({
+      installFlag: args.install,
+      yes: args.yes,
+      promptFunctions,
+    });
+
+    if (shouldInstall) {
+      try {
+        output.log("Installing dependencies...");
+        await installDependencies({
+          targetDir: writeResult.targetDir,
+          packageManager: project.packageManager,
+          commandRunner: options.installCommandRunner,
+        });
+        output.log("");
+      } catch (error) {
+        output.error(
+          "Error: Project files were created, but dependency installation failed.",
+        );
+        output.error(`Error: ${formatCliErrorMessage(error)}`);
+        output.error("Run this manually:");
+        output.error(`  ${formatInstallCommand(project.packageManager)}`);
+        output.log("");
+
+        for (const line of formatNextSteps({
+          targetDir,
+          packageManager: project.packageManager,
+        })) {
+          output.log(line);
+        }
+
+        return 1;
+      }
+    }
+
     for (const line of formatNextSteps({
       targetDir,
       packageManager: project.packageManager,
+      dependenciesInstalled: shouldInstall,
     })) {
       output.log(line);
     }
@@ -127,4 +169,23 @@ function formatCliErrorMessage(error: unknown): string {
   }
 
   return "Project generation failed.";
+}
+
+async function shouldInstallDependencies(input: {
+  installFlag?: boolean;
+  yes: boolean;
+  promptFunctions: PromptFunctions;
+}): Promise<boolean> {
+  if (input.installFlag !== undefined) {
+    return input.installFlag;
+  }
+
+  if (input.yes) {
+    return false;
+  }
+
+  return input.promptFunctions.confirm({
+    message: "Install dependencies now?",
+    default: false,
+  });
 }

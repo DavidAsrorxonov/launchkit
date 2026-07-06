@@ -31,6 +31,7 @@ export type CliArgs = {
   orm?: OrmFlag;
   auth?: AuthFlag;
   docker?: DockerFlag;
+  install?: boolean;
   yes: boolean;
   help: boolean;
   version: boolean;
@@ -57,7 +58,9 @@ export function parseCliArgs(argv: string[] = process.argv.slice(2)): CliArgs {
         database: { type: "string" },
         docker: { type: "string" },
         help: { type: "boolean", short: "h" },
+        install: { type: "boolean" },
         name: { type: "string" },
+        "no-install": { type: "boolean" },
         orm: { type: "string" },
         "package-manager": { type: "string" },
         ui: { type: "string" },
@@ -74,6 +77,10 @@ export function parseCliArgs(argv: string[] = process.argv.slice(2)): CliArgs {
     throw new CliArgumentError("Expected at most one target directory.");
   }
 
+  if (parsed.values.install === true && parsed.values["no-install"] === true) {
+    throw new CliArgumentError("Use either --install or --no-install, not both.");
+  }
+
   return {
     targetDir: parsed.positionals[0],
     name: readStringFlag(parsed.values.name, "name"),
@@ -87,6 +94,7 @@ export function parseCliArgs(argv: string[] = process.argv.slice(2)): CliArgs {
     orm: readLiteralFlag(parsed.values.orm, "orm", ormOptions),
     auth: readLiteralFlag(parsed.values.auth, "auth", authOptions),
     docker: readLiteralFlag(parsed.values.docker, "docker", dockerOptions),
+    install: readInstallFlag(parsed.values.install, parsed.values["no-install"]),
     yes: parsed.values.yes === true,
     help: parsed.values.help === true,
     version: parsed.values.version === true,
@@ -107,6 +115,8 @@ Options:
   --orm <${formatAllowedValues(ormOptions)}>                   Select ORM scaffolding.
   --auth <${formatAllowedValues(authOptions)}>      Select auth scaffolding.
   --docker <${formatAllowedValues(dockerOptions)}>              Select Docker Compose scaffolding.
+  --install                            Install dependencies after project creation.
+  --no-install                         Skip dependency installation.
   -y, --yes                             Accept defaults where possible.
   -h, --help                            Show this help text.
   -v, --version                         Show the CLI version.
@@ -119,6 +129,29 @@ Examples:
 
 export function getVersionText(): string {
   return CLI_VERSION;
+}
+
+function readInstallFlag(
+  installValue: string | boolean | (string | boolean)[] | undefined,
+  noInstallValue: string | boolean | (string | boolean)[] | undefined,
+): boolean | undefined {
+  if (installValue === true) {
+    return true;
+  }
+
+  if (noInstallValue === true) {
+    return false;
+  }
+
+  if (installValue !== undefined) {
+    throw new CliArgumentError("--install must not receive a value.");
+  }
+
+  if (noInstallValue !== undefined) {
+    throw new CliArgumentError("--no-install must not receive a value.");
+  }
+
+  return undefined;
 }
 
 function readStringFlag(

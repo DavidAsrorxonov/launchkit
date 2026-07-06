@@ -10,6 +10,7 @@ import {
 describe("parseCliArgs", () => {
   it("parses empty args", () => {
     expect(parseCliArgs([])).toEqual({
+      install: undefined,
       yes: false,
       help: false,
       version: false,
@@ -66,6 +67,20 @@ describe("parseCliArgs", () => {
     expect(parseCliArgs(["--yes"])).toMatchObject({ yes: true });
   });
 
+  it("parses --install", () => {
+    expect(parseCliArgs(["--install"])).toMatchObject({ install: true });
+  });
+
+  it("parses --no-install", () => {
+    expect(parseCliArgs(["--no-install"])).toMatchObject({ install: false });
+  });
+
+  it("throws a typed error when --install and --no-install are combined", () => {
+    expect(() => parseCliArgs(["--install", "--no-install"])).toThrow(
+      CliArgumentError,
+    );
+  });
+
   it("parses --help", () => {
     expect(parseCliArgs(["--help"])).toMatchObject({ help: true });
   });
@@ -109,6 +124,8 @@ describe("help and version text", () => {
     expect(helpText).toContain("--orm <none|prisma>");
     expect(helpText).toContain("--auth <none|authjs-credentials>");
     expect(helpText).toContain("--docker <none|postgres>");
+    expect(helpText).toContain("--install");
+    expect(helpText).toContain("--no-install");
     expect(helpText).toContain("-y, --yes");
     expect(helpText).toContain("-h, --help");
     expect(helpText).toContain("-v, --version");

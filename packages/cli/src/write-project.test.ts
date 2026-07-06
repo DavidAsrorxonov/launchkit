@@ -271,6 +271,33 @@ describe("target directory and output formatting", () => {
     ]);
   });
 
+  it("omits install step when dependencies were installed", () => {
+    expect(
+      formatNextSteps({
+        targetDir: "my-app",
+        packageManager: "npm",
+        dependenciesInstalled: true,
+      }),
+    ).toEqual([
+      "Next steps:",
+      "  cd my-app",
+      "  npm run dev",
+    ]);
+  });
+
+  it("omits install step for current directory when dependencies were installed", () => {
+    expect(
+      formatNextSteps({
+        targetDir: ".",
+        packageManager: "pnpm",
+        dependenciesInstalled: true,
+      }),
+    ).toEqual([
+      "Next steps:",
+      "  pnpm dev",
+    ]);
+  });
+
   it("formats pnpm next steps", () => {
     expect(formatNextSteps({ targetDir: "my-app", packageManager: "pnpm" })).toEqual([
       "Next steps:",

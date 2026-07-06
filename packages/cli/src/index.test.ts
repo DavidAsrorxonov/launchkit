@@ -11,6 +11,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { CliProjectGenerator } from "./generate.js";
+import type { CommandRunner } from "./install.js";
 import { main, type CliOutput } from "./index.js";
 import type { PromptFunctions } from "./prompts.js";
 import type { CliProjectWriter } from "./write-project.js";
@@ -34,11 +35,13 @@ describe("main", () => {
       files: ["package.json", "README.md"],
     });
     const projectWriter = createProjectWriter();
+    const installCalls: CommandRunnerCall[] = [];
 
     const exitCode = await main(["my-app", "--yes"], {
       output,
       projectGenerator,
       projectWriter,
+      installCommandRunner: createCommandRunner(installCalls),
     });
 
     expect(exitCode).toBe(0);
@@ -59,6 +62,7 @@ describe("main", () => {
         yes: true,
       },
     ]);
+    expect(installCalls).toEqual([]);
   });
 
   it("uses --name as the default target directory", async () => {
@@ -270,6 +274,11 @@ describe("main", () => {
         message: "The target directory is not empty. Continue and add LaunchKit files?",
         default: false,
       },
+      {
+        kind: "confirm",
+        message: "Install dependencies now?",
+        default: false,
+      },
     ]);
     await expect(readFile(path.join(cwd, "my-app", "package.json"), "utf8")).resolves.toBe(
       "",
@@ -312,6 +321,193 @@ describe("main", () => {
     expect(output.logs).toEqual([]);
     expect(output.errors).toEqual(["Error: Project creation cancelled."]);
   });
+
+  it("asks whether to install dependencies after files are written in interactive mode", async () => {
+    const output = createOutputCapture();
+    const projectWriter = createProjectWriter();
+    const prompts = createPromptFunctions();
+    const installCalls: CommandRunnerCall[] = [];
+
+    const exitCode = await main(
+      [
+        "my-app",
+        "--name",
+        "my-app",
+        "--package-manager",
+        "npm",
+        "--ui",
+        "none",
+        "--database",
+        "none",
+        "--auth",
+        "none",
+      ],
+      {
+        output,
+        promptFunctions: prompts,
+        projectGenerator: createProjectGenerator({
+          name: "my-app",
+          packageManager: "npm",
+          files: ["package.json"],
+        }),
+        projectWriter,
+        installCommandRunner: createCommandRunner(installCalls),
+      },
+    );
+
+    expect(exitCode).toBe(0);
+    expect(projectWriter.calls).toHaveLength(1);
+    expect(prompts.calls).toEqual([
+      {
+        kind: "confirm",
+        message: "Install dependencies now?",
+        default: false,
+      },
+    ]);
+    expect(installCalls).toEqual([]);
+  });
+
+  it("--install runs dependency installation without prompting", async () => {
+    const output = createOutputCapture();
+    const installCalls: CommandRunnerCall[] = [];
+
+    const exitCode = await main(["my-app", "--yes", "--install"], {
+      output,
+      projectGenerator: createProjectGenerator({
+        name: "my-app",
+        packageManager: "npm",
+        files: ["package.json"],
+      }),
+      projectWriter: createProjectWriter({
+        resolvedTargetDir: "/tmp/my-app",
+      }),
+      installCommandRunner: createCommandRunner(installCalls),
+    });
+
+    expect(exitCode).toBe(0);
+    expect(installCalls).toEqual([
+      {
+        command: "npm",
+        args: ["install"],
+        cwd: "/tmp/my-app",
+      },
+    ]);
+    expect(output.logs).toEqual([
+      "Created my-app in ./my-app",
+      "",
+      "Installing dependencies...",
+      "",
+      "Next steps:",
+      "  cd my-app",
+      "  npm run dev",
+    ]);
+  });
+
+  it("--no-install skips dependency installation without prompting", async () => {
+    const output = createOutputCapture();
+    const prompts = createPromptFunctions();
+    const installCalls: CommandRunnerCall[] = [];
+
+    const exitCode = await main(
+      [
+        "my-app",
+        "--name",
+        "my-app",
+        "--package-manager",
+        "npm",
+        "--ui",
+        "none",
+        "--database",
+        "none",
+        "--auth",
+        "none",
+        "--no-install",
+      ],
+      {
+        output,
+        promptFunctions: prompts,
+        projectGenerator: createProjectGenerator({
+          name: "my-app",
+          packageManager: "npm",
+          files: ["package.json"],
+        }),
+        projectWriter: createProjectWriter(),
+        installCommandRunner: createCommandRunner(installCalls),
+      },
+    );
+
+    expect(exitCode).toBe(0);
+    expect(prompts.calls).toEqual([]);
+    expect(installCalls).toEqual([]);
+    expect(output.logs).toContain("  npm install");
+  });
+
+  it("uses the generated project directory as install cwd", async () => {
+    const output = createOutputCapture();
+    const cwd = await createTempRoot();
+    const installCalls: CommandRunnerCall[] = [];
+
+    const exitCode = await main(["my-app", "--yes", "--install"], {
+      cwd,
+      output,
+      projectGenerator: createProjectGenerator({
+        name: "my-app",
+        packageManager: "pnpm",
+        files: ["package.json"],
+      }),
+      installCommandRunner: createCommandRunner(installCalls),
+    });
+
+    expect(exitCode).toBe(0);
+    expect(installCalls).toEqual([
+      {
+        command: "pnpm",
+        args: ["install"],
+        cwd: path.join(cwd, "my-app"),
+      },
+    ]);
+    expect(output.logs).toContain("  pnpm dev");
+    expect(output.logs).not.toContain("  pnpm install");
+  });
+
+  it("reports install failure, keeps generated files, and prints manual next steps", async () => {
+    const output = createOutputCapture();
+    const cwd = await createTempRoot();
+
+    const exitCode = await main(["my-app", "--yes", "--install"], {
+      cwd,
+      output,
+      projectGenerator: createProjectGenerator({
+        name: "my-app",
+        packageManager: "npm",
+        files: ["package.json"],
+      }),
+      installCommandRunner: async () => {
+        throw new Error("npm install failed with exit code 1.");
+      },
+    });
+
+    expect(exitCode).toBe(1);
+    await expect(readFile(path.join(cwd, "my-app", "package.json"), "utf8")).resolves.toBe(
+      "",
+    );
+    expect(output.errors).toEqual([
+      "Error: Project files were created, but dependency installation failed.",
+      "Error: npm install failed with exit code 1.",
+      "Run this manually:",
+      "  npm install",
+    ]);
+    expect(output.logs).toEqual([
+      "Created my-app in ./my-app",
+      "",
+      "Installing dependencies...",
+      "",
+      "Next steps:",
+      "  cd my-app",
+      "  npm install",
+      "  npm run dev",
+    ]);
+  });
 });
 
 function createOutputCapture(): CliOutput & {
@@ -348,7 +544,9 @@ function createProjectGenerator(input: {
   });
 }
 
-function createProjectWriter(): CliProjectWriter & {
+function createProjectWriter(options?: {
+  resolvedTargetDir?: string;
+}): CliProjectWriter & {
   calls: Array<{
     targetDir: string;
     projectName: string;
@@ -373,12 +571,28 @@ function createProjectWriter(): CliProjectWriter & {
       });
 
       return {
-        targetDir: input.targetDir,
+        targetDir: options?.resolvedTargetDir ?? input.targetDir,
         filesWritten: input.project.files.map((file) => file.path),
       };
     },
     { calls },
   );
+}
+
+type CommandRunnerCall = {
+  command: string;
+  args: string[];
+  cwd: string;
+};
+
+function createCommandRunner(calls: CommandRunnerCall[]): CommandRunner {
+  return async (command, args, options) => {
+    calls.push({
+      command,
+      args,
+      cwd: options.cwd,
+    });
+  };
 }
 
 type PromptCall = {
