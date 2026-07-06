@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 9 Step 1 CLI planning decisions documented; Phase 8 manual localhost browser/responsive/download QA reported complete by user
-Primary focus: Website MVP is stable enough to proceed to Phase 9 Step 2 CLI package foundation when prompted
+Current phase: Phase 9 Step 2 CLI package foundation completed
+Primary focus: CLI workspace scaffold exists with package metadata, bin entry, TypeScript config, placeholder entry point, and minimal Vitest coverage; next scope is argument parsing
 ```
 
 ## Phase Progress
@@ -23,11 +23,135 @@ Primary focus: Website MVP is stable enough to proceed to Phase 9 Step 2 CLI pac
 | Phase 6 | Website MVP                           | Complete    | Step 12 automated checks passed; user reported localhost browser/download QA works. |
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
-| Phase 9 | Future CLI                            | In Progress | Step 1 planning decisions documented; Phase 9 Step 2 package foundation is unblocked when prompted. |
+| Phase 9 | Future CLI                            | In Progress | Step 2 created the `create-launchkit` workspace package foundation; no real CLI generation behavior added. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-06
+
+Phase 9 Step 2 completed: Create CLI package foundation
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 9 Step 2 prompt before making changes.
+- Confirmed Phase 9 Step 1 is documented as complete.
+- Confirmed Phase 8 is marked complete after user-reported localhost browser/responsive/download QA.
+- Implemented only this package foundation step.
+- Did not move to Phase 9 Step 3.
+- Did not add argument parsing.
+- Did not add interactive prompts.
+- Did not connect to the generator.
+- Did not write generated files to disk.
+- Did not install generated project dependencies.
+- Did not duplicate schema or generator logic.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Created `packages/cli` workspace package.
+- Added `create-launchkit` package metadata.
+- Added CLI bin entry for `create-launchkit` pointing to `./dist/index.js`.
+- Added TypeScript config using the repo's NodeNext package style.
+- Added minimal executable CLI entry point with placeholder output only.
+- Added `cliPackageReady()` test seam for the scaffold.
+- Added minimal Vitest package test.
+- Ran `npm install` so `package-lock.json` records the new workspace package link.
+- Confirmed no real CLI generation behavior was added.
+
+Files changed:
+
+- `packages/cli/package.json`
+- `packages/cli/tsconfig.json`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/index.test.ts`
+- `package-lock.json`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-09/step-2.md
+rg --files
+sed -n '1,260p' context/architecture.md
+sed -n '1,320p' context/build-plan.md
+sed -n '1,300p' context/project-overview.md
+sed -n '1,300p' context/ui-rules.md
+sed -n '261,520p' .agents/prompts/phase-09/step-2.md
+git status --short
+sed -n '261,620p' context/architecture.md
+sed -n '321,760p' context/build-plan.md
+sed -n '301,700p' context/project-overview.md
+sed -n '301,620p' context/ui-rules.md
+cat package.json
+cat .gitignore
+sed -n '621,980p' context/architecture.md
+sed -n '761,1120p' context/build-plan.md
+sed -n '701,980p' context/project-overview.md
+cat packages/schema/package.json
+cat packages/generator/package.json
+cat packages/templates/package.json
+sed -n '981,1120p' context/architecture.md
+sed -n '1121,1200p' context/build-plan.md
+cat packages/shared/package.json
+cat packages/generator/tsconfig.json
+cat packages/schema/tsconfig.json
+cat tsconfig.base.json
+npm install
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run build
+git diff --check
+git status --short
+rg -n "node:test|node --test|parseArgs|@inquirer|prompts|enquirer|generateProject|writeFile|mkdir|spawn\\(|exec\\(|execFile|npm install|pnpm install" packages/cli
+node packages/cli/dist/index.js
+git diff -- package-lock.json packages/cli/package.json packages/cli/tsconfig.json packages/cli/src/index.ts packages/cli/src/index.test.ts
+```
+
+Verification result:
+
+- `npm install` passed and updated `package-lock.json` with the `create-launchkit` workspace link.
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 1 file, 1 test.
+- `npm run build -w create-launchkit` passed.
+- `npm run typecheck` passed across workspaces, including `create-launchkit`.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 1 file, 1 test;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit` built with `tsc -p tsconfig.json`;
+  - generator, schema, shared, and templates built successfully.
+- `git diff --check` passed.
+- Static scan of `packages/cli` found no Node built-in test runner usage, argument parser, prompt library, generator integration, filesystem writes, process spawning, or dependency install behavior.
+- `node packages/cli/dist/index.js` printed `LaunchKit CLI is not implemented yet.`
+
+Notes/blockers:
+
+- `packages/cli/dist/` was generated by the build and remains ignored by the root `dist` gitignore rule.
+- `.agents/prompts/phase-09/step-2.md` is untracked prompt context and was left untouched.
+- Existing unrelated working-tree changes outside this step were not reverted.
+
+Next suggested step:
+
+- Phase 9 Step 3: Add CLI argument parsing.
 
 ### 2026-07-06
 
