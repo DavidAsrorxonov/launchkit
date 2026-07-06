@@ -9,12 +9,18 @@ import {
   parseCliArgs,
 } from "./args.js";
 import {
-  formatGeneratedProjectPreview,
   generateProjectForCli,
   type CliProjectGenerator,
 } from "./generate.js";
 import { promptForConfig, type PromptFunctions } from "./prompts.js";
 import { validateCliConfigDraft } from "./validate-config.js";
+import {
+  formatNextSteps,
+  formatTargetDirForDisplay,
+  resolveTargetDir,
+  writeGeneratedProject,
+  type CliProjectWriter,
+} from "./write-project.js";
 
 export type CliOutput = {
   log: (message: string) => void;
@@ -25,6 +31,8 @@ export type CliMainOptions = {
   output?: CliOutput;
   promptFunctions?: PromptFunctions;
   projectGenerator?: CliProjectGenerator;
+  projectWriter?: CliProjectWriter;
+  cwd?: string;
 };
 
 export function cliPackageReady() {
@@ -65,8 +73,23 @@ export async function main(
       validation.config,
       options.projectGenerator,
     );
+    const targetDir = resolveTargetDir({
+      targetDir: args.targetDir,
+      projectName: validation.config.name,
+    });
+    await (options.projectWriter ?? writeGeneratedProject)({
+      project,
+      targetDir,
+      cwd: options.cwd,
+    });
 
-    for (const line of formatGeneratedProjectPreview(project)) {
+    output.log(`Created ${project.name} in ${formatTargetDirForDisplay(targetDir)}`);
+    output.log("");
+
+    for (const line of formatNextSteps({
+      targetDir,
+      packageManager: project.packageManager,
+    })) {
       output.log(line);
     }
 

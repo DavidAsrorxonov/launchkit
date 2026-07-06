@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 9 Step 6 CLI generator integration completed
-Primary focus: CLI now validates config drafts, calls @launchkit/generator in memory, and prints a safe generated project preview; next scope is filesystem writes
+Current phase: Phase 9 Step 7 CLI filesystem write behavior completed
+Primary focus: CLI now validates config drafts, generates in memory, writes generated files safely to a target directory, and prints next steps; next scope is existing-directory safety
 ```
 
 ## Phase Progress
@@ -23,11 +23,171 @@ Primary focus: CLI now validates config drafts, calls @launchkit/generator in me
 | Phase 6 | Website MVP                           | Complete    | Step 12 automated checks passed; user reported localhost browser/download QA works. |
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
-| Phase 9 | Future CLI                            | In Progress | Step 6 connects validated CLI configs to the shared generator and prints safe in-memory previews; filesystem writes, directory safety, and installs remain future work. |
+| Phase 9 | Future CLI                            | In Progress | Step 7 writes generated files safely to a target directory with conservative empty-directory behavior; richer existing-directory policy and installs remain future work. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-06
+
+Phase 9 Step 7 completed: Add filesystem write behavior
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 9 Step 7 prompt before making changes.
+- Confirmed Phase 9 Step 6 is documented as complete.
+- Implemented only this filesystem write step.
+- Did not move to Phase 9 Step 8.
+- Did not implement full existing-directory overwrite policy.
+- Did not install generated project dependencies.
+- Did not run generated project code.
+- Did not duplicate generator logic.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added safe generated project write helper in `packages/cli/src/write-project.ts`.
+- Added target directory resolution:
+  - positional target directory wins;
+  - otherwise uses validated config/project name;
+  - `.` is only used when explicitly passed.
+- Added generated path safety checks before writing:
+  - reuses Step 6 safe generated path checks;
+  - rejects absolute generated paths;
+  - rejects `..` traversal;
+  - rejects empty path segments;
+  - rejects `src` as a path segment.
+- Added resolved output path containment checks so file writes cannot escape the resolved target directory.
+- Added directory creation and file writing:
+  - creates target directory and parents;
+  - creates generated file parent directories;
+  - writes UTF-8 string contents;
+  - writes `Uint8Array` contents.
+- Added conservative existing-directory behavior:
+  - creates missing target directories;
+  - writes into existing empty directories;
+  - fails on existing non-empty directories;
+  - fails when the target path is an existing file.
+- Updated CLI entry flow to:
+  - parse args;
+  - collect config draft;
+  - validate config;
+  - generate project in memory;
+  - resolve target directory;
+  - write generated files;
+  - print success and next-step commands.
+- Added npm and pnpm next-step output.
+- Added CLI-friendly write error handling through the existing top-level error path.
+- Added Vitest coverage for filesystem writes, nested directories, string and binary contents, unsafe paths, existing directory behavior, target resolution, next-step formatting, entry-flow write success/failure, and no dependency installation.
+- Confirmed dependency installation is not implemented yet.
+
+Files changed:
+
+- `packages/cli/src/write-project.ts`
+- `packages/cli/src/write-project.test.ts`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/index.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,280p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-09/step-7.md
+git status --short
+sed -n '281,560p' .agents/prompts/phase-09/step-7.md
+sed -n '1,1200p' context/architecture.md
+sed -n '1,1500p' context/build-plan.md
+sed -n '1,1100p' context/project-overview.md
+sed -n '1,900p' context/ui-rules.md
+sed -n '1,260p' packages/cli/src/index.ts
+sed -n '1,260p' packages/cli/src/generate.ts
+sed -n '1,320p' packages/cli/src/generate.test.ts
+sed -n '1,260p' packages/cli/src/index.test.ts
+sed -n '1,220p' packages/generator/src/file-tree.ts
+sed -n '1,260p' packages/cli/src/args.ts
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+git diff -- packages/cli/src/index.ts packages/cli/src/index.test.ts packages/cli/src/write-project.ts packages/cli/src/write-project.test.ts
+mktemp -d /private/tmp/launchkit-cli-manual.XXXXXX
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js my-app --yes
+find my-app -maxdepth 2 -type f -print | sort
+find my-app -maxdepth 2 -type d -print | sort
+test -d my-app/node_modules
+test -f my-app/package-lock.json
+npm run typecheck
+npm test
+npm run lint
+rg -n "node:test|node --test|spawn\\(|exec\\(|execFile|npm install|pnpm install|npm run dev|pnpm dev|node_modules|package-lock|child_process|execa" packages/cli/src -g '!*.test.ts'
+rg -n "writeFile|mkdir|readdir|stat|normalizeGeneratedPath|src" packages/cli/src/write-project.ts packages/cli/src/write-project.test.ts
+npm run build
+npm run build
+git diff --check
+git status --short
+git diff --stat
+rg -n "node:test|node --test|spawn\\(|exec\\(|execFile|child_process|execa" packages/cli/src
+```
+
+Verification result:
+
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 6 files, 84 tests.
+- `npm run build -w create-launchkit` passed.
+- `npm run typecheck` passed across workspaces, including `create-launchkit`.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 6 files, 84 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Static scan found no Node built-in test runner usage, process spawning, child process usage, or install execution in `packages/cli/src`.
+- Static scan found install/dev command strings only in next-step output formatting, not executed commands.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/_not-found`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit` built with `tsc -p tsconfig.json`;
+  - generator, schema, shared, and templates built successfully.
+- `git diff --check` passed.
+
+Manual verification:
+
+- Created temporary manual verification directory:
+  - `/private/tmp/launchkit-cli-manual.Lyrj3E`
+- Ran the built CLI from that directory:
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js my-app --yes`
+- CLI exited `0` and printed:
+  - `Created my-app in ./my-app`;
+  - next steps for npm.
+- Verified generated files:
+  - `my-app/package.json`;
+  - `my-app/.env.example`;
+  - `my-app/README.md`.
+- Verified generated directories:
+  - `my-app`.
+- Verified dependency installation did not run:
+  - `test -d my-app/node_modules` exited `1`;
+  - `test -f my-app/package-lock.json` exited `1`.
+- Did not run `npm install`.
+- Did not run generated project code.
+
+Notes/blockers:
+
+- The generated file list reflects the current default generator API output used by the CLI in this phase: `package.json`, `.env.example`, and `README.md`.
+- `packages/cli/dist/` was generated by the build and remains ignored by the root `dist` gitignore rule.
+- `.agents/prompts/phase-09/step-7.md` is untracked prompt context and was left untouched.
+- The temporary manual verification directory under `/private/tmp` was left in place for inspection.
+
+Next suggested step:
+
+- Phase 9 Step 8: Add existing-directory safety.
 
 ### 2026-07-06
 
