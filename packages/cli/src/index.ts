@@ -12,7 +12,11 @@ import {
   generateProjectForCli,
   type CliProjectGenerator,
 } from "./generate.js";
-import { promptForConfig, type PromptFunctions } from "./prompts.js";
+import {
+  defaultPromptFunctions,
+  promptForConfig,
+  type PromptFunctions,
+} from "./prompts.js";
 import { validateCliConfigDraft } from "./validate-config.js";
 import {
   formatNextSteps,
@@ -44,6 +48,7 @@ export async function main(
   options: CliMainOptions = {},
 ): Promise<number> {
   const output = options.output ?? console;
+  const promptFunctions = options.promptFunctions ?? defaultPromptFunctions;
 
   try {
     const args = parseCliArgs(argv);
@@ -58,7 +63,7 @@ export async function main(
       return 0;
     }
 
-    const configDraft = await promptForConfig(args, options.promptFunctions);
+    const configDraft = await promptForConfig(args, promptFunctions);
     const validation = validateCliConfigDraft(configDraft);
 
     if (!validation.ok) {
@@ -81,6 +86,12 @@ export async function main(
       project,
       targetDir,
       cwd: options.cwd,
+      yes: args.yes,
+      confirm: (message) =>
+        promptFunctions.confirm({
+          message,
+          default: false,
+        }),
     });
 
     output.log(`Created ${project.name} in ${formatTargetDirForDisplay(targetDir)}`);

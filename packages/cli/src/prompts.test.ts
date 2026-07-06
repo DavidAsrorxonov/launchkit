@@ -269,21 +269,32 @@ describe("getPromptFields", () => {
 });
 
 type PromptCall = {
-  kind: "input" | "select";
+  kind: "confirm" | "input" | "select";
   message: string;
-  default?: string;
+  default?: boolean | string;
 };
 
 function createPromptFunctions(options?: {
+  confirmAnswers?: boolean[];
   inputAnswers?: string[];
   selectAnswers?: string[];
 }): PromptFunctions & { calls: PromptCall[] } {
   const calls: PromptCall[] = [];
+  const confirmAnswers = [...(options?.confirmAnswers ?? [])];
   const inputAnswers = [...(options?.inputAnswers ?? [])];
   const selectAnswers = [...(options?.selectAnswers ?? [])];
 
   return {
     calls,
+    async confirm(config) {
+      calls.push({
+        kind: "confirm",
+        message: config.message,
+        default: config.default,
+      });
+
+      return confirmAnswers.shift() ?? config.default ?? false;
+    },
     async input(config) {
       calls.push({
         kind: "input",

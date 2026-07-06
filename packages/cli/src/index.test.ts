@@ -1,8 +1,29 @@
-import { describe, expect, it } from "vitest";
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
+import { afterEach, describe, expect, it } from "vitest";
 
 import type { CliProjectGenerator } from "./generate.js";
 import { main, type CliOutput } from "./index.js";
+import type { PromptFunctions } from "./prompts.js";
 import type { CliProjectWriter } from "./write-project.js";
+
+const tempRoots: string[] = [];
+
+afterEach(async () => {
+  await Promise.all(
+    tempRoots.splice(0).map((tempRoot) =>
+      rm(tempRoot, { recursive: true, force: true }),
+    ),
+  );
+});
 
 describe("main", () => {
   it("returns zero and prints next steps when project writing succeeds", async () => {
@@ -35,6 +56,7 @@ describe("main", () => {
         targetDir: "my-app",
         projectName: "my-app",
         cwd: undefined,
+        yes: true,
       },
     ]);
   });
@@ -156,6 +178,140 @@ describe("main", () => {
     expect(output.logs).toEqual([]);
     expect(output.errors).toEqual(["Error: Target directory is not empty: /tmp/my-app"]);
   });
+
+  it("omits cd from next steps when generating into the current directory", async () => {
+    const output = createOutputCapture();
+    const cwd = await createTempRoot();
+
+    const exitCode = await main([".", "--name", "current-app", "--yes"], {
+      cwd,
+      output,
+      projectGenerator: createProjectGenerator({
+        name: "current-app",
+        packageManager: "npm",
+        files: ["package.json"],
+      }),
+    });
+
+    expect(exitCode).toBe(0);
+    expect(output.logs).toEqual([
+      "Created current-app in .",
+      "",
+      "Next steps:",
+      "  npm install",
+      "  npm run dev",
+    ]);
+    await expect(readFile(path.join(cwd, "package.json"), "utf8")).resolves.toBe("");
+  });
+
+  it("rejects an existing non-empty target directory with --yes", async () => {
+    const output = createOutputCapture();
+    const cwd = await createTempRoot();
+    await mkdir(path.join(cwd, "my-app"));
+    await writeFile(path.join(cwd, "my-app", "existing.txt"), "");
+
+    const exitCode = await main(["my-app", "--yes"], {
+      cwd,
+      output,
+      projectGenerator: createProjectGenerator({
+        name: "my-app",
+        packageManager: "npm",
+        files: ["package.json"],
+      }),
+    });
+
+    expect(exitCode).toBe(1);
+    expect(output.logs).toEqual([]);
+    expect(output.errors).toEqual([
+      [
+        "Error: Target directory is not empty.",
+        "Choose an empty directory or run without --yes to confirm adding LaunchKit files.",
+      ].join("\n"),
+    ]);
+  });
+
+  it("writes into a non-empty target directory after interactive confirmation", async () => {
+    const output = createOutputCapture();
+    const cwd = await createTempRoot();
+    await mkdir(path.join(cwd, "my-app"));
+    await writeFile(path.join(cwd, "my-app", "existing.txt"), "");
+    const prompts = createPromptFunctions({ confirmAnswers: [true] });
+
+    const exitCode = await main(
+      [
+        "my-app",
+        "--name",
+        "my-app",
+        "--package-manager",
+        "npm",
+        "--ui",
+        "none",
+        "--database",
+        "none",
+        "--auth",
+        "none",
+      ],
+      {
+        cwd,
+        output,
+        promptFunctions: prompts,
+        projectGenerator: createProjectGenerator({
+          name: "my-app",
+          packageManager: "npm",
+          files: ["package.json"],
+        }),
+      },
+    );
+
+    expect(exitCode).toBe(0);
+    expect(prompts.calls).toEqual([
+      {
+        kind: "confirm",
+        message: "The target directory is not empty. Continue and add LaunchKit files?",
+        default: false,
+      },
+    ]);
+    await expect(readFile(path.join(cwd, "my-app", "package.json"), "utf8")).resolves.toBe(
+      "",
+    );
+  });
+
+  it("stops when interactive non-empty target confirmation is declined", async () => {
+    const output = createOutputCapture();
+    const cwd = await createTempRoot();
+    await mkdir(path.join(cwd, "my-app"));
+    await writeFile(path.join(cwd, "my-app", "existing.txt"), "");
+
+    const exitCode = await main(
+      [
+        "my-app",
+        "--name",
+        "my-app",
+        "--package-manager",
+        "npm",
+        "--ui",
+        "none",
+        "--database",
+        "none",
+        "--auth",
+        "none",
+      ],
+      {
+        cwd,
+        output,
+        promptFunctions: createPromptFunctions({ confirmAnswers: [false] }),
+        projectGenerator: createProjectGenerator({
+          name: "my-app",
+          packageManager: "npm",
+          files: ["package.json"],
+        }),
+      },
+    );
+
+    expect(exitCode).toBe(1);
+    expect(output.logs).toEqual([]);
+    expect(output.errors).toEqual(["Error: Project creation cancelled."]);
+  });
 });
 
 function createOutputCapture(): CliOutput & {
@@ -193,9 +349,19 @@ function createProjectGenerator(input: {
 }
 
 function createProjectWriter(): CliProjectWriter & {
-  calls: Array<{ targetDir: string; projectName: string; cwd?: string }>;
+  calls: Array<{
+    targetDir: string;
+    projectName: string;
+    cwd?: string;
+    yes?: boolean;
+  }>;
 } {
-  const calls: Array<{ targetDir: string; projectName: string; cwd?: string }> = [];
+  const calls: Array<{
+    targetDir: string;
+    projectName: string;
+    cwd?: string;
+    yes?: boolean;
+  }> = [];
 
   return Object.assign(
     async (input: Parameters<CliProjectWriter>[0]) => {
@@ -203,6 +369,7 @@ function createProjectWriter(): CliProjectWriter & {
         targetDir: input.targetDir,
         projectName: input.project.name,
         cwd: input.cwd,
+        yes: input.yes,
       });
 
       return {
@@ -212,4 +379,55 @@ function createProjectWriter(): CliProjectWriter & {
     },
     { calls },
   );
+}
+
+type PromptCall = {
+  kind: "confirm" | "input" | "select";
+  message: string;
+  default?: boolean | string;
+};
+
+function createPromptFunctions(options?: {
+  confirmAnswers?: boolean[];
+}): PromptFunctions & { calls: PromptCall[] } {
+  const calls: PromptCall[] = [];
+  const confirmAnswers = [...(options?.confirmAnswers ?? [])];
+
+  return {
+    calls,
+    async confirm(config) {
+      calls.push({
+        kind: "confirm",
+        message: config.message,
+        default: config.default,
+      });
+
+      return confirmAnswers.shift() ?? config.default ?? false;
+    },
+    async input(config) {
+      calls.push({
+        kind: "input",
+        message: config.message,
+        default: config.default,
+      });
+
+      return config.default ?? "my-app";
+    },
+    async select(config) {
+      calls.push({
+        kind: "select",
+        message: config.message,
+        default: config.default,
+      });
+
+      return (config.default ?? config.choices[0]?.value) as never;
+    },
+  };
+}
+
+async function createTempRoot(): Promise<string> {
+  const tempRoot = await mkdtemp(path.join(tmpdir(), "launchkit-cli-"));
+  tempRoots.push(tempRoot);
+
+  return tempRoot;
 }

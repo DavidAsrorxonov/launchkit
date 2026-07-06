@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 9 Step 7 CLI filesystem write behavior completed
-Primary focus: CLI now validates config drafts, generates in memory, writes generated files safely to a target directory, and prints next steps; next scope is existing-directory safety
+Current phase: Phase 9 Step 8 existing-directory safety completed
+Primary focus: CLI now detects target directory state, rejects unsafe non-empty --yes writes, prompts interactively for non-empty directories, detects file conflicts before writing, and handles current-directory next steps; next scope is optional dependency install prompt
 ```
 
 ## Phase Progress
@@ -23,11 +23,192 @@ Primary focus: CLI now validates config drafts, generates in memory, writes gene
 | Phase 6 | Website MVP                           | Complete    | Step 12 automated checks passed; user reported localhost browser/download QA works. |
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
-| Phase 9 | Future CLI                            | In Progress | Step 7 writes generated files safely to a target directory with conservative empty-directory behavior; richer existing-directory policy and installs remain future work. |
+| Phase 9 | Future CLI                            | In Progress | Step 8 adds robust existing-directory safety, interactive confirmation, conflict detection before writes, and current-directory next steps; dependency install remains future work. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-06
+
+Phase 9 Step 8 completed: Add existing-directory safety
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 9 Step 8 prompt before making changes.
+- Confirmed Phase 9 Step 7 is documented as complete.
+- Implemented only this existing-directory safety step.
+- Did not move to Phase 9 Step 9.
+- Did not install generated project dependencies.
+- Did not run generated project code.
+- Did not duplicate generator logic.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added target directory state detection in `packages/cli/src/directory-safety.ts`.
+- Added `.DS_Store` as the only ignored directory noise file for state detection.
+- Added non-empty directory safety checks:
+  - missing directories are allowed;
+  - existing empty directories are allowed;
+  - existing non-empty directories reject under `--yes`;
+  - existing non-empty directories prompt in interactive mode.
+- Added interactive confirmation for non-empty directories with injectable prompt behavior.
+- Added `--yes` behavior that does not prompt and refuses non-empty directories by default.
+- Added current-directory target handling:
+  - empty current directory is allowed;
+  - non-empty current directory rejects under `--yes`;
+  - non-empty current directory prompts in interactive mode;
+  - next steps omit `cd .`.
+- Added conflict detection before writing generated files.
+- Added no-partial-write behavior for detected conflicts by checking all conflicts before directory creation or file writes.
+- Added concise user-facing errors for non-empty directories, declined confirmation, target files, and conflicting generated paths.
+- Updated CLI entry flow to pass `--yes` and confirmation prompts into the writer.
+- Extended prompt abstractions to include injectable confirmation.
+- Added Vitest coverage for directory state detection, `.DS_Store`, missing/empty/non-empty directories, `--yes`, interactive confirmation accept/decline, current directory behavior, conflicts, conflict error output, entry-flow behavior, current-directory next steps, and no partial writes.
+- Confirmed dependency installation is not implemented yet.
+
+Files changed:
+
+- `packages/cli/src/directory-safety.ts`
+- `packages/cli/src/directory-safety.test.ts`
+- `packages/cli/src/write-project.ts`
+- `packages/cli/src/write-project.test.ts`
+- `packages/cli/src/prompts.ts`
+- `packages/cli/src/prompts.test.ts`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/index.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-09/step-8.md
+git status --short
+sed -n '241,520p' .agents/prompts/phase-09/step-8.md
+rg --files context
+sed -n '1,1200p' context/architecture.md
+sed -n '1,1500p' context/build-plan.md
+sed -n '1,1200p' context/project-overview.md
+sed -n '1,900p' context/ui-rules.md
+sed -n '1,320p' packages/cli/src/write-project.ts
+sed -n '1,360p' packages/cli/src/index.ts
+sed -n '1,420p' packages/cli/src/write-project.test.ts
+sed -n '1,420p' packages/cli/src/index.test.ts
+sed -n '1,340p' packages/cli/src/prompts.ts
+sed -n '1,340p' packages/cli/src/args.ts
+ls packages/cli/src
+sed -n '1,260p' packages/cli/src/generate.ts
+sed -n '1,260p' packages/cli/package.json
+sed -n '1,260p' packages/cli/tsconfig.json
+sed -n '1,360p' packages/cli/src/prompts.test.ts
+rg -n "ProjectWriteError|DirectorySafetyError|ConfirmFunction|formatNextSteps|writeGeneratedProject\\(" packages/cli/src
+sed -n '1,260p' packages/cli/src/index.test.ts
+sed -n '1,260p' packages/cli/src/write-project.ts
+sed -n '1,320p' packages/cli/src/directory-safety.ts
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run build
+mktemp -d /private/tmp/launchkit-cli-step8.XXXXXX
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js missing-app --yes
+mkdir existing-empty
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js existing-empty --yes
+mkdir existing-non-empty
+touch existing-non-empty/notes.txt
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js existing-non-empty --yes
+find missing-app -maxdepth 2 -type f -print
+find existing-empty -maxdepth 2 -type f -print
+find . -name node_modules -print
+find . -name package-lock.json -print
+mkdir current-target
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js . --name current-target --yes
+rg -n "node:test|node --test|spawn\\(|exec\\(|execFile|child_process|execa|npm install|pnpm install|npm run dev|pnpm dev" packages/cli/src
+git diff --check
+git status --short
+git diff --stat
+git diff -- packages/cli/src/index.ts packages/cli/src/prompts.ts packages/cli/src/write-project.ts
+git diff -- packages/cli/src/index.test.ts packages/cli/src/prompts.test.ts packages/cli/src/write-project.test.ts
+sed -n '1,320p' packages/cli/src/directory-safety.ts
+sed -n '1,360p' packages/cli/src/directory-safety.test.ts
+rg -n "PromptFunctions|confirm\\(" packages/cli/src
+```
+
+Verification result:
+
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 7 files, 106 tests.
+- `npm run build -w create-launchkit` passed.
+- `npm run typecheck` passed across workspaces, including `create-launchkit`.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 7 files, 106 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/_not-found`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit` built with `tsc -p tsconfig.json`;
+  - generator, schema, shared, and templates built successfully.
+- Static scan found no Node built-in test runner usage, process spawning, child process usage, or dependency install execution in `packages/cli/src`.
+- Static scan found install/dev command strings only in next-step output formatting and expected tests, not executed commands.
+- `git diff --check` passed.
+
+Manual verification:
+
+- Created temporary manual verification directory:
+  - `/private/tmp/launchkit-cli-step8.0yvreV`
+- Ran the built CLI from that directory:
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js missing-app --yes`
+  - CLI exited `0` and printed next steps with `cd missing-app`.
+- Verified missing target writes successfully:
+  - `missing-app/package.json`;
+  - `missing-app/.env.example`;
+  - `missing-app/README.md`.
+- Created `existing-empty`, then ran:
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js existing-empty --yes`
+  - CLI exited `0` and printed next steps with `cd existing-empty`.
+- Verified existing empty target writes successfully:
+  - `existing-empty/package.json`;
+  - `existing-empty/.env.example`;
+  - `existing-empty/README.md`.
+- Created `existing-non-empty/notes.txt`, then ran:
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js existing-non-empty --yes`
+  - CLI exited `1` and printed:
+    - `Target directory is not empty.`;
+    - `Choose an empty directory or run without --yes to confirm adding LaunchKit files.`
+- Created `current-target`, then ran from inside it:
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js . --name current-target --yes`
+  - CLI exited `0` and printed next steps without `cd .`.
+- Verified dependency installation did not run:
+  - `find . -name node_modules -print` produced no output;
+  - `find . -name package-lock.json -print` produced no output.
+- Did not run `npm install`.
+- Did not run generated project code.
+
+Notes/blockers:
+
+- `.DS_Store` is intentionally ignored for target directory emptiness checks; all other entries are treated conservatively.
+- The generated file list reflects the current default generator API output used by the CLI in this phase: `package.json`, `.env.example`, and `README.md`.
+- `packages/cli/dist/` was generated by the build and remains ignored by the root `dist` gitignore rule.
+- `.agents/prompts/phase-09/step-8.md` is untracked prompt context and was left untouched.
+- The temporary manual verification directory under `/private/tmp` was left in place for inspection.
+
+Next suggested step:
+
+- Phase 9 Step 9: Add optional dependency install prompt.
 
 ### 2026-07-06
 

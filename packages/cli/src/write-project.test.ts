@@ -13,6 +13,7 @@ import path from "node:path";
 import type { GeneratedProject } from "@launchkit/generator";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { DirectorySafetyError } from "./directory-safety.js";
 import {
   ProjectWriteError,
   UnsafeGeneratedPathError,
@@ -191,7 +192,7 @@ describe("writeGeneratedProject", () => {
     );
   });
 
-  it("fails on an existing non-empty directory", async () => {
+  it("fails on an existing non-empty directory with --yes behavior by default", async () => {
     const cwd = await createTempRoot();
     await mkdir(path.join(cwd, "my-app"));
     await writeFile(path.join(cwd, "my-app", "existing.txt"), "");
@@ -204,7 +205,7 @@ describe("writeGeneratedProject", () => {
           files: [{ path: "package.json", contents: "{}" }],
         }),
       }),
-    ).rejects.toThrow(ProjectWriteError);
+    ).rejects.toThrow(DirectorySafetyError);
   });
 
   it("fails when the target path is an existing file", async () => {
@@ -219,7 +220,7 @@ describe("writeGeneratedProject", () => {
           files: [{ path: "package.json", contents: "{}" }],
         }),
       }),
-    ).rejects.toThrow(ProjectWriteError);
+    ).rejects.toThrow(DirectorySafetyError);
   });
 
   it("does not install dependencies", async () => {
@@ -257,6 +258,14 @@ describe("target directory and output formatting", () => {
     expect(formatNextSteps({ targetDir: "my-app", packageManager: "npm" })).toEqual([
       "Next steps:",
       "  cd my-app",
+      "  npm install",
+      "  npm run dev",
+    ]);
+  });
+
+  it("formats current-directory npm next steps without cd .", () => {
+    expect(formatNextSteps({ targetDir: ".", packageManager: "npm" })).toEqual([
+      "Next steps:",
       "  npm install",
       "  npm run dev",
     ]);

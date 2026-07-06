@@ -1,19 +1,23 @@
 import {
   mkdir,
-  readdir,
-  stat,
   writeFile,
 } from "node:fs/promises";
 import path from "node:path";
 
 import type { GeneratedProject } from "@launchkit/generator";
 
+import {
+  ensureSafeTargetDirectory,
+  type ConfirmFunction,
+} from "./directory-safety.js";
 import { UnsafeGeneratedPathError, getSafeGeneratedFilePaths } from "./generate.js";
 
 export type WriteProjectInput = {
   project: GeneratedProject;
   targetDir: string;
   cwd?: string;
+  yes?: boolean;
+  confirm?: ConfirmFunction;
 };
 
 export type CliProjectWriter = (
@@ -55,11 +59,17 @@ export function formatNextSteps(input: {
   targetDir: string;
   packageManager: GeneratedProject["packageManager"];
 }): string[] {
-  const cdTarget = input.targetDir === "." ? "." : input.targetDir;
+  if (input.targetDir === ".") {
+    return [
+      "Next steps:",
+      `  ${input.packageManager} install`,
+      input.packageManager === "pnpm" ? "  pnpm dev" : "  npm run dev",
+    ];
+  }
 
   return [
     "Next steps:",
-    `  cd ${cdTarget}`,
+    `  cd ${input.targetDir}`,
     `  ${input.packageManager} install`,
     input.packageManager === "pnpm" ? "  pnpm dev" : "  npm run dev",
   ];
@@ -72,7 +82,13 @@ export async function writeGeneratedProject(
   const targetRoot = path.resolve(cwd, input.targetDir);
   const safePaths = getSafeGeneratedFilePaths(input.project);
 
-  await prepareTargetDirectory(targetRoot);
+  await ensureSafeTargetDirectory({
+    targetDir: targetRoot,
+    generatedPaths: safePaths,
+    yes: input.yes ?? true,
+    confirm: input.confirm,
+  });
+  await mkdir(targetRoot, { recursive: true });
 
   const filesWritten: string[] = [];
 
@@ -96,42 +112,6 @@ export async function writeGeneratedProject(
   };
 }
 
-async function prepareTargetDirectory(targetRoot: string): Promise<void> {
-  const targetStatus = await readTargetStatus(targetRoot);
-
-  if (targetStatus === "missing") {
-    await mkdir(targetRoot, { recursive: true });
-    return;
-  }
-
-  if (targetStatus === "file") {
-    throw new ProjectWriteError(
-      `Target path exists and is not a directory: ${targetRoot}`,
-    );
-  }
-
-  const entries = await readdir(targetRoot);
-
-  if (entries.length > 0) {
-    throw new ProjectWriteError(
-      `Target directory is not empty: ${targetRoot}`,
-    );
-  }
-}
-
-async function readTargetStatus(targetRoot: string): Promise<"directory" | "file" | "missing"> {
-  try {
-    const targetStat = await stat(targetRoot);
-    return targetStat.isDirectory() ? "directory" : "file";
-  } catch (error) {
-    if (isNodeError(error) && error.code === "ENOENT") {
-      return "missing";
-    }
-
-    throw error;
-  }
-}
-
 function resolveOutputPath(targetRoot: string, safePath: string): string {
   const outputPath = path.resolve(targetRoot, safePath);
   const relativePath = path.relative(targetRoot, outputPath);
@@ -148,10 +128,6 @@ function resolveOutputPath(targetRoot: string, safePath: string): string {
   }
 
   return outputPath;
-}
-
-function isNodeError(error: unknown): error is NodeJS.ErrnoException {
-  return error instanceof Error && "code" in error;
 }
 
 export { UnsafeGeneratedPathError };

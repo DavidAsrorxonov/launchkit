@@ -1,4 +1,4 @@
-import { input, select } from "@inquirer/prompts";
+import { confirm, input, select } from "@inquirer/prompts";
 import {
   authMetadata,
   databaseMetadata,
@@ -46,6 +46,10 @@ export type PromptFunctions = {
     default?: TValue;
     choices: SelectChoice<TValue>[];
   }) => Promise<TValue>;
+  confirm: (config: {
+    message: string;
+    default?: boolean;
+  }) => Promise<boolean>;
 };
 
 type PromptField =
@@ -57,7 +61,8 @@ type PromptField =
   | "auth"
   | "docker";
 
-const defaultPromptFunctions: PromptFunctions = {
+export const defaultPromptFunctions: PromptFunctions = {
+  confirm,
   input,
   select,
 };
