@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 9 Step 2 CLI package foundation completed
-Primary focus: CLI workspace scaffold exists with package metadata, bin entry, TypeScript config, placeholder entry point, and minimal Vitest coverage; next scope is argument parsing
+Current phase: Phase 9 Step 3 CLI argument parsing completed
+Primary focus: CLI now parses supported MVP flags, target directory, help/version/yes aliases, and typed argument errors; next scope is interactive prompts
 ```
 
 ## Phase Progress
@@ -23,11 +23,143 @@ Primary focus: CLI workspace scaffold exists with package metadata, bin entry, T
 | Phase 6 | Website MVP                           | Complete    | Step 12 automated checks passed; user reported localhost browser/download QA works. |
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
-| Phase 9 | Future CLI                            | In Progress | Step 2 created the `create-launchkit` workspace package foundation; no real CLI generation behavior added. |
+| Phase 9 | Future CLI                            | In Progress | Step 3 added typed argument parsing and help/version handling; prompts, generator integration, filesystem writes, and installs remain future work. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-06
+
+Phase 9 Step 3 completed: Add CLI argument parsing
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 9 Step 3 prompt before making changes.
+- Confirmed Phase 9 Step 2 is documented as complete.
+- Implemented only this argument parsing step.
+- Did not move to Phase 9 Step 4.
+- Did not add interactive prompts.
+- Did not connect to the generator.
+- Did not write generated files to disk.
+- Did not install generated project dependencies.
+- Did not duplicate schema or generator logic.
+- Used npm workspaces and Vitest.
+- Used Node standard library `node:util` `parseArgs` as planned; did not add an argument parser dependency.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added `packages/cli/src/args.ts` with typed `CliArgs` parsing.
+- Added supported flags:
+  - `--name`;
+  - `--package-manager <npm|pnpm>`;
+  - `--ui <none|shadcn>`;
+  - `--database <none|postgres>`;
+  - `--orm <none|prisma>`;
+  - `--auth <none|authjs-credentials>`;
+  - `--docker <none|postgres>`;
+  - `--yes`;
+  - `--help`;
+  - `--version`.
+- Added aliases:
+  - `-y`;
+  - `-h`;
+  - `-v`.
+- Added optional positional target directory parsing.
+- Added `CliArgumentError` for typed parse errors.
+- Added help text generation.
+- Added version text handling with the current package version placeholder `0.0.0`.
+- Updated the CLI entry point so:
+  - `--help` prints help and succeeds;
+  - `--version` prints version and succeeds;
+  - invalid args print a concise error plus help hint;
+  - normal parsed args print a placeholder and do not generate files.
+- Added Vitest coverage for supported flags, aliases, target directory parsing, invalid values, unknown flags, help text, unsupported help options, and version text.
+- Confirmed prompts/generation/filesystem writes/dependency installs are not implemented yet.
+
+Files changed:
+
+- `packages/cli/src/index.ts`
+- `packages/cli/src/args.ts`
+- `packages/cli/src/args.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-09/step-3.md
+rg --files packages/cli context .agents/prompts/phase-09
+git status --short
+sed -n '281,560p' .agents/prompts/phase-09/step-3.md
+cat packages/cli/src/index.ts
+cat packages/cli/src/index.test.ts
+cat packages/cli/package.json
+cat packages/cli/tsconfig.json
+wc -l context/build-plan.md context/project-overview.md context/ui-rules.md context/progress-tracker.md context/architecture.md
+sed -n '1,1200p' context/build-plan.md
+sed -n '1,900p' context/project-overview.md
+sed -n '1,700p' context/ui-rules.md
+sed -n '241,760p' context/progress-tracker.md
+sed -n '1,1100p' context/architecture.md
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run build
+node packages/cli/dist/index.js --help
+node packages/cli/dist/index.js --version
+node packages/cli/dist/index.js my-app --package-manager pnpm --ui shadcn --database postgres --orm prisma --auth authjs-credentials --docker postgres --yes
+node packages/cli/dist/index.js --framework next
+rg -n "node:test|node --test|@inquirer|prompts|enquirer|generateProject|writeFile|mkdir|spawn\\(|exec\\(|execFile|npm install|pnpm install|fs/promises" packages/cli
+git diff --check
+git status --short
+git diff -- packages/cli/src/args.ts packages/cli/src/args.test.ts packages/cli/src/index.ts packages/cli/src/index.test.ts context/progress-tracker.md
+git diff --stat
+```
+
+Verification result:
+
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 2 files, 21 tests.
+- `npm run build -w create-launchkit` passed.
+- `npm run typecheck` passed across workspaces, including `create-launchkit`.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 2 files, 21 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit` built with `tsc -p tsconfig.json`;
+  - generator, schema, shared, and templates built successfully.
+- `node packages/cli/dist/index.js --help` printed supported usage/options only.
+- `node packages/cli/dist/index.js --version` printed `0.0.0`.
+- `node packages/cli/dist/index.js my-app --package-manager pnpm --ui shadcn --database postgres --orm prisma --auth authjs-credentials --docker postgres --yes` printed the placeholder parse success message.
+- `node packages/cli/dist/index.js --framework next` returned a typed parse error and help hint.
+- Static scan of `packages/cli` found no Node built-in test runner usage, prompt library, generator integration, filesystem writes, process spawning, or dependency install behavior.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- No parser dependency was added, so `package.json` and `package-lock.json` did not need changes for this step.
+- `packages/cli/dist/` was generated by the build and remains ignored by the root `dist` gitignore rule.
+- `.agents/prompts/phase-09/step-3.md` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- Phase 9 Step 4: Add interactive prompts.
 
 ### 2026-07-06
 

@@ -2,12 +2,43 @@
 
 import { pathToFileURL } from "node:url";
 
+import {
+  CliArgumentError,
+  getHelpText,
+  getVersionText,
+  parseCliArgs,
+} from "./args.js";
+
 export function cliPackageReady() {
   return true;
 }
 
-export async function main() {
-  console.log("LaunchKit CLI is not implemented yet.");
+export async function main(argv: string[] = process.argv.slice(2)) {
+  try {
+    const args = parseCliArgs(argv);
+
+    if (args.help) {
+      console.log(getHelpText());
+      return args;
+    }
+
+    if (args.version) {
+      console.log(getVersionText());
+      return args;
+    }
+
+    console.log("LaunchKit CLI parsed arguments. Project generation is not implemented yet.");
+    return args;
+  } catch (error) {
+    if (error instanceof CliArgumentError) {
+      console.error(`Error: ${error.message}`);
+      console.error("Run create-launchkit --help for usage.");
+      process.exitCode = 1;
+      return undefined;
+    }
+
+    throw error;
+  }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
