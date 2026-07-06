@@ -1,11 +1,26 @@
 import { parseArgs } from "node:util";
 
-export type PackageManagerFlag = "npm" | "pnpm";
-export type UiFlag = "none" | "shadcn";
-export type DatabaseFlag = "none" | "postgres";
-export type OrmFlag = "none" | "prisma";
-export type AuthFlag = "none" | "authjs-credentials";
-export type DockerFlag = "none" | "postgres";
+import {
+  authOptions,
+  databaseOptions,
+  dockerOptions,
+  ormOptions,
+  packageManagerOptions,
+  uiOptions,
+  type AuthOption,
+  type DatabaseOption,
+  type DockerOption,
+  type OrmOption,
+  type PackageManagerOption,
+  type UiOption,
+} from "@launchkit/schema";
+
+export type PackageManagerFlag = PackageManagerOption;
+export type UiFlag = UiOption;
+export type DatabaseFlag = DatabaseOption;
+export type OrmFlag = OrmOption;
+export type AuthFlag = AuthOption;
+export type DockerFlag = DockerOption;
 
 export type CliArgs = {
   targetDir?: string;
@@ -29,13 +44,6 @@ export class CliArgumentError extends Error {
 }
 
 export const CLI_VERSION = "0.0.0";
-
-const packageManagers = ["npm", "pnpm"] as const;
-const uiOptions = ["none", "shadcn"] as const;
-const databaseOptions = ["none", "postgres"] as const;
-const ormOptions = ["none", "prisma"] as const;
-const authOptions = ["none", "authjs-credentials"] as const;
-const dockerOptions = ["none", "postgres"] as const;
 
 export function parseCliArgs(argv: string[] = process.argv.slice(2)): CliArgs {
   let parsed: ReturnType<typeof parseArgs>;
@@ -72,7 +80,7 @@ export function parseCliArgs(argv: string[] = process.argv.slice(2)): CliArgs {
     packageManager: readLiteralFlag(
       parsed.values["package-manager"],
       "package-manager",
-      packageManagers,
+      packageManagerOptions,
     ),
     ui: readLiteralFlag(parsed.values.ui, "ui", uiOptions),
     database: readLiteralFlag(parsed.values.database, "database", databaseOptions),
@@ -93,12 +101,12 @@ Usage:
 
 Options:
   --name <name>                         Set the generated project name.
-  --package-manager <npm|pnpm>          Select the package manager.
-  --ui <none|shadcn>                    Select UI scaffolding.
-  --database <none|postgres>            Select database scaffolding.
-  --orm <none|prisma>                   Select ORM scaffolding.
-  --auth <none|authjs-credentials>      Select auth scaffolding.
-  --docker <none|postgres>              Select Docker Compose scaffolding.
+  --package-manager <${formatAllowedValues(packageManagerOptions)}>          Select the package manager.
+  --ui <${formatAllowedValues(uiOptions)}>                    Select UI scaffolding.
+  --database <${formatAllowedValues(databaseOptions)}>            Select database scaffolding.
+  --orm <${formatAllowedValues(ormOptions)}>                   Select ORM scaffolding.
+  --auth <${formatAllowedValues(authOptions)}>      Select auth scaffolding.
+  --docker <${formatAllowedValues(dockerOptions)}>              Select Docker Compose scaffolding.
   -y, --yes                             Accept defaults where possible.
   -h, --help                            Show this help text.
   -v, --version                         Show the CLI version.
@@ -156,4 +164,8 @@ function formatParseError(error: unknown): string {
   }
 
   return "Unable to parse command line arguments.";
+}
+
+function formatAllowedValues(values: readonly string[]): string {
+  return values.join("|");
 }

@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 9 Step 4 CLI interactive prompts completed
-Primary focus: CLI now collects a config draft from parsed args, defaults, and interactive prompts; next scope is schema validation
+Current phase: Phase 9 Step 5 CLI schema validation completed
+Primary focus: CLI now validates config drafts with @launchkit/schema before the future generator step; next scope is generator integration
 ```
 
 ## Phase Progress
@@ -23,11 +23,167 @@ Primary focus: CLI now collects a config draft from parsed args, defaults, and i
 | Phase 6 | Website MVP                           | Complete    | Step 12 automated checks passed; user reported localhost browser/download QA works. |
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
-| Phase 9 | Future CLI                            | In Progress | Step 4 added interactive prompt flow and config draft assembly; schema validation, generator integration, filesystem writes, and installs remain future work. |
+| Phase 9 | Future CLI                            | In Progress | Step 5 validates CLI config drafts with shared schema and compatibility helpers; generator integration, filesystem writes, and installs remain future work. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-06
+
+Phase 9 Step 5 completed: Connect CLI to schema validation
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 9 Step 5 prompt before making changes.
+- Confirmed Phase 9 Step 4 is documented as complete.
+- Implemented only this schema validation step.
+- Did not move to Phase 9 Step 6.
+- Did not connect to the generator.
+- Did not write generated files to disk.
+- Did not install generated project dependencies.
+- Did not duplicate schema compatibility logic.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added CLI config validation helper in `packages/cli/src/validate-config.ts`.
+- Connected CLI config draft validation to `@launchkit/schema`:
+  - `LaunchKitConfigSchema`;
+  - `defaultLaunchKitConfig`;
+  - `validateCompatibility`;
+  - `LaunchKitConfig`.
+- Added CLI-friendly schema error mapping for:
+  - required project names;
+  - invalid project names;
+  - unsupported package manager, UI, database, ORM, auth, Docker, and fixed MVP options;
+  - unsupported config keys;
+  - invalid non-object drafts.
+- Added compatibility validation using shared schema helpers.
+- Updated CLI entry flow to:
+  - parse args;
+  - collect a config draft from prompts or `--yes`;
+  - validate the draft;
+  - print concise validation errors;
+  - return `0` for help/version/success and `1` for argument/config/compatibility errors.
+- Updated the executable wrapper to set `process.exitCode` from the testable `main()` return value.
+- Reused schema option arrays in CLI argument parsing instead of local duplicated arrays.
+- Adjusted prompt draft assembly so explicit incompatible CLI selections are preserved for shared compatibility validation.
+- Kept normal interactive prompt behavior valid by skipping Prisma and Docker prompts unless PostgreSQL is selected.
+- Added Vitest coverage for valid, invalid, default-filled, fixed-value, and incompatible CLI configs.
+- Added entry-flow tests for valid success and invalid config non-zero exit behavior.
+- Confirmed Auth.js credentials without database remains valid.
+- Confirmed generation and filesystem writes are not implemented yet.
+
+Files changed:
+
+- `packages/cli/src/args.ts`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/index.test.ts`
+- `packages/cli/src/prompts.ts`
+- `packages/cli/src/prompts.test.ts`
+- `packages/cli/src/validate-config.ts`
+- `packages/cli/src/validate-config.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-09/step-5.md
+git status --short
+rg --files context | sort
+sed -n '241,520p' .agents/prompts/phase-09/step-5.md
+sed -n '1,260p' packages/cli/src/index.ts
+sed -n '1,360p' packages/cli/src/prompts.ts
+sed -n '1,1200p' context/architecture.md
+sed -n '1,1400p' context/build-plan.md
+sed -n '1,1000p' context/project-overview.md
+sed -n '1,900p' context/ui-rules.md
+sed -n '1,340p' packages/schema/src/index.ts
+sed -n '1,360p' packages/schema/src/config.ts
+sed -n '1,360p' packages/schema/src/compatibility.ts
+sed -n '1,420p' packages/cli/src/prompts.test.ts
+sed -n '1,340p' packages/cli/src/args.test.ts
+cat packages/cli/tsconfig.json
+cat packages/cli/package.json
+sed -n '1,260p' packages/schema/src/defaults.ts
+sed -n '1,320p' packages/schema/src/options.ts
+sed -n '1,320p' packages/cli/src/args.ts
+rg -n "main\\(|promptForConfig|process.exitCode|LaunchKit config" packages/cli/src apps packages -g '*.test.ts'
+sed -n '1,260p' packages/cli/src/args.ts
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+git diff -- packages/cli/src/args.ts packages/cli/src/index.ts packages/cli/src/prompts.ts packages/cli/src/prompts.test.ts packages/cli/src/validate-config.ts packages/cli/src/validate-config.test.ts packages/cli/src/index.test.ts
+node packages/cli/dist/index.js --yes
+node packages/cli/dist/index.js --name Invalid_Name --yes
+node packages/cli/dist/index.js my-app --database none --orm prisma --yes
+node packages/cli/dist/index.js my-app --database none --docker postgres --yes
+node packages/cli/dist/index.js my-app --auth authjs-credentials --yes
+rg -n "node:test|node --test|generateProject|writeFile|mkdir|spawn\\(|exec\\(|execFile|npm install|pnpm install|fs/promises" packages/cli
+rg -n "normalizeOrm|normalizeDocker|prisma_requires_postgresql|docker_postgres_requires_postgresql|PostgreSQL Docker Compose|Prisma requires PostgreSQL" packages/cli/src
+git diff --check
+git status --short
+npm run typecheck
+npm test
+npm test -w @launchkit/schema
+npm run lint
+npm run build
+npm run build
+sed -n '1,220p' context/progress-tracker.md
+git diff --stat
+git status --short
+```
+
+Verification result:
+
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 4 files, 51 tests.
+- `npm run build -w create-launchkit` passed.
+- Built CLI behavior checks passed:
+  - `node packages/cli/dist/index.js --yes` exited `0` and printed:
+    - `LaunchKit config validated.`;
+    - `Generation will be added in the next step.`
+  - `node packages/cli/dist/index.js --name Invalid_Name --yes` exited `1` and printed:
+    - `Error: Use lowercase letters, numbers, and hyphens only.`
+  - `node packages/cli/dist/index.js my-app --database none --orm prisma --yes` exited `1` and printed:
+    - `Error: Prisma requires PostgreSQL.`
+  - `node packages/cli/dist/index.js my-app --database none --docker postgres --yes` exited `1` and printed:
+    - `Error: PostgreSQL Docker Compose is only available when PostgreSQL is selected.`
+  - `node packages/cli/dist/index.js my-app --auth authjs-credentials --yes` exited `0` and printed the validated-config placeholder.
+- Static scan of `packages/cli` found no Node built-in test runner usage, generator integration, filesystem writes, process spawning, or dependency install behavior.
+- Static scan confirmed Prisma/Docker compatibility messages in CLI code only appear in tests, not duplicated in implementation logic.
+- `git diff --check` passed.
+- `npm run typecheck` passed across workspaces, including `create-launchkit`.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 4 files, 51 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm test -w @launchkit/schema` passed: 5 files, 87 tests.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/_not-found`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit` built with `tsc -p tsconfig.json`;
+  - generator, schema, shared, and templates built successfully.
+
+Notes/blockers:
+
+- `packages/cli/dist/` was generated by the build and remains ignored by the root `dist` gitignore rule.
+- `.agents/prompts/phase-09/step-5.md` is untracked prompt context and was left untouched.
+- `memory.md` had pre-existing unrelated local modifications and was left untouched.
+
+Next suggested step:
+
+- Phase 9 Step 6: Connect CLI to generator.
 
 ### 2026-07-06
 

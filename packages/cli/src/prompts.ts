@@ -7,14 +7,8 @@ import {
   ormMetadata,
   packageManagerMetadata,
   uiMetadata,
-  type AuthOption,
-  type DatabaseOption,
-  type DockerOption,
   type LaunchKitConfig,
   type OptionMetadata,
-  type OrmOption,
-  type PackageManagerOption,
-  type UiOption,
 } from "@launchkit/schema";
 
 import type { CliArgs } from "./args.js";
@@ -156,12 +150,9 @@ export function createConfigDraftFromAnswers(input: {
       args.packageManager ?? answers.packageManager ?? defaultLaunchKitConfig.packageManager,
     ui: args.ui ?? answers.ui ?? defaultLaunchKitConfig.ui,
     database,
-    orm: normalizeOrm(database, args.orm ?? answers.orm ?? defaultLaunchKitConfig.orm),
+    orm: args.orm ?? answers.orm ?? defaultLaunchKitConfig.orm,
     auth: args.auth ?? answers.auth ?? defaultLaunchKitConfig.auth,
-    docker: normalizeDocker(
-      database,
-      args.docker ?? answers.docker ?? defaultLaunchKitConfig.docker,
-    ),
+    docker: args.docker ?? answers.docker ?? defaultLaunchKitConfig.docker,
     framework: "next",
     language: "typescript",
     router: "app",
@@ -210,22 +201,6 @@ export function getPromptFields(args: CliArgs): PromptField[] {
 
 function getProjectNameDefault(args: CliArgs): string {
   return args.name ?? args.targetDir ?? defaultLaunchKitConfig.name;
-}
-
-function normalizeOrm(database: DatabaseOption, orm: OrmOption): OrmOption {
-  if (database !== "postgres") {
-    return "none";
-  }
-
-  return orm;
-}
-
-function normalizeDocker(database: DatabaseOption, docker: DockerOption): DockerOption {
-  if (database !== "postgres") {
-    return "none";
-  }
-
-  return docker;
 }
 
 function toChoices<TValue extends string>(

@@ -125,22 +125,22 @@ describe("createConfigDraftFromAnswers", () => {
     });
   });
 
-  it("forces Prisma to none without PostgreSQL", () => {
+  it("preserves explicit Prisma selection for validation without PostgreSQL", () => {
     const draft = createConfigDraftFromAnswers({
       args: { ...emptyArgs, database: "none", orm: "prisma" },
       answers: {},
     });
 
-    expect(draft).toMatchObject({ database: "none", orm: "none" });
+    expect(draft).toMatchObject({ database: "none", orm: "prisma" });
   });
 
-  it("forces Docker PostgreSQL to none without PostgreSQL", () => {
+  it("preserves explicit Docker PostgreSQL selection for validation without PostgreSQL", () => {
     const draft = createConfigDraftFromAnswers({
       args: { ...emptyArgs, database: "none", docker: "postgres" },
       answers: {},
     });
 
-    expect(draft).toMatchObject({ database: "none", docker: "none" });
+    expect(draft).toMatchObject({ database: "none", docker: "postgres" });
   });
 
   it("does not force PostgreSQL for Auth.js credentials", () => {
