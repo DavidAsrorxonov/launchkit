@@ -831,6 +831,72 @@ CLI-specific concerns:
 
 All actual generation should remain in `packages/generator`.
 
+### CLI Package Strategy
+
+The future CLI should live at:
+
+```txt
+packages/cli
+```
+
+This fits the root npm workspace pattern:
+
+```json
+{
+  "workspaces": ["apps/*", "packages/*"]
+}
+```
+
+The package should be named:
+
+```txt
+create-launchkit
+```
+
+The primary future invocation is:
+
+```bash
+npx create-launchkit@latest
+```
+
+The npm create form can also be documented after publication:
+
+```bash
+npm create launchkit@latest
+```
+
+npm's `create`/`init` convention maps `npm create launchkit` to `npx create-launchkit`, so both forms can be backed by the same package. Do not claim either command is available until the package is published.
+
+The CLI binary should be named:
+
+```txt
+create-launchkit
+```
+
+The future package manifest should point the binary at compiled output:
+
+```json
+{
+  "bin": {
+    "create-launchkit": "./dist/index.js"
+  }
+}
+```
+
+The CLI should be an ESM TypeScript package with source in `src/` and compiled output in `dist/`.
+
+Recommended implementation choices:
+
+- prompt library: `@inquirer/prompts`
+- argument parsing: `node:util` `parseArgs`
+- tests: Vitest
+
+Use an external argument parser later only if the flag surface outgrows the standard library.
+
+Filesystem writes must stay inside the selected target directory, reject absolute paths and `..` segments, reject empty path segments, and avoid overwriting unrelated user files without confirmation.
+
+Dependency installation must be optional. Generate files first, then ask whether to run the selected package manager's install command. If the user declines, print next steps instead.
+
 ## Dependency Direction
 
 The dependency graph should point inward toward shared packages.

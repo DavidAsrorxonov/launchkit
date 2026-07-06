@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 8 Step 5 final launch QA automated checks completed; Phase 8 remains in progress pending user-run browser/responsive/download QA
-Primary focus: Phase 8 launch preparation has landing, builder, and docs routes with passing automated verification, but Phase 7/Phase 6 manual browser and download verification remains unresolved
+Current phase: Phase 9 Step 1 CLI planning decisions documented; Phase 8 manual localhost browser/responsive/download QA reported complete by user
+Primary focus: Website MVP is stable enough to proceed to Phase 9 Step 2 CLI package foundation when prompted
 ```
 
 ## Phase Progress
@@ -20,14 +20,158 @@ Primary focus: Phase 8 launch preparation has landing, builder, and docs routes 
 | Phase 3 | Shared Schema and Compatibility Rules | Complete    | Step 8 checkpoint verified schema package completeness, exports, Vitest coverage, and workspace checks. |
 | Phase 4 | Generator Core                        | Complete    | Step 10 checkpoint verified generator exports, source organization, tests, builds, and Node-loadable ESM package output. |
 | Phase 5 | Template Implementation               | Complete    | Step 9 verified all MVP template layers, real-template generator output, path safety, and compatibility behavior. |
-| Phase 6 | Website MVP                           | In Progress | Step 12 polished responsive wizard layout and added Phase 6 contract tests; manual browser/download QA remains before marking Phase 6 complete. |
-| Phase 7 | Testing, Validation, and Hardening    | In Progress | Step 7 verified automated schema, generator, template, API, UI failure-state, build, and smoke coverage; manual website/download QA remains before marking complete. |
-| Phase 8 | Launch Preparation                    | In Progress | Step 5 automated final QA passed, including build, unit tests, package tests, smoke tests, API/download safety checks, and docs accuracy scan. Not complete until user-run browser/responsive/download QA is finished. |
-| Phase 9 | Future CLI                            | Not Started | Deferred until website MVP is stable.                                                                   |
+| Phase 6 | Website MVP                           | Complete    | Step 12 automated checks passed; user reported localhost browser/download QA works. |
+| Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
+| Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
+| Phase 9 | Future CLI                            | In Progress | Step 1 planning decisions documented; Phase 9 Step 2 package foundation is unblocked when prompted. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-06
+
+Phase 8 manual QA completion recorded: Website MVP stable
+
+Scope and note:
+
+- User reported that localhost monitoring and manual checks completed successfully.
+- Recorded the manual browser/responsive/download QA blocker as resolved.
+- Marked Phase 6 complete because website MVP automated checks and manual browser/download QA are now both recorded as passing.
+- Marked Phase 7 complete because automated hardening checks and manual website/download QA are now both recorded as passing.
+- Marked Phase 8 complete because automated final QA and manual launch QA are now both recorded as passing.
+- Did not make code changes.
+- Did not create the CLI package.
+- Did not add CLI functionality.
+
+Files changed:
+
+- `context/progress-tracker.md`
+
+Verification result:
+
+- Documentation-only tracker update. No code verification was required.
+
+Next suggested step:
+
+- Proceed to Phase 9 Step 2 when prompted: create the CLI package foundation without adding full CLI behavior.
+
+### 2026-07-06
+
+Phase 9 Step 1 completed: Confirm CLI scope and package strategy
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 9 Step 1 prompt before making changes.
+- Could not confirm Phase 8 is complete because the tracker still records required user-run browser/responsive/download QA as pending.
+- Implemented only this planning/scope step.
+- Did not create `packages/cli`.
+- Did not add CLI implementation code.
+- Did not duplicate generator logic.
+- Did not change website behavior.
+- Used npm workspaces and Vitest as the planned workspace/test strategy.
+- Did not introduce Node's built-in test runner.
+
+Decisions confirmed:
+
+- CLI package location: `packages/cli`.
+- Package name: `create-launchkit`.
+- Binary name: `create-launchkit`.
+- npm workspace strategy: the existing root `workspaces: ["apps/*", "packages/*"]` includes `packages/cli`.
+- Future primary command: `npx create-launchkit@latest`.
+- Future npm create command: `npm create launchkit@latest`, because `npm init <package-spec>`/`npm create <package-spec>` maps to `npx create-<package-spec>`.
+- Availability: do not claim either command is available until the package is published.
+- Argument parser: start with `node:util` `parseArgs`; add an external parser later only if the flag surface becomes complex.
+- Prompt library: `@inquirer/prompts`.
+- Build strategy: TypeScript source in `src/`, compiled output in `dist/`, ESM package, future bin target `./dist/index.js`.
+- Filesystem safety strategy: write only inside the chosen target directory; reject absolute generated paths, `..` segments, and empty path segments; handle existing files carefully; never overwrite unrelated user files without confirmation.
+- Dependency install strategy: generate files first, then ask whether to install dependencies; never install by default; print next steps when install is skipped.
+- Test strategy: Vitest coverage for argument parsing, prompt-to-config mapping, schema validation, compatibility handling, generated file writing, existing directory safety, dependency install command construction, and next-step output.
+
+CLI MVP scope:
+
+- Ask for project options.
+- Validate config with `@launchkit/schema`.
+- Validate compatibility with shared schema helpers.
+- Call `@launchkit/generator`.
+- Write generated files to a target directory.
+- Prevent unsafe path writes.
+- Handle existing directories safely.
+- Optionally offer dependency installation.
+- Print next steps.
+
+CLI non-goals:
+
+- Unsupported frameworks.
+- JavaScript output.
+- Pages Router.
+- Generated `src/`.
+- LaunchKit user accounts.
+- Saved presets.
+- Duplicated generator logic.
+- Running generated app code.
+- Automatically starting dev servers.
+
+Files changed:
+
+- `context/architecture.md`
+- `context/build-plan.md`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-09/step-1.md
+rg --files
+sed -n '1,260p' context/project-overview.md
+sed -n '1,340p' context/architecture.md
+sed -n '1,440p' context/build-plan.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '1,260p' .agents/prompts/phase-09/step-1.md
+git status --short
+sed -n '261,620p' context/project-overview.md
+sed -n '341,760p' context/architecture.md
+sed -n '441,980p' context/build-plan.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '261,520p' .agents/prompts/phase-09/step-1.md
+cat package.json
+sed -n '981,1400p' context/build-plan.md
+sed -n '761,1120p' context/architecture.md
+sed -n '1,220p' README.md
+rg -n "Phase 9|create-launchkit|npm create|packages/cli|commander|inquirer|parseArgs|CLI" context README.md
+npm init --help
+nl -ba context/build-plan.md | sed -n '915,1025p'
+nl -ba context/architecture.md | sed -n '800,885p'
+nl -ba context/progress-tracker.md | sed -n '1,80p'
+cat packages/schema/package.json
+cat packages/generator/package.json
+cat tsconfig.base.json
+git diff --check
+npm run typecheck
+npm test
+```
+
+Verification result:
+
+- `git diff --check` passed.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+
+Notes/blockers:
+
+- Phase 8 remains incomplete in the tracker until user-run browser/responsive/download QA is completed.
+- Phase 9 package creation should remain deferred until the website MVP is confirmed stable.
+- `.agents/prompts/phase-09/` is untracked prompt context and was left untouched.
+- `memory.md` was already modified in the working tree and was left untouched.
+
+Next suggested step:
+
+- Complete the pending Phase 8 manual browser/responsive/download QA. If it passes, Phase 9 Step 2 can create the CLI package foundation without adding CLI behavior beyond the scaffold.
 
 ### 2026-07-05
 

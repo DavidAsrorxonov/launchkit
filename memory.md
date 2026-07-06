@@ -1,96 +1,113 @@
-# Memory - Phase 7 Completion Verification
+# Memory - Phase 8 Final QA Handoff
 
-Last updated: 2026-07-04 23:04 JST
+Last updated: 2026-07-06 10:17 JST
 
 ## What was built
 
-Phase 7 Step 7 was completed as an automated verification pass and recorded in `context/progress-tracker.md`.
+Phase 8 launch-prep work is implemented through Step 5 and documented in `context/progress-tracker.md`.
 
-No implementation files were changed during Step 7. The only edited project file was:
+Current completed Phase 8 work:
 
-- `context/progress-tracker.md`
+- Step 1: deployment and production readiness work completed and recorded.
+- Step 2: docs, supported stack, and limitations added to project docs and builder surface.
+- Step 3: dedicated landing page added at `/`; builder moved to `/builder`.
+- Step 4: dedicated documentation page added at `/docs`.
+- Step 5: automated final launch QA completed and recorded.
 
-The tracker now records that automated Phase 7 verification passed but Phase 7 remains `In Progress` because manual website/download QA is still pending.
+The latest session fixed one small docs mismatch:
+
+- `apps/web/README.md` now correctly documents `/docs` as the dedicated documentation page instead of future/reserved work.
 
 ## Decisions made
 
-Phase 7 was not marked complete because the user said they will perform manual browser/download QA themselves.
+Phase 8 was not marked complete because required live browser/responsive/download QA remains user-run pending.
 
-Phase 8 remains `Not Started`. Do not begin Phase 8 until manual website/download QA is complete and the tracker is updated accordingly.
+Website MVP was not marked ready for the same reason.
 
-Vitest remains the test runner. No Node built-in test runner, Jest, or Mocha usage was introduced.
+Phase 9 remains deferred. Do not start CLI work until Phase 8 is genuinely complete.
+
+The CLI command `npx create-launchkit@latest` is documented only as planned/coming soon. Do not claim the CLI exists.
+
+Vitest remains the test runner. Do not introduce Node's built-in test runner.
 
 ## Problems solved
 
-The previous `memory.md` was stale from Phase 7 Step 3 and has now been replaced with the current state.
-
-Automated verification confirmed the Phase 7 hardening checklist is covered by existing tests and code inspection:
-
-- schema regression coverage;
-- generator/template output and snapshot coverage;
-- generated project smoke tests;
-- API validation and safety hardening;
-- website failure-state behavior;
-- download and ZIP safety behavior.
-
-Known environment behavior:
+Known environment behavior is now established:
 
 - Sandboxed Next/Turbopack builds fail because the sandbox blocks process creation/port binding.
-- Escalated `npm run build` and `npm run build -w apps/web` both passed.
-- Sandboxed `npm run test:smoke` hung during generated dependency work and was interrupted.
-- Escalated `npm run test:smoke` passed for default and all-compatible generated projects.
-- Sandboxed local app startup cannot bind ports.
-- A stale Next dev server was reported on PID `66572` at port 3000, but `curl -I http://localhost:3000` could not connect.
+- Escalated `npm run build -w apps/web` passes.
+- Escalated `npm run build` passes.
+- Sandboxed generated-project smoke tests time out during `npm install`.
+- Escalated `npm run test:smoke` passes.
+- Sandboxed local dev server startup cannot bind to `127.0.0.1`.
+
+Automated final QA verified:
+
+- `/`, `/builder`, and `/docs` prerender as static routes.
+- `/api/generate` remains server-rendered on demand.
+- API schema validation, compatibility validation, structured errors, unsafe-path rejection, and no stack-trace leakage are covered by tests.
+- Browser ZIP helper rejects unsafe paths and generated `src/` paths.
+- Static scan found no web-app generated-code execution, generated dependency installation, or generated-project server disk writes.
+- Generated default and all-compatible projects install, typecheck, and build when smoke tests run outside the sandbox.
 
 ## Current state
 
-`context/progress-tracker.md` says:
+`context/progress-tracker.md` currently says:
 
 - Phase 6: `In Progress`, manual browser/download QA pending.
-- Phase 7: `In Progress`, Step 7 automated verification passed, manual website/download QA pending.
-- Phase 8: `Not Started`.
+- Phase 7: `In Progress`, automated hardening verified, manual website/download QA pending.
+- Phase 8: `In Progress`, Step 5 automated final QA passed, manual browser/responsive/download QA pending.
+- Phase 9: `Not Started`.
 
-Latest automated verification from Step 7:
+Latest verification:
 
-- `npm run typecheck` passed.
-- `npm test` passed:
-  - web: 4 files, 46 tests;
+- `npm run typecheck -w apps/web` passed.
+- `npm test -w apps/web` passed: 5 files, 49 tests.
+- `npm run lint -w apps/web` passed.
+- `git diff --check` passed.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
   - generator: 11 files, 127 tests;
   - schema: 5 files, 87 tests;
   - templates: 1 file, 52 tests.
 - `npm run lint` passed.
-- `npm run build` passed when rerun escalated after the known sandbox failure.
 - `npm test -w @launchkit/schema` passed.
 - `npm test -w @launchkit/generator` passed.
 - `npm test -w @launchkit/templates` passed.
-- `npm run typecheck -w @launchkit/schema` passed.
-- `npm run typecheck -w @launchkit/generator` passed.
-- `npm run typecheck -w @launchkit/templates` passed.
-- `npm run build -w apps/web` passed when rerun escalated after the known sandbox failure.
-- Escalated `npm run test:smoke` passed:
-  - default generated project installed, typechecked, and built;
-  - all-compatible generated project installed, ran `db:generate`, typechecked, and built.
+- Escalated `npm run build -w apps/web` passed.
+- Escalated `npm run build` passed.
+- Escalated `npm run test:smoke` passed.
 
-Current git state before this memory save showed:
+Current visible git state before this memory save showed:
 
-- `context/progress-tracker.md` modified.
-- `.agents/prompts/phase-08/` untracked, containing `step-1.md`.
+- `.agents/prompts/phase-09/step-1.md` untracked.
 
 ## Next session starts with
 
-Manual QA should be completed by the user before Phase 7 is marked complete:
+Run user-local manual browser QA before marking Phase 8 complete:
 
-1. Complete the website wizard with default options.
-2. Preview generated output.
-3. Download and inspect the ZIP.
-4. Repeat with all compatible MVP features selected.
-5. Confirm invalid combinations are prevented or clearly explained.
-6. Confirm download error/retry behavior where practical.
+1. Start the app locally.
+2. Open `/` and verify landing page polish, command card, builder CTA, docs link, and no visual overlap.
+3. Open `/builder` and complete the full 9-step builder flow.
+4. Confirm validation, compatibility behavior, state persistence, preview, and download.
+5. Inspect the default browser-downloaded ZIP.
+6. Inspect the all-compatible browser-downloaded ZIP.
+7. Confirm generated ZIP output has no `src/`.
+8. Open `/docs` and verify required sections, docs accuracy, and no unsupported options.
+9. Check responsive widths: 375px, 768px, 1280px, and 1440px+.
+10. Confirm nav does not overflow, code blocks/tables scroll correctly, buttons remain usable, and no text overlaps or clips.
 
-After manual QA passes, update `context/progress-tracker.md` to mark Phase 7 complete and Phase 8 ready. Only then should `.agents/prompts/phase-08/step-1.md` be implemented.
+If manual QA passes, update `context/progress-tracker.md` to mark:
+
+- Phase 8: `Complete`
+- Website MVP: ready
+- Phase 9: deferred until the website MVP is stable in real use
+
+If manual QA fails, fix the specific blocker before marking Phase 8 complete.
 
 ## Open questions
 
-Does the user-run manual browser/download QA pass on their machine?
+Does the user-run browser/responsive/download QA pass locally?
 
-Should the stale Next dev server metadata for PID `66572` be cleaned up, or is it harmless in the user's environment?
+Should `.agents/prompts/phase-09/step-1.md` remain untracked until Phase 8 is marked complete?
