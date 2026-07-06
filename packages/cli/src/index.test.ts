@@ -1,17 +1,31 @@
 import { describe, expect, it } from "vitest";
 
+import type { CliProjectGenerator } from "./generate.js";
 import { main, type CliOutput } from "./index.js";
 
 describe("main", () => {
-  it("returns zero when config validation succeeds", async () => {
+  it("returns zero and prints a preview when generation succeeds", async () => {
     const output = createOutputCapture();
+    const projectGenerator = createProjectGenerator({
+      name: "my-app",
+      packageManager: "npm",
+      files: ["package.json", "README.md"],
+    });
 
-    const exitCode = await main(["my-app", "--yes"], { output });
+    const exitCode = await main(["my-app", "--yes"], {
+      output,
+      projectGenerator,
+    });
 
     expect(exitCode).toBe(0);
     expect(output.logs).toEqual([
-      "LaunchKit config validated.",
-      "Generation will be added in the next step.",
+      "Generated project preview:",
+      "- name: my-app",
+      "- package manager: npm",
+      "- files: 2",
+      "Files:",
+      "- package.json",
+      "- README.md",
     ]);
     expect(output.errors).toEqual([]);
   });
@@ -27,6 +41,42 @@ describe("main", () => {
     expect(output.logs).toEqual([]);
     expect(output.errors).toEqual([
       "Error: Use lowercase letters, numbers, and hyphens only.",
+    ]);
+  });
+
+  it("returns non-zero and prints a CLI-friendly error when generation fails", async () => {
+    const output = createOutputCapture();
+    const projectGenerator: CliProjectGenerator = async () => {
+      throw new Error("Template loader failed.");
+    };
+
+    const exitCode = await main(["my-app", "--yes"], {
+      output,
+      projectGenerator,
+    });
+
+    expect(exitCode).toBe(1);
+    expect(output.logs).toEqual([]);
+    expect(output.errors).toEqual(["Error: Template loader failed."]);
+  });
+
+  it("returns non-zero when generated output contains an unsafe path", async () => {
+    const output = createOutputCapture();
+    const projectGenerator = createProjectGenerator({
+      name: "my-app",
+      packageManager: "npm",
+      files: ["src/app/page.tsx"],
+    });
+
+    const exitCode = await main(["my-app", "--yes"], {
+      output,
+      projectGenerator,
+    });
+
+    expect(exitCode).toBe(1);
+    expect(output.logs).toEqual([]);
+    expect(output.errors).toEqual([
+      "Error: Generated project contains an unsafe file path: src/app/page.tsx",
     ]);
   });
 });
@@ -48,4 +98,19 @@ function createOutputCapture(): CliOutput & {
       errors.push(message);
     },
   };
+}
+
+function createProjectGenerator(input: {
+  name: string;
+  packageManager: "npm" | "pnpm";
+  files: string[];
+}): CliProjectGenerator {
+  return async () => ({
+    name: input.name,
+    packageManager: input.packageManager,
+    files: input.files.map((path) => ({
+      path,
+      contents: "",
+    })),
+  });
 }

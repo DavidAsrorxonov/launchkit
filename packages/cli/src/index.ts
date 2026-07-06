@@ -8,6 +8,11 @@ import {
   getVersionText,
   parseCliArgs,
 } from "./args.js";
+import {
+  formatGeneratedProjectPreview,
+  generateProjectForCli,
+  type CliProjectGenerator,
+} from "./generate.js";
 import { promptForConfig, type PromptFunctions } from "./prompts.js";
 import { validateCliConfigDraft } from "./validate-config.js";
 
@@ -19,6 +24,7 @@ export type CliOutput = {
 export type CliMainOptions = {
   output?: CliOutput;
   promptFunctions?: PromptFunctions;
+  projectGenerator?: CliProjectGenerator;
 };
 
 export function cliPackageReady() {
@@ -55,8 +61,15 @@ export async function main(
       return 1;
     }
 
-    output.log("LaunchKit config validated.");
-    output.log("Generation will be added in the next step.");
+    const project = await generateProjectForCli(
+      validation.config,
+      options.projectGenerator,
+    );
+
+    for (const line of formatGeneratedProjectPreview(project)) {
+      output.log(line);
+    }
+
     return 0;
   } catch (error) {
     if (error instanceof CliArgumentError) {
@@ -65,10 +78,19 @@ export async function main(
       return 1;
     }
 
-    throw error;
+    output.error(`Error: ${formatCliErrorMessage(error)}`);
+    return 1;
   }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   process.exitCode = await main();
+}
+
+function formatCliErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message.length > 0) {
+    return error.message;
+  }
+
+  return "Project generation failed.";
 }

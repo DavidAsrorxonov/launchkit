@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 9 Step 5 CLI schema validation completed
-Primary focus: CLI now validates config drafts with @launchkit/schema before the future generator step; next scope is generator integration
+Current phase: Phase 9 Step 6 CLI generator integration completed
+Primary focus: CLI now validates config drafts, calls @launchkit/generator in memory, and prints a safe generated project preview; next scope is filesystem writes
 ```
 
 ## Phase Progress
@@ -23,11 +23,156 @@ Primary focus: CLI now validates config drafts with @launchkit/schema before the
 | Phase 6 | Website MVP                           | Complete    | Step 12 automated checks passed; user reported localhost browser/download QA works. |
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
-| Phase 9 | Future CLI                            | In Progress | Step 5 validates CLI config drafts with shared schema and compatibility helpers; generator integration, filesystem writes, and installs remain future work. |
+| Phase 9 | Future CLI                            | In Progress | Step 6 connects validated CLI configs to the shared generator and prints safe in-memory previews; filesystem writes, directory safety, and installs remain future work. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-06
+
+Phase 9 Step 6 completed: Connect CLI to generator
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 9 Step 6 prompt before making changes.
+- Confirmed Phase 9 Step 5 is documented as complete.
+- Implemented only this generator integration step.
+- Did not move to Phase 9 Step 7.
+- Did not write generated files to disk.
+- Did not implement existing-directory safety.
+- Did not install generated project dependencies.
+- Did not duplicate generator logic.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added CLI generation helper in `packages/cli/src/generate.ts`.
+- Connected validated CLI config to `@launchkit/generator` through `generateProjectForCli`.
+- Added generated project preview summary:
+  - project name;
+  - package manager;
+  - generated file count;
+  - capped generated file path list.
+- Added defense-in-depth generated path safety checks before output:
+  - uses `normalizeGeneratedPath` from `@launchkit/generator`;
+  - rejects paths containing `src` as a path segment;
+  - rejects invalid absolute, parent-directory, empty-segment, `.`, and `..` paths via the shared generator path normalizer.
+- Added CLI-friendly generator error handling in the entry flow without stack traces.
+- Added injectable generator support in `main()` for entry-flow tests.
+- Added Vitest coverage for:
+  - valid config calling the generator helper;
+  - generated project return value;
+  - preview summary name, package manager, and file count;
+  - path checks before output;
+  - unsafe generated path rejection;
+  - generator errors as CLI-friendly failures;
+  - no filesystem writes during generation preview;
+  - a fast integration-style test with the real generator.
+- Confirmed generated files are not written to disk yet.
+
+Files changed:
+
+- `packages/cli/src/generate.ts`
+- `packages/cli/src/generate.test.ts`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/index.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-09/step-6.md
+git status --short
+sed -n '261,520p' .agents/prompts/phase-09/step-6.md
+sed -n '1,1200p' context/architecture.md
+sed -n '1,1500p' context/build-plan.md
+sed -n '1,1100p' context/project-overview.md
+sed -n '1,900p' context/ui-rules.md
+rg --files packages/generator/src packages/cli/src | sort
+sed -n '1,260p' packages/generator/src/index.ts
+sed -n '1,320p' packages/generator/src/generate-project.ts
+sed -n '1,320p' packages/generator/src/types.ts
+sed -n '1,260p' packages/cli/src/index.ts
+sed -n '1,260p' packages/cli/src/index.test.ts
+sed -n '1,320p' packages/generator/src/file-tree.ts
+sed -n '1,360p' packages/generator/src/__tests__/generate-project.test.ts
+sed -n '1,320p' packages/generator/src/__tests__/file-tree.test.ts
+sed -n '1,260p' packages/cli/src/validate-config.ts
+cat packages/cli/package.json
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+git diff -- packages/cli/src/generate.ts packages/cli/src/generate.test.ts packages/cli/src/index.ts packages/cli/src/index.test.ts
+node packages/cli/dist/index.js --yes
+node packages/cli/dist/index.js my-app --database postgres --orm prisma --auth authjs-credentials --docker postgres --package-manager pnpm --yes
+node packages/cli/dist/index.js my-app --database none --orm prisma --yes
+rg -n "node:test|node --test|writeFile|mkdir|spawn\\(|exec\\(|execFile|npm install|pnpm install|fs/promises|writeProjectToDirectory|createWriteStream" packages/cli
+rg -n "generateProject\\(|create.*TemplateLoader|templateLoader" apps packages -g '*.ts' -g '*.tsx'
+sed -n '1,260p' apps/web/app/api/generate/route.ts
+sed -n '1,320p' packages/generator/src/template-loader.ts
+npm test -w @launchkit/generator
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run build
+rg -n "node:test|node --test|writeFile|mkdir|spawn\\(|exec\\(|execFile|npm install|pnpm install|fs/promises|writeProjectToDirectory|createWriteStream" packages/cli/src -g '!*.test.ts'
+rg -n "generateProject|normalizeGeneratedPath|src" packages/cli/src/generate.ts packages/cli/src/index.ts packages/cli/src/generate.test.ts packages/cli/src/index.test.ts
+git diff --check
+git status --short
+git diff --stat
+```
+
+Verification result:
+
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 5 files, 63 tests.
+- `npm run build -w create-launchkit` passed.
+- Built CLI behavior checks passed:
+  - `node packages/cli/dist/index.js --yes` exited `0` and printed:
+    - `Generated project preview:`;
+    - `- name: my-app`;
+    - `- package manager: npm`;
+    - `- files: 3`;
+    - generated file paths for `package.json`, `.env.example`, and `README.md`.
+  - `node packages/cli/dist/index.js my-app --database postgres --orm prisma --auth authjs-credentials --docker postgres --package-manager pnpm --yes` exited `0` and printed a generated project preview with package manager `pnpm`.
+  - `node packages/cli/dist/index.js my-app --database none --orm prisma --yes` exited `1` and still printed the schema compatibility error before generation:
+    - `Error: Prisma requires PostgreSQL.`
+- `npm test -w @launchkit/generator` passed: 11 files, 127 tests.
+- `npm run typecheck` passed across workspaces, including `create-launchkit`.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 5 files, 63 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/_not-found`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit` built with `tsc -p tsconfig.json`;
+  - generator, schema, shared, and templates built successfully.
+- Production CLI static scan found no Node built-in test runner usage, filesystem writes, process spawning, dependency install behavior, or filesystem adapter calls.
+- Static scan confirmed CLI generation uses `generateProject` and `normalizeGeneratedPath` from `@launchkit/generator`.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- `sed -n '1,320p' packages/generator/src/types.ts` failed because the generator package has no `types.ts`; `GeneratedProject` is exported from `packages/generator/src/file-tree.ts`.
+- `packages/cli/dist/` was generated by the build and remains ignored by the root `dist` gitignore rule.
+- `.agents/prompts/phase-09/step-6.md` is untracked prompt context and was left untouched.
+- The CLI uses the generator package's default `generateProject(config)` call in this step. That returns the in-memory generated project available from the shared API; filesystem writing and any target-directory handling remain for Step 7.
+
+Next suggested step:
+
+- Phase 9 Step 7: Add filesystem write behavior.
 
 ### 2026-07-06
 
