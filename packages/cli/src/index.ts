@@ -8,6 +8,7 @@ import {
   getVersionText,
   parseCliArgs,
 } from "./args.js";
+import { promptForConfig } from "./prompts.js";
 
 export function cliPackageReady() {
   return true;
@@ -27,8 +28,11 @@ export async function main(argv: string[] = process.argv.slice(2)) {
       return args;
     }
 
-    console.log("LaunchKit CLI parsed arguments. Project generation is not implemented yet.");
-    return args;
+    const configDraft = await promptForConfig(args);
+
+    console.log("LaunchKit CLI config collected.");
+    console.log("Generation will be added in a later step.");
+    return configDraft;
   } catch (error) {
     if (error instanceof CliArgumentError) {
       console.error(`Error: ${error.message}`);

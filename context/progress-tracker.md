@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 9 Step 3 CLI argument parsing completed
-Primary focus: CLI now parses supported MVP flags, target directory, help/version/yes aliases, and typed argument errors; next scope is interactive prompts
+Current phase: Phase 9 Step 4 CLI interactive prompts completed
+Primary focus: CLI now collects a config draft from parsed args, defaults, and interactive prompts; next scope is schema validation
 ```
 
 ## Phase Progress
@@ -23,11 +23,160 @@ Primary focus: CLI now parses supported MVP flags, target directory, help/versio
 | Phase 6 | Website MVP                           | Complete    | Step 12 automated checks passed; user reported localhost browser/download QA works. |
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
-| Phase 9 | Future CLI                            | In Progress | Step 3 added typed argument parsing and help/version handling; prompts, generator integration, filesystem writes, and installs remain future work. |
+| Phase 9 | Future CLI                            | In Progress | Step 4 added interactive prompt flow and config draft assembly; schema validation, generator integration, filesystem writes, and installs remain future work. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-06
+
+Phase 9 Step 4 completed: Add interactive prompts
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 9 Step 4 prompt before making changes.
+- Confirmed Phase 9 Step 3 is documented as complete.
+- Implemented only this interactive prompt step.
+- Did not move to Phase 9 Step 5.
+- Did not connect to the generator.
+- Did not write generated files to disk.
+- Did not install generated project dependencies.
+- Did not duplicate schema or generator logic.
+- Used npm workspaces and Vitest.
+- Used the Phase 9 Step 1 selected prompt library: `@inquirer/prompts`.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Added `@inquirer/prompts` to the `create-launchkit` workspace package.
+- Added CLI interactive prompt flow in `packages/cli/src/prompts.ts`.
+- Added config draft assembly from parsed args, defaults, and prompt answers.
+- Added `--yes` behavior:
+  - skips interactive prompts;
+  - uses provided CLI args;
+  - fills missing values from `defaultLaunchKitConfig`.
+- Added prompts for:
+  - project name;
+  - package manager;
+  - UI;
+  - database;
+  - ORM;
+  - auth;
+  - Docker.
+- Used schema metadata for prompt labels/descriptions where available.
+- Preserved fixed MVP values without prompting:
+  - `framework: "next"`;
+  - `language: "typescript"`;
+  - `router: "app"`;
+  - `projectStructure: "no-src"`;
+  - `styling: "tailwind"`.
+- Added prompt behavior that skips or resets Prisma to `none` without PostgreSQL.
+- Added prompt behavior that skips or resets Docker PostgreSQL to `none` without PostgreSQL.
+- Confirmed Auth.js credentials does not force PostgreSQL.
+- Structured prompt code with injectable prompt functions so tests do not use real terminal prompts.
+- Updated the CLI entry point to call the prompt flow after argument parsing and print a placeholder collected-config message.
+- Added Vitest coverage for prompt/config draft behavior.
+- Confirmed generation and filesystem writes are not implemented yet.
+
+Files changed:
+
+- `packages/cli/package.json`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/prompts.ts`
+- `packages/cli/src/prompts.test.ts`
+- `package-lock.json`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,320p' .agents/prompts/phase-09/step-4.md
+rg --files packages/cli context .agents/prompts/phase-09
+git status --short
+sed -n '321,640p' .agents/prompts/phase-09/step-4.md
+sed -n '1,1100p' context/architecture.md
+sed -n '1,1200p' context/build-plan.md
+sed -n '1,900p' context/project-overview.md
+sed -n '1,700p' context/ui-rules.md
+sed -n '1,240p' packages/schema/src/config.ts
+sed -n '1,240p' packages/schema/src/defaults.ts
+sed -n '1,260p' packages/schema/src/options.ts
+sed -n '1,280p' packages/schema/src/metadata.ts
+sed -n '1,260p' packages/schema/src/index.ts
+cat packages/cli/package.json
+npm install @inquirer/prompts -w create-launchkit
+npm install @inquirer/prompts -w create-launchkit
+sed -n '1,260p' packages/cli/src/args.ts
+sed -n '1,220p' packages/cli/src/index.ts
+cat packages/cli/package.json
+git diff -- package.json package-lock.json packages/cli/package.json
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run build
+node packages/cli/dist/index.js --yes
+node packages/cli/dist/index.js my-app --database postgres --orm prisma --docker postgres --yes
+node packages/cli/dist/index.js --help
+rg -n "node:test|node --test|generateProject|writeFile|mkdir|spawn\\(|exec\\(|execFile|npm install|pnpm install|fs/promises" packages/cli
+rg -n "framework|language|router|projectStructure|styling" packages/cli/src/prompts.ts packages/cli/src/prompts.test.ts
+git diff --check
+git status --short
+git diff -- package-lock.json packages/cli/package.json packages/cli/src/index.ts packages/cli/src/prompts.ts packages/cli/src/prompts.test.ts context/progress-tracker.md
+git diff --stat
+```
+
+Verification result:
+
+- Initial sandboxed `npm install @inquirer/prompts -w create-launchkit` failed due to DNS/network restriction:
+  - `getaddrinfo ENOTFOUND registry.npmjs.org`.
+- Escalated `npm install @inquirer/prompts -w create-launchkit` passed:
+  - added 22 packages;
+  - changed 1 package;
+  - found 0 vulnerabilities.
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 3 files, 37 tests.
+- `npm run build -w create-launchkit` passed.
+- `npm run typecheck` passed across workspaces, including `create-launchkit`.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 3 files, 37 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit` built with `tsc -p tsconfig.json`;
+  - generator, schema, shared, and templates built successfully.
+- `node packages/cli/dist/index.js --yes` printed:
+  - `LaunchKit CLI config collected.`;
+  - `Generation will be added in a later step.`
+- `node packages/cli/dist/index.js my-app --database postgres --orm prisma --docker postgres --yes` printed the same config-collected placeholder.
+- `node packages/cli/dist/index.js --help` printed supported usage/options only.
+- Static scan of `packages/cli` found no Node built-in test runner usage, generator integration, filesystem writes, process spawning, or dependency install behavior.
+- Static scan confirmed fixed MVP values exist only as draft fields/tests and not as unsupported prompt fields.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- `@inquirer/prompts` currently records an engine range of `>=23.5.0 || ^22.13.0 || ^20.17.0`; the current verification environment satisfied it.
+- `packages/cli/dist/` was generated by the build and remains ignored by the root `dist` gitignore rule.
+- `.agents/prompts/phase-09/step-4.md` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- Phase 9 Step 5: Connect CLI to schema validation.
 
 ### 2026-07-06
 

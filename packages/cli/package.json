@@ -14,6 +14,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@inquirer/prompts": "^8.5.2",
     "@launchkit/generator": "0.0.0",
     "@launchkit/schema": "0.0.0"
   },
