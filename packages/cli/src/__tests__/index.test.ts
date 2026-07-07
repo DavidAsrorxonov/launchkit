@@ -10,11 +10,11 @@ import path from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import type { CliProjectGenerator } from "./generate.js";
-import type { CommandRunner } from "./install.js";
-import { main, type CliOutput } from "./index.js";
-import type { PromptFunctions } from "./prompts.js";
-import type { CliProjectWriter } from "./write-project.js";
+import type { CliProjectGenerator } from "../generate.js";
+import type { CommandRunner } from "../install.js";
+import { main, type CliOutput } from "../index.js";
+import type { PromptFunctions } from "../prompts.js";
+import type { CliProjectWriter } from "../write-project.js";
 
 const tempRoots: string[] = [];
 

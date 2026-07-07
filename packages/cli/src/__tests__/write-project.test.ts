@@ -13,7 +13,7 @@ import path from "node:path";
 import type { GeneratedProject } from "@launchkit/generator";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { DirectorySafetyError } from "./directory-safety.js";
+import { DirectorySafetyError } from "../directory-safety.js";
 import {
   ProjectWriteError,
   UnsafeGeneratedPathError,
@@ -21,7 +21,7 @@ import {
   formatTargetDirForDisplay,
   resolveTargetDir,
   writeGeneratedProject,
-} from "./write-project.js";
+} from "../write-project.js";
 
 const tempRoots: string[] = [];
 

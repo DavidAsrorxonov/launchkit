@@ -16,8 +16,8 @@ import {
   ensureSafeTargetDirectory,
   findConflictingGeneratedPaths,
   getTargetDirectoryState,
-} from "./directory-safety.js";
-import { writeGeneratedProject } from "./write-project.js";
+} from "../directory-safety.js";
+import { writeGeneratedProject } from "../write-project.js";
 
 const tempRoots: string[] = [];
 

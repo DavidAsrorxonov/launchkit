@@ -1,5 +1,3 @@
-import { writeFile } from "node:fs/promises";
-
 import { defaultLaunchKitConfig } from "@launchkit/schema";
 import { describe, expect, it, vi } from "vitest";
 
@@ -9,7 +7,7 @@ import {
   generateProjectForCli,
   getSafeGeneratedFilePaths,
   type CliProjectGenerator,
-} from "./generate.js";
+} from "../generate.js";
 
 describe("generateProjectForCli", () => {
   it("calls the provided generator helper with a valid config", async () => {
@@ -71,16 +69,23 @@ describe("generateProjectForCli", () => {
   });
 
   it("does not write files during generation preview", async () => {
-    const writeFileSpy = vi.mocked(writeFile);
     const project = createGeneratedProjectPreview({
       name: "my-app",
       packageManager: "npm",
       files: ["package.json"],
     });
 
-    await generateProjectForCli(defaultLaunchKitConfig, async () => project);
+    const generatedProject = await generateProjectForCli(
+      defaultLaunchKitConfig,
+      async () => project,
+    );
 
-    expect(writeFileSpy).not.toHaveBeenCalled();
+    expect(generatedProject.files).toEqual([
+      {
+        path: "package.json",
+        contents: "",
+      },
+    ]);
   });
 
   it("works with the real generator", async () => {
@@ -91,7 +96,37 @@ describe("generateProjectForCli", () => {
       packageManager: defaultLaunchKitConfig.packageManager,
     });
     expect(project.files.length).toBeGreaterThan(0);
-    expect(project.files.map((file) => file.path)).toContain("package.json");
+    expect(project.files.map((file) => file.path)).toEqual(
+      expect.arrayContaining(["package.json", "app/page.tsx"]),
+    );
+  });
+
+  it("uses real templates for the all-compatible MVP config", async () => {
+    const project = await generateProjectForCli({
+      ...defaultLaunchKitConfig,
+      name: "full-app",
+      ui: "shadcn",
+      database: "postgres",
+      orm: "prisma",
+      auth: "authjs-credentials",
+      docker: "postgres",
+    });
+
+    expect(project.files.map((file) => file.path)).toEqual(
+      expect.arrayContaining([
+        "components.json",
+        "components/ui/button.tsx",
+        "lib/utils.ts",
+        "prisma/schema.prisma",
+        "lib/db.ts",
+        "auth.ts",
+        "app/api/auth/[...nextauth]/route.ts",
+        "docker-compose.yml",
+        ".env.example",
+        "package.json",
+        "README.md",
+      ]),
+    );
   });
 });
 
@@ -157,10 +192,6 @@ describe("getSafeGeneratedFilePaths", () => {
     expect(getSafeGeneratedFilePaths(project)).toEqual(["app/page.tsx"]);
   });
 });
-
-vi.mock("node:fs/promises", () => ({
-  writeFile: vi.fn(),
-}));
 
 function createGeneratedProjectPreview(input: {
   name: string;

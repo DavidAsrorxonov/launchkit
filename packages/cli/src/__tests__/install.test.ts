@@ -6,7 +6,7 @@ import {
   getInstallCommand,
   installDependencies,
   type CommandRunner,
-} from "./install.js";
+} from "../install.js";
 
 describe("getInstallCommand", () => {
   it("constructs npm install", () => {

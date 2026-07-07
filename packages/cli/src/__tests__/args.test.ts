@@ -5,7 +5,7 @@ import {
   getHelpText,
   getVersionText,
   parseCliArgs,
-} from "./args.js";
+} from "../args.js";
 
 describe("parseCliArgs", () => {
   it("parses empty args", () => {

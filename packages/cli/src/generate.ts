@@ -1,9 +1,12 @@
 import {
+  createGenerationPlan,
   generateProject,
   normalizeGeneratedPath,
   type GeneratedProject,
 } from "@launchkit/generator";
 import type { LaunchKitConfig } from "@launchkit/schema";
+
+import { createCliTemplateLoader } from "./template-loader.js";
 
 export type CliProjectGenerator = (
   config: LaunchKitConfig,
@@ -22,7 +25,7 @@ export class UnsafeGeneratedPathError extends Error {
 
 export async function generateProjectForCli(
   config: LaunchKitConfig,
-  projectGenerator: CliProjectGenerator = generateProject,
+  projectGenerator: CliProjectGenerator = generateProjectWithCliTemplates,
 ): Promise<GeneratedProject> {
   const project = await projectGenerator(config);
   assertGeneratedProjectPathsSafe(project);
@@ -70,5 +73,15 @@ export function getSafeGeneratedFilePaths(project: GeneratedProject): string[] {
     }
 
     return normalizedPath;
+  });
+}
+
+async function generateProjectWithCliTemplates(
+  config: LaunchKitConfig,
+): Promise<GeneratedProject> {
+  const plan = createGenerationPlan(config);
+
+  return generateProject(config, {
+    templateLoader: createCliTemplateLoader(plan),
   });
 }

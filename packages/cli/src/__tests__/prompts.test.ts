@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import type { CliArgs } from "./args.js";
+import type { CliArgs } from "../args.js";
 import {
   createConfigDraftFromAnswers,
   getPromptFields,
   promptForConfig,
   type PromptFunctions,
-} from "./prompts.js";
+} from "../prompts.js";
 
 const emptyArgs: CliArgs = {
   yes: false,

@@ -1,7 +1,7 @@
 import { defaultLaunchKitConfig } from "@launchkit/schema";
 import { describe, expect, it } from "vitest";
 
-import { validateCliConfigDraft } from "./validate-config.js";
+import { validateCliConfigDraft } from "../validate-config.js";
 
 describe("validateCliConfigDraft", () => {
   it("passes a valid default draft", () => {
