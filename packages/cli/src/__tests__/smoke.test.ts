@@ -1,6 +1,7 @@
 import {
   mkdir,
   mkdtemp,
+  readFile,
   readdir,
   rm,
   stat,
@@ -29,6 +30,21 @@ afterEach(async () => {
 });
 
 describe("built CLI smoke checks", () => {
+  it("bundles internal packages and template assets", async () => {
+    await expectFile(cliEntry);
+    await expectFile(packageRoot, "dist/templates/base/next/app/page.tsx");
+    await expectFile(
+      packageRoot,
+      "dist/templates/features/shadcn/components/ui/button.tsx",
+    );
+
+    const entryContents = await readFile(cliEntry, "utf8");
+
+    expect(entryContents.startsWith("#!/usr/bin/env node")).toBe(true);
+    expect(entryContents).not.toContain('from "@launchkit/generator"');
+    expect(entryContents).not.toContain('from "@launchkit/schema"');
+  });
+
   it("generates the default --yes project without installing dependencies", async () => {
     const cwd = await createTempRoot();
     const result = await runBuiltCli(["my-app", "--yes"], cwd);
@@ -186,9 +202,15 @@ async function expectFiles(
   expectedPaths: string[],
 ): Promise<void> {
   for (const expectedPath of expectedPaths) {
-    const fileStat = await stat(path.join(cwd, projectDir, expectedPath));
-    expect(fileStat.isFile(), expectedPath).toBe(true);
+    await expectFile(cwd, projectDir, expectedPath);
   }
+}
+
+async function expectFile(...pathParts: string[]): Promise<void> {
+  const expectedPath = path.join(...pathParts);
+  const fileStat = await stat(expectedPath);
+
+  expect(fileStat.isFile(), expectedPath).toBe(true);
 }
 
 async function expectNoSrcDirectory(

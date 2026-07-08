@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 10 Step 1 complete
-Primary focus: CLI npm publishing preparation has started; package remains private and unpublished
+Current phase: Phase 10 Step 2 complete
+Primary focus: CLI is bundled for future npm packaging; package remains private and unpublished
 ```
 
 ## Phase Progress
@@ -24,13 +24,270 @@ Primary focus: CLI npm publishing preparation has started; package remains priva
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
-| Phase 10 | npm Release Preparation              | In Progress | Step 1 prepared package metadata and release strategy; no publish or tarball test was performed. |
+| Phase 10 | npm Release Preparation              | In Progress | Step 2 bundles the CLI and copies template assets into dist; no publish or tarball test was performed. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
 
 ### 2026-07-08
+
+Phase 10 Step 2 completed: Bundle CLI for publishing
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 10 Step 2 prompt before making changes.
+- Confirmed Phase 10 Step 1 is documented as complete.
+- Confirmed the chosen dependency strategy is Option B: bundle internal LaunchKit packages into `create-launchkit`.
+- Implemented only this bundling step.
+- Did not move to Phase 10 Step 3.
+- Did not publish to npm.
+- Did not run `npm publish`.
+- Did not run `npm publish --dry-run`.
+- Did not run tarball/package publishing tests.
+- Did not create a GitHub release.
+- Did not add product options.
+- Did not change CLI behavior beyond bundling/runtime asset resolution.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Decisions confirmed:
+
+- Bundler: `esbuild`.
+- Output format: ESM.
+- Output entry: `packages/cli/dist/index.js`.
+- Internal package strategy: bundle `@launchkit/schema` and `@launchkit/generator` source into the CLI output.
+- Template asset strategy: copy `packages/templates/base` and `packages/templates/features` into `packages/cli/dist/templates`.
+- Runtime dependency strategy: keep `@inquirer/prompts` as a normal npm runtime dependency; keep internal LaunchKit packages as dev-only workspace dependencies for local build/test.
+- Typecheck strategy: keep `tsc -p tsconfig.json --noEmit` as a separate typecheck script.
+- Package files strategy: keep the existing allowlist with `dist`, `README.md`, and `package.json`; templates are included through `dist/templates`.
+
+Changes made:
+
+- Added `packages/cli/scripts/build.mjs`.
+- Updated the CLI build script to run the bundling build script.
+- Build script now:
+  - cleans `packages/cli/dist`;
+  - removes stale TypeScript build info before declaration emit;
+  - emits declaration files;
+  - bundles `src/index.ts` to `dist/index.js` with esbuild;
+  - preserves the CLI shebang;
+  - marks `@inquirer/prompts` external as a declared runtime dependency;
+  - aliases `@launchkit/schema` and `@launchkit/generator` to workspace source for bundling;
+  - copies template assets into `dist/templates`;
+  - makes the built CLI entry executable.
+- Updated the CLI template loader to prefer package-local `dist/templates` and fall back to workspace `packages/templates` for source/test usage.
+- Moved `@launchkit/schema` and `@launchkit/generator` from CLI runtime dependencies to dev dependencies.
+- Added `esbuild` as a CLI dev dependency.
+- Strengthened CLI smoke checks to verify:
+  - bundled `dist/index.js` exists;
+  - bundled output starts with the shebang;
+  - template assets are copied into `dist/templates`;
+  - bundled runtime output does not import `@launchkit/generator` or `@launchkit/schema`.
+- Refreshed `package-lock.json`.
+
+Files changed:
+
+- `package-lock.json`
+- `packages/cli/package.json`
+- `packages/cli/scripts/build.mjs`
+- `packages/cli/src/template-loader.ts`
+- `packages/cli/src/__tests__/smoke.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-10/step-2.md
+rg --files context packages/cli packages/generator packages/schema packages/templates | sort
+sed -n '1,260p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '1,320p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '281,620p' .agents/prompts/phase-10/step-2.md
+sed -n '261,620p' context/architecture.md
+sed -n '361,760p' context/build-plan.md
+sed -n '321,700p' context/project-overview.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '261,560p' context/progress-tracker.md
+sed -n '621,1040p' context/architecture.md
+sed -n '761,1120p' context/build-plan.md
+sed -n '701,1040p' context/project-overview.md
+sed -n '561,900p' context/progress-tracker.md
+git status --short
+sed -n '1,240p' packages/cli/package.json
+sed -n '1,260p' packages/cli/src/template-loader.ts
+sed -n '1,260p' packages/cli/src/generate.ts
+sed -n '1,260p' packages/generator/src/template-loader.ts
+sed -n '1,220p' packages/cli/src/__tests__/smoke.test.ts
+test -x node_modules/.bin/tsup && node_modules/.bin/tsup --version || true
+test -x node_modules/.bin/esbuild && node_modules/.bin/esbuild --version || true
+sed -n '1,260p' package.json
+sed -n '1,220p' packages/generator/src/index.ts
+sed -n '1,200p' packages/templates/src/index.ts
+rg -n '"esbuild"|node_modules/esbuild|packages/cli' package-lock.json
+sed -n '1,240p' packages/cli/tsconfig.json
+sed -n '1,220p' tsconfig.base.json
+find packages/templates/base packages/templates/features -type f | sort
+sed -n '1,220p' .gitignore
+sed -n '1,80p' packages/cli/src/index.ts
+sed -n '80,220p' packages/cli/src/index.ts
+sed -n '7156,7178p' package-lock.json
+sed -n '13178,13205p' package-lock.json
+rg -n '@launchkit/(schema|generator|templates)|from "\\./|from "\\.\\.' packages/cli/src packages/generator/src packages/schema/src
+npm install -w create-launchkit --save-dev esbuild@^0.28.1
+npm install -w create-launchkit --save-dev esbuild@^0.28.1
+sed -n '1,240p' packages/cli/package.json
+sed -n '13178,13210p' package-lock.json
+npm install
+nl -ba packages/cli/package.json | sed -n '38,56p'
+npm install
+npm run build -w create-launchkit
+find packages/cli/dist -maxdepth 4 -type f | sort | sed -n '1,120p'
+sed -n '1,12p' packages/cli/dist/index.js
+rg -n '@launchkit/(generator|schema)|\\.\\./templates|packages/templates' packages/cli/dist/index.js packages/cli/dist/index.d.ts packages/cli/dist -g '!templates/**'
+ls -l packages/cli/dist/index.js
+node packages/cli/dist/index.js --help
+find packages/cli -name '*.tsbuildinfo' -o -name '*.d.ts' | sort
+find packages/cli/dist/templates -type f | sort | sed -n '1,160p'
+find packages/cli/dist -maxdepth 2 -type f | sort
+npm run build -w create-launchkit
+find packages/cli/dist -maxdepth 2 -type f | sort
+find packages/cli -name '*.tsbuildinfo' -o -name '*.d.ts' | sort
+rg -n '@launchkit/(generator|schema)|from "@launchkit|from "\\.\\./templates|packages/templates' packages/cli/dist/index.js packages/cli/dist/index.d.ts
+sed -n '1,20p' packages/cli/dist/index.d.ts
+rg -n '@launchkit/(generator|schema)' packages/cli/dist/*.d.ts
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+npm run test:smoke -w create-launchkit
+mktemp -d /private/tmp/launchkit-cli-step2.XXXXXX
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js my-app --yes
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js full-app --yes --ui shadcn --database postgres --orm prisma --auth authjs-credentials --docker postgres
+find my-app -maxdepth 3 -type f | sort
+find full-app -maxdepth 6 -type f | sort
+find . -name src -type d -print
+find . -name node_modules -o -name package-lock.json -o -name pnpm-lock.yaml
+test -f my-app/package.json && test -f my-app/app/page.tsx && test -f my-app/README.md && test -f full-app/components.json && test -f full-app/components/ui/button.tsx && test -f full-app/lib/utils.ts && test -f full-app/prisma/schema.prisma && test -f full-app/lib/db.ts && test -f full-app/auth.ts && test -f 'full-app/app/api/auth/[...nextauth]/route.ts' && test -f full-app/docker-compose.yml
+npm run typecheck
+npm test
+npm run build
+npm run build
+node packages/cli/dist/index.js --version
+find packages/cli/dist/templates -type f | sort | sed -n '1,120p'
+rg -n '@launchkit/(generator|schema)|from "@launchkit|packages/templates|\\.\\./templates' packages/cli/dist/index.js
+sed -n '38,62p' packages/cli/package.json
+sed -n '13178,13212p' package-lock.json
+git diff -- packages/cli/package.json packages/cli/src/template-loader.ts packages/cli/src/__tests__/smoke.test.ts packages/cli/scripts/build.mjs package-lock.json
+git diff --check
+git status --short
+git diff --stat
+npm run lint
+```
+
+Verification result:
+
+- Initial sandboxed `npm install -w create-launchkit --save-dev esbuild@^0.28.1` failed due to DNS/network restriction:
+  - `getaddrinfo ENOTFOUND registry.npmjs.org`.
+- Escalated `npm install -w create-launchkit --save-dev esbuild@^0.28.1` passed:
+  - `found 0 vulnerabilities`.
+- Initial `npm install` after manual edits failed because `packages/cli/package.json` was missing a comma between dev dependencies.
+- Fixed the package JSON comma.
+- `npm install` passed.
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 8 files, 123 tests.
+- `npm run build -w create-launchkit` passed and produced bundled output.
+- `packages/cli/dist/index.js` starts with `#!/usr/bin/env node`.
+- `packages/cli/dist/index.js` is executable.
+- `node packages/cli/dist/index.js --help` passed.
+- `node packages/cli/dist/index.js --version` printed `0.1.0`.
+- Runtime bundle scan found no imports of `@launchkit/generator` or `@launchkit/schema` in `packages/cli/dist/index.js`.
+- Template assets were copied into `packages/cli/dist/templates`.
+- `npm run test:smoke -w create-launchkit` passed:
+  - 1 smoke file;
+  - 4 tests.
+- `npm run typecheck` passed across workspaces:
+  - web;
+  - create-launchkit;
+  - generator;
+  - schema;
+  - shared;
+  - templates.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 8 files, 123 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/_not-found`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit`, generator, schema, shared, and templates built successfully.
+- `npm run lint` passed.
+- `git diff --check` passed.
+
+Manual verification:
+
+- Created temporary manual verification directory:
+  - `/private/tmp/launchkit-cli-step2.TPtmku`
+- Ran the bundled CLI from that directory:
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js my-app --yes`
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js full-app --yes --ui shadcn --database postgres --orm prisma --auth authjs-credentials --docker postgres`
+- Both commands exited `0` and printed next steps with:
+  - `cd <project>`;
+  - `npm install`;
+  - `npm run dev`.
+- Verified default generated project includes:
+  - `my-app/package.json`;
+  - `my-app/app/page.tsx`;
+  - `my-app/README.md`;
+  - `my-app/.env.example`;
+  - `my-app/app/layout.tsx`;
+  - `my-app/next.config.ts`;
+  - `my-app/postcss.config.mjs`;
+  - `my-app/tsconfig.json`.
+- Verified all-compatible MVP generated project includes:
+  - `full-app/components.json`;
+  - `full-app/components/ui/button.tsx`;
+  - `full-app/lib/utils.ts`;
+  - `full-app/prisma/schema.prisma`;
+  - `full-app/lib/db.ts`;
+  - `full-app/auth.ts`;
+  - `full-app/app/api/auth/[...nextauth]/route.ts`;
+  - `full-app/docker-compose.yml`;
+  - `full-app/.env.example`;
+  - `full-app/package.json`;
+  - `full-app/README.md`.
+- Verified no generated `src/` directory:
+  - `find . -name src -type d -print` produced no output.
+- Verified dependencies were not installed by default:
+  - `find . -name node_modules -o -name package-lock.json -o -name pnpm-lock.yaml` produced no output.
+- Did not run generated app code.
+- Did not run `npm install` in generated projects.
+- Did not run `npm run dev`.
+- Did not start Docker containers.
+- Did not run Prisma commands.
+- Did not connect to databases.
+
+Notes/blockers:
+
+- The CLI package remains private and unpublished.
+- No tarball test was performed; that belongs to Phase 10 Step 3.
+- `@inquirer/prompts` remains an external runtime dependency and is listed in `dependencies`.
+- `@launchkit/schema` and `@launchkit/generator` are bundled into runtime output and remain listed only in `devDependencies` for local build/test.
+- Template assets are included through `dist/templates`, which is covered by the existing package `files` allowlist.
+- `packages/cli/dist/` was regenerated by builds and remains ignored by the root `dist` gitignore rule.
+- `.agents/prompts/phase-10/step-2.md` is untracked prompt context and was left untouched.
+- The temporary manual verification directory under `/private/tmp` was left in place for inspection.
+
+Next suggested step:
+
+- Phase 10 Step 3: Test npm package tarball locally.
 
 Phase 10 Step 1 completed: Prepare npm package metadata and release strategy
 

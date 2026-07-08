@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,8 +12,12 @@ import {
   type TemplateLoader,
 } from "@launchkit/generator";
 
-const packageRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-const templatesRoot = join(packageRoot, "..", "templates");
+const moduleDir = dirname(fileURLToPath(import.meta.url));
+const bundledTemplatesRoot = join(moduleDir, "templates");
+const workspaceTemplatesRoot = join(dirname(moduleDir), "..", "templates");
+const templatesRoot = existsSync(bundledTemplatesRoot)
+  ? bundledTemplatesRoot
+  : workspaceTemplatesRoot;
 
 export function createCliTemplateLoader(plan: GenerationPlan): TemplateLoader {
   const targetPathBySourcePath = new Map(
