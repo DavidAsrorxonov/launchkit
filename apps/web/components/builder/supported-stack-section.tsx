@@ -31,7 +31,7 @@ const supportedStackGroups = [
 ] as const;
 
 const limitations = [
-  "CLI generation is deferred.",
+  "The CLI package exists in the repo but has not been published.",
   "Only Next.js, TypeScript, App Router, no-src, and Tailwind CSS are supported.",
   "Auth.js credentials is a scaffold and needs real user lookup, password verification, and AUTH_SECRET.",
   "PostgreSQL Docker Compose is for local development only.",
@@ -60,7 +60,7 @@ export function SupportedStackSection() {
         </h2>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
           LaunchKit generates a TypeScript-first Next.js starter as a downloadable
-          zip. The CLI is deferred.
+          zip. A local CLI package exists in the repo but is not published.
         </p>
       </div>
 

@@ -20,7 +20,7 @@ const docsNavItems = [
   { id: "downloaded-project-usage", label: "Downloaded Project Usage" },
   { id: "compatibility-rules", label: "Compatibility Rules" },
   { id: "limitations", label: "Limitations" },
-  { id: "future-cli", label: "Future CLI" },
+  { id: "cli-status", label: "CLI Status" },
   { id: "troubleshooting", label: "Troubleshooting" },
 ] as const satisfies readonly DocsNavItem[];
 
@@ -71,7 +71,7 @@ const compatibilityRules = [
 ] as const;
 
 const limitations = [
-  "CLI generation is planned but not part of the current MVP.",
+  "The CLI package exists in the repo for local use but has not been published yet.",
   "Only Next.js is supported.",
   "Only TypeScript is supported.",
   "Only App Router is supported.",
@@ -149,7 +149,7 @@ export function DocsPage() {
             </h1>
             <p className="mt-4 text-base leading-7 text-muted-foreground">
               Practical notes for the current website-first MVP, the generated
-              project output, and the planned CLI path that will reuse the same
+              project output, and the local CLI package that reuses the same
               shared generator core.
             </p>
             <Link
@@ -177,8 +177,8 @@ export function DocsPage() {
             </p>
             <p>
               The generated project is intended to be unzipped and edited
-              locally. The shared generator core is designed so a future CLI can
-              reuse the same schema, compatibility rules, and templates.
+              locally. The shared generator core is also used by the local CLI
+              package in this repo, though that package has not been published.
             </p>
           </DocsSection>
 
@@ -315,17 +315,17 @@ npm run build`}</CodeBlock>
             </ul>
           </DocsSection>
 
-          <DocsSection id="future-cli" eyebrow="12" title="Future CLI">
+          <DocsSection id="cli-status" eyebrow="12" title="CLI Status">
             <p>
-              CLI generation is planned later and is not part of the current MVP.
-              The intended command is shown as a future interface, not something
-              that is available today.
+              CLI generation exists locally in `packages/cli`, but the package
+              has not been published. The public command is shown as a future
+              publishing target, not something that is available today.
             </p>
-            <CodeBlock>{`# Planned CLI, coming later
+            <CodeBlock>{`# Future publish command, not available yet
 npx create-launchkit@latest`}</CodeBlock>
             <p>
-              The planned CLI should reuse the same shared generator core as the
-              website so website and terminal output stay aligned.
+              The local CLI reuses the same shared generator core as the website
+              so website and terminal output stay aligned.
             </p>
           </DocsSection>
 

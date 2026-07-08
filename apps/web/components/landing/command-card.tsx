@@ -10,10 +10,10 @@ export function CommandCard() {
           </span>
           <div className="min-w-0">
             <p className="text-sm font-semibold text-foreground">
-              CLI coming soon
+              Local CLI ready
             </p>
             <p className="text-xs text-muted-foreground">
-              Planned Phase 9 interface over the same generator
+              Package exists in-repo, not published yet
             </p>
           </div>
         </div>
@@ -28,7 +28,7 @@ export function CommandCard() {
       </div>
 
       <ul className="mt-4 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-        {["Website builder works today", "CLI is not released yet"].map((item) => (
+        {["Website builder works today", "CLI package is not published"].map((item) => (
           <li key={item} className="flex min-w-0 items-center gap-2">
             <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <span>{item}</span>

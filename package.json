@@ -10,6 +10,7 @@
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "test:cli-smoke": "npm run test:smoke -w create-launchkit",
     "test:smoke": "npm run test:smoke -w @launchkit/generator",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },

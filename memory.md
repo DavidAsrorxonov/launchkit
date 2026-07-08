@@ -1,96 +1,136 @@
-# Memory - Phase 7 Completion Verification
+# Memory - Phase 9 CLI Handoff
 
-Last updated: 2026-07-04 23:04 JST
+Last updated: 2026-07-06 11:41 JST
 
 ## What was built
 
-Phase 7 Step 7 was completed as an automated verification pass and recorded in `context/progress-tracker.md`.
+Phase 9 CLI work is implemented through Step 4 and documented in `context/progress-tracker.md`.
 
-No implementation files were changed during Step 7. The only edited project file was:
+Completed Phase 9 work:
 
-- `context/progress-tracker.md`
+- Step 1: confirmed CLI scope and package strategy.
+- Step 2: created the `packages/cli` workspace package named `create-launchkit`.
+- Step 3: added typed CLI argument parsing with `node:util` `parseArgs`.
+- Step 4: added interactive prompt flow and config draft assembly.
 
-The tracker now records that automated Phase 7 verification passed but Phase 7 remains `In Progress` because manual website/download QA is still pending.
+Current CLI files of interest:
+
+- `packages/cli/package.json`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/args.ts`
+- `packages/cli/src/args.test.ts`
+- `packages/cli/src/prompts.ts`
+- `packages/cli/src/prompts.test.ts`
+
+Step 4 added `@inquirer/prompts` and updated `package-lock.json`.
 
 ## Decisions made
 
-Phase 7 was not marked complete because the user said they will perform manual browser/download QA themselves.
+The CLI package is `create-launchkit` with binary name `create-launchkit`.
 
-Phase 8 remains `Not Started`. Do not begin Phase 8 until manual website/download QA is complete and the tracker is updated accordingly.
+The CLI remains a thin interface over shared packages. It must not duplicate schema, compatibility, template, or generator logic.
 
-Vitest remains the test runner. No Node built-in test runner, Jest, or Mocha usage was introduced.
+Argument parsing uses Node standard library `node:util` `parseArgs`.
+
+Interactive prompts use `@inquirer/prompts`.
+
+Prompt code is structured with injectable prompt functions so tests do not require real terminal input.
+
+The CLI draft always includes fixed MVP values:
+
+- `framework: "next"`
+- `language: "typescript"`
+- `router: "app"`
+- `projectStructure: "no-src"`
+- `styling: "tailwind"`
+
+Unsupported framework, language, router, project-structure, and styling prompts must not be added.
+
+Vitest remains the test runner. Do not introduce Node's built-in test runner.
 
 ## Problems solved
 
-The previous `memory.md` was stale from Phase 7 Step 3 and has now been replaced with the current state.
+The CLI now handles:
 
-Automated verification confirmed the Phase 7 hardening checklist is covered by existing tests and code inspection:
+- optional positional target directory;
+- `--name`;
+- `--package-manager npm|pnpm`;
+- `--ui none|shadcn`;
+- `--database none|postgres`;
+- `--orm none|prisma`;
+- `--auth none|authjs-credentials`;
+- `--docker none|postgres`;
+- `--yes/-y`;
+- `--help/-h`;
+- `--version/-v`;
+- typed argument errors through `CliArgumentError`;
+- help and version output.
 
-- schema regression coverage;
-- generator/template output and snapshot coverage;
-- generated project smoke tests;
-- API validation and safety hardening;
-- website failure-state behavior;
-- download and ZIP safety behavior.
+The prompt flow now handles:
+
+- `--yes` without running prompts;
+- using CLI args as defaults or skip conditions;
+- defaulting missing values from `defaultLaunchKitConfig`;
+- project-name default from positional target dir;
+- `--name` overriding positional target dir for config name;
+- Prisma skipped/reset to `none` unless database is PostgreSQL;
+- Docker PostgreSQL skipped/reset to `none` unless database is PostgreSQL;
+- Auth.js credentials without forcing PostgreSQL.
 
 Known environment behavior:
 
-- Sandboxed Next/Turbopack builds fail because the sandbox blocks process creation/port binding.
-- Escalated `npm run build` and `npm run build -w apps/web` both passed.
-- Sandboxed `npm run test:smoke` hung during generated dependency work and was interrupted.
-- Escalated `npm run test:smoke` passed for default and all-compatible generated projects.
-- Sandboxed local app startup cannot bind ports.
-- A stale Next dev server was reported on PID `66572` at port 3000, but `curl -I http://localhost:3000` could not connect.
+- Sandboxed `npm install @inquirer/prompts -w create-launchkit` failed with DNS `ENOTFOUND registry.npmjs.org`; escalated install passed.
+- Sandboxed `npm run build` fails because Next/Turbopack cannot create a process or bind to a port in the sandbox.
+- Escalated `npm run build` passes.
 
 ## Current state
 
-`context/progress-tracker.md` says:
+`context/progress-tracker.md` currently says:
 
-- Phase 6: `In Progress`, manual browser/download QA pending.
-- Phase 7: `In Progress`, Step 7 automated verification passed, manual website/download QA pending.
-- Phase 8: `Not Started`.
+- Phase 6: `Complete`
+- Phase 7: `Complete`
+- Phase 8: `Complete`
+- Phase 9: `In Progress`
+- Current phase: Phase 9 Step 4 CLI interactive prompts completed.
+- Next scope: schema validation.
 
-Latest automated verification from Step 7:
+Latest verification from Step 4:
 
-- `npm run typecheck` passed.
-- `npm test` passed:
-  - web: 4 files, 46 tests;
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 3 files, 37 tests.
+- `npm run build -w create-launchkit` passed.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 3 files, 37 tests;
   - generator: 11 files, 127 tests;
   - schema: 5 files, 87 tests;
   - templates: 1 file, 52 tests.
 - `npm run lint` passed.
-- `npm run build` passed when rerun escalated after the known sandbox failure.
-- `npm test -w @launchkit/schema` passed.
-- `npm test -w @launchkit/generator` passed.
-- `npm test -w @launchkit/templates` passed.
-- `npm run typecheck -w @launchkit/schema` passed.
-- `npm run typecheck -w @launchkit/generator` passed.
-- `npm run typecheck -w @launchkit/templates` passed.
-- `npm run build -w apps/web` passed when rerun escalated after the known sandbox failure.
-- Escalated `npm run test:smoke` passed:
-  - default generated project installed, typechecked, and built;
-  - all-compatible generated project installed, ran `db:generate`, typechecked, and built.
+- Escalated `npm run build` passed across workspaces.
+- `git diff --check` passed.
 
-Current git state before this memory save showed:
+Current visible git state before this memory save showed:
 
-- `context/progress-tracker.md` modified.
-- `.agents/prompts/phase-08/` untracked, containing `step-1.md`.
+- `.agents/prompts/phase-09/step-5.md` untracked.
 
 ## Next session starts with
 
-Manual QA should be completed by the user before Phase 7 is marked complete:
+Implement Phase 9 Step 5: connect the CLI config draft to shared schema validation.
 
-1. Complete the website wizard with default options.
-2. Preview generated output.
-3. Download and inspect the ZIP.
-4. Repeat with all compatible MVP features selected.
-5. Confirm invalid combinations are prevented or clearly explained.
-6. Confirm download error/retry behavior where practical.
+Start by reading:
 
-After manual QA passes, update `context/progress-tracker.md` to mark Phase 7 complete and Phase 8 ready. Only then should `.agents/prompts/phase-08/step-1.md` be implemented.
+1. `memory.md`
+2. all files in `context/`
+3. `context/progress-tracker.md`
+4. `.agents/prompts/phase-09/step-5.md`
+5. current CLI files under `packages/cli/src/`
+6. schema validation and compatibility helpers under `packages/schema/src/`
+
+Keep Step 5 scoped to validation only unless the prompt explicitly says otherwise. Do not connect to the generator, write files to disk, install generated project dependencies, or add full generation behavior.
 
 ## Open questions
 
-Does the user-run manual browser/download QA pass on their machine?
+What exact Step 5 validation shape should the prompt require: raw `LaunchKitConfigSchema` validation only, compatibility validation too, or a CLI-specific wrapper around both?
 
-Should the stale Next dev server metadata for PID `66572` be cleaned up, or is it harmless in the user's environment?
+Should invalid CLI draft errors be formatted with the existing `CliArgumentError` style or a new CLI validation error type?

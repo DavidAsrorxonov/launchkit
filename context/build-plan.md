@@ -922,6 +922,62 @@ Goal: Add CLI support using the same generator core.
 
 This phase should happen after the website MVP works.
 
+### 9.0 Confirm CLI Scope And Strategy
+
+Before creating `packages/cli`, confirm the Phase 8 website MVP is stable.
+
+Confirmed package strategy:
+
+- package location: `packages/cli`
+- package name: `create-launchkit`
+- binary name: `create-launchkit`
+- package format: ESM TypeScript
+- source directory: `src/`
+- build output: `dist/`
+- future bin target: `./dist/index.js`
+
+Supported future commands after publication:
+
+```bash
+npx create-launchkit@latest
+npm create launchkit@latest
+```
+
+`npm create launchkit` follows npm's create/init convention and resolves to the `create-launchkit` package. Do not document these commands as available until the package is actually published.
+
+CLI MVP responsibilities:
+
+- ask for project options
+- validate config with `@launchkit/schema`
+- validate compatibility with shared schema helpers
+- call `@launchkit/generator`
+- write generated files to a target directory
+- prevent unsafe path writes
+- handle existing directories safely
+- optionally offer dependency installation
+- print next steps
+
+CLI MVP non-goals:
+
+- unsupported frameworks
+- JavaScript output
+- Pages Router
+- generated `src/`
+- LaunchKit user accounts
+- saved presets
+- duplicated generator logic
+- running generated app code
+- automatically starting dev servers
+
+Implementation strategy:
+
+- prompt library: `@inquirer/prompts`
+- argument parsing: `node:util` `parseArgs`
+- tests: Vitest
+- dependency installation: ask first, never install by default
+
+Filesystem writing must stay inside the chosen target directory, reject absolute paths and `..` segments, reject empty path segments, and avoid overwriting unrelated user files without confirmation.
+
 ### 9.1 Create CLI Package
 
 Create:
@@ -938,7 +994,7 @@ create-launchkit
 
 ### 9.2 Add CLI Entry
 
-Support:
+After publication, support:
 
 ```bash
 npx create-launchkit@latest
