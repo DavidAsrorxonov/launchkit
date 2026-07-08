@@ -994,7 +994,7 @@ create-launchkit
 
 ### 9.2 Add CLI Entry
 
-Support:
+After publication, support:
 
 ```bash
 npx create-launchkit@latest

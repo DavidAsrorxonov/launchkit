@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 9 Step 10 CLI tests and smoke checks completed
-Primary focus: CLI tests are organized under __tests__, smoke checks exercise the built CLI for default and all-compatible MVP configs, and the CLI now loads real generator templates for local output; next scope is Phase 9 completion verification
+Current phase: Phase 9 complete
+Primary focus: CLI MVP is ready for local use; publishing was not performed and should only be prepared when explicitly requested
 ```
 
 ## Phase Progress
@@ -23,11 +23,380 @@ Primary focus: CLI tests are organized under __tests__, smoke checks exercise th
 | Phase 6 | Website MVP                           | Complete    | Step 12 automated checks passed; user reported localhost browser/download QA works. |
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
-| Phase 9 | Future CLI                            | In Progress | Step 10 adds organized CLI unit coverage, opt-in built-CLI smoke checks, real-template CLI generation, and root/package smoke scripts. |
+| Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-08
+
+Phase 9 Step 11 completed: Verify Phase 9 completion
+
+Phase status:
+
+- Phase 9: Complete
+- CLI MVP: Ready for local use
+- Publishing: Not performed
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 9 Step 11 prompt before making changes.
+- Confirmed Phase 9 Steps 1-10 are documented as complete.
+- Implemented only this final verification step.
+- Did not add product options.
+- Did not publish the CLI package.
+- Did not start a new phase.
+- Did not perform broad refactors.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Verified CLI package foundation:
+  - `packages/cli/package.json`;
+  - `packages/cli/tsconfig.json`;
+  - `packages/cli/src/`;
+  - package name `create-launchkit`;
+  - binary name `create-launchkit`;
+  - ESM package type;
+  - workspace package;
+  - build output under `packages/cli/dist/`.
+- Verified argument parsing:
+  - positional target directory;
+  - `--name`;
+  - `--package-manager <npm|pnpm>`;
+  - `--ui <none|shadcn>`;
+  - `--database <none|postgres>`;
+  - `--orm <none|prisma>`;
+  - `--auth <none|authjs-credentials>`;
+  - `--docker <none|postgres>`;
+  - `--yes`;
+  - `--install`;
+  - `--no-install`;
+  - `--help`;
+  - `--version`;
+  - unknown flag errors;
+  - invalid value errors;
+  - help text accuracy.
+- Verified interactive prompts:
+  - project name;
+  - package manager;
+  - UI option;
+  - database option;
+  - ORM option only when PostgreSQL is selected;
+  - auth option;
+  - Docker option only when PostgreSQL is selected;
+  - dependency install prompt in interactive mode;
+  - fixed MVP values are not prompted as selectable choices;
+  - `--yes` skips prompts and uses defaults/flags.
+- Verified schema validation:
+  - CLI validates through `@launchkit/schema`;
+  - invalid project names fail;
+  - unsupported values fail;
+  - Prisma without PostgreSQL fails;
+  - Docker PostgreSQL without PostgreSQL fails;
+  - Auth.js credentials without database passes;
+  - errors are CLI-friendly.
+- Verified generator integration:
+  - CLI uses `@launchkit/generator`;
+  - validated config is passed to the generator;
+  - generator output is used directly;
+  - generator feature/template composition is not duplicated in the CLI;
+  - CLI template loader only reads template files requested by the generator;
+  - generator errors are handled clearly;
+  - generated paths are checked before writing.
+- Verified filesystem write behavior:
+  - target directory resolution;
+  - generated file writing;
+  - nested directory creation;
+  - string content writing;
+  - binary content writing coverage;
+  - unsafe path rejection;
+  - path traversal prevention;
+  - target directory containment;
+  - generated `src/` path rejection.
+- Verified existing-directory safety:
+  - missing target directories work;
+  - existing empty directories work;
+  - existing non-empty directories do not overwrite by default;
+  - `--yes` rejects existing non-empty directories;
+  - interactive mode can confirm non-empty directory use;
+  - conflicting files are detected before writing;
+  - conflicts stop before partial writes;
+  - current-directory targets are handled safely.
+- Verified optional dependency install behavior:
+  - dependency install is optional;
+  - `--yes` does not install by default;
+  - `--install` behavior is covered by mocked command runners;
+  - `--no-install` behavior is covered;
+  - npm projects use `npm install`;
+  - pnpm projects use `pnpm install`;
+  - install runs in the generated project directory;
+  - install failures are clear;
+  - generated files remain if install fails.
+- Verified CLI does not run generated app commands:
+  - does not run `npm run dev`;
+  - does not run `npm run build`;
+  - does not run Prisma commands;
+  - does not run Docker commands;
+  - does not start servers;
+  - does not connect to databases.
+- Verified next-step output:
+  - skipped install includes `cd`, install, and dev commands;
+  - successful install omits install command;
+  - pnpm output uses `pnpm install` and `pnpm dev`;
+  - current-directory target omits `cd .`.
+- Verified tests and smoke checks:
+  - args parsing;
+  - prompt/config flow;
+  - schema validation;
+  - generator connection;
+  - filesystem writing;
+  - existing-directory safety;
+  - optional install behavior;
+  - next-step output;
+  - default config smoke check;
+  - all-compatible MVP smoke check.
+- Verified smoke checks:
+  - run built CLI locally with `node`;
+  - generate into temp directories;
+  - verify expected files;
+  - verify no `src/`;
+  - do not publish the package;
+  - do not run generated app code;
+  - do not install dependencies by default;
+  - do not start Docker;
+  - do not connect to databases.
+- Updated docs and website copy to reflect current CLI status accurately:
+  - local CLI package exists in the repo;
+  - package has not been published;
+  - public `npx create-launchkit@latest` remains a future publish command.
+
+Files changed:
+
+- `README.md`
+- `apps/web/README.md`
+- `apps/web/components/builder/supported-stack-section.tsx`
+- `apps/web/components/docs/docs-page.tsx`
+- `apps/web/components/docs/docs-page.test.tsx`
+- `apps/web/components/landing/command-card.tsx`
+- `context/build-plan.md`
+- `context/project-overview.md`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,280p' .agents/prompts/phase-09/step-11.md
+git status --short
+sed -n '281,620p' .agents/prompts/phase-09/step-11.md
+rg --files context | sort
+sed -n '261,620p' context/progress-tracker.md
+sed -n '1,1200p' context/architecture.md
+sed -n '1,1500p' context/build-plan.md
+sed -n '1,1200p' context/project-overview.md
+sed -n '1,900p' context/ui-rules.md
+rg -n "create-launchkit|npm create|npx create-launchkit|CLI package|published|publish|pnpm create" README.md context apps packages .agents -g '!packages/*/dist/**' -g '!node_modules/**'
+rg -n "Phase 9 Step [0-9]+ completed|Phase 9 Step 10 completed" context/progress-tracker.md
+find packages/cli -maxdepth 3 -type f | sort
+sed -n '1,260p' packages/cli/package.json
+sed -n '280,360p' apps/web/components/docs/docs-page.tsx
+sed -n '1,100p' apps/web/components/docs/docs-page.test.tsx
+sed -n '1,120p' apps/web/components/landing/command-card.tsx
+sed -n '1,80p' context/project-overview.md
+sed -n '250,275p' context/project-overview.md
+rg -n "CLI generation|CLI coming soon|Planned Phase 9|Planned CLI|not part of the current MVP|CLI is not released|Future CLI|planned later" apps/web/components context/project-overview.md
+sed -n '1,140p' apps/web/components/docs/docs-page.tsx
+sed -n '140,240p' apps/web/components/docs/docs-page.tsx
+sed -n '1,80p' apps/web/components/builder/supported-stack-section.tsx
+sed -n '1,140p' README.md
+sed -n '1,140p' apps/web/README.md
+sed -n '930,950p' context/build-plan.md
+sed -n '994,1010p' context/build-plan.md
+sed -n '850,870p' context/architecture.md
+rg -n "future CLI is deferred|does not exist|CLI generation is deferred|CLI generation is planned|not part of the current MVP|CLI coming soon|Planned Phase 9|not published|Future publish command|not available yet" README.md context apps packages -g '!packages/*/dist/**' -g '!node_modules/**'
+sed -n '1,220p' packages/cli/src/index.ts
+sed -n '1,220p' packages/cli/src/args.ts
+sed -n '1,220p' packages/cli/src/prompts.ts
+rg -n "future CLI is deferred|does not exist|CLI generation is deferred|CLI generation is planned but not part|CLI coming soon|Planned Phase 9|npx create-launchkit@latest|npm create launchkit@latest" README.md apps context -g '!node_modules/**'
+sed -n '1,220p' packages/cli/src/generate.ts
+sed -n '1,260p' packages/cli/src/write-project.ts
+sed -n '1,220p' packages/cli/src/directory-safety.ts
+sed -n '1,220p' packages/cli/src/install.ts
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+npm run test:smoke -w create-launchkit
+npm test -w @launchkit/schema
+npm test -w @launchkit/generator
+npm test -w @launchkit/templates
+npm run typecheck
+npm test
+npm run lint
+npm run build
+npm run build
+npm run test:cli-smoke
+mktemp -d /private/tmp/launchkit-cli-step11.XXXXXX
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js my-app --yes
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js full-app --yes --ui shadcn --database postgres --orm prisma --auth authjs-credentials --docker postgres
+find my-app -maxdepth 3 -type f | sort
+find full-app -maxdepth 6 -type f | sort
+find . -name src -type d -print
+find . -name node_modules -o -name package-lock.json -o -name pnpm-lock.yaml
+mkdir blocked-app
+touch blocked-app/notes.txt
+node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js blocked-app --yes
+find blocked-app -maxdepth 2 -type f | sort
+node packages/cli/dist/index.js --help
+node packages/cli/dist/index.js --version
+node packages/cli/dist/index.js --framework next
+node packages/cli/dist/index.js bad-app --package-manager yarn --yes
+rg -n "node:test|node --test" package.json apps packages context README.md
+rg -n "npm run dev|pnpm dev|next dev|docker compose|prisma|npm install|pnpm install|spawn\\(|exec\\(|execFile|child_process|execa" packages/cli/src packages/cli/package.json apps/web/components README.md apps/web/README.md
+git diff --check
+git status --short
+git diff --stat
+rg -n "node:test|node --test" package.json apps packages README.md -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'
+rg -n "future CLI is deferred|does not exist in this repo|CLI generation is deferred|CLI generation is planned but not part|CLI coming soon|Planned Phase 9|not part of the current MVP" README.md apps context/project-overview.md context/build-plan.md context/architecture.md
+```
+
+Verification result:
+
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 8 files, 123 tests.
+- `npm run build -w create-launchkit` passed.
+- `npm test -w @launchkit/schema` passed: 5 files, 87 tests.
+- `npm test -w @launchkit/generator` passed: 11 files, 127 tests.
+- `npm test -w @launchkit/templates` passed: 1 file, 52 tests.
+- `npm run typecheck` passed across workspaces:
+  - web;
+  - create-launchkit;
+  - generator;
+  - schema;
+  - shared;
+  - templates.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 8 files, 123 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run lint` passed.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/_not-found`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit`, generator, schema, shared, and templates built successfully.
+- Help output showed all supported flags and did not advertise unsupported framework/language/router/project-structure/styling flags.
+- Version output returned `0.0.0`.
+- Unknown flag check failed clearly:
+  - `Error: Unknown option '--framework'...`
+  - `Run create-launchkit --help for usage.`
+- Invalid value check failed clearly:
+  - `Error: Invalid value for --package-manager: yarn. Expected one of: npm, pnpm.`
+  - `Run create-launchkit --help for usage.`
+- Focused source/package scan found no Node built-in test runner usage:
+  - `rg -n "node:test|node --test" package.json apps packages README.md -g '!dist/**' -g '!node_modules/**' -g '!*.tsbuildinfo'` returned no matches.
+- Static command scan found process execution only in expected CLI locations:
+  - `packages/cli/src/install.ts`, where optional installs use `spawn(command, args, { cwd })`;
+  - `packages/cli/src/__tests__/smoke.test.ts`, where smoke tests run the built CLI with `node`.
+- Static command scan found install/dev/Docker/Prisma strings in docs, next-step output, UI guidance, and tests; no generated app dev/build, Prisma, Docker, server, or database commands are executed by the CLI.
+- Docs availability scan found no stale wording claiming the CLI is deferred, nonexistent, coming soon, or part of an unpublished public release.
+- `git diff --check` passed.
+
+Smoke check result:
+
+- `npm run test:smoke -w create-launchkit` passed:
+  - 1 smoke file;
+  - 3 tests.
+- `npm run test:cli-smoke` passed and verified the root smoke script.
+- Smoke checks:
+  - run built CLI locally with `node`;
+  - generate into temp directories;
+  - verify expected files;
+  - verify no `src/`;
+  - reject an existing non-empty directory with `--yes`;
+  - verify `--yes` skips dependency installation by default;
+  - do not publish package;
+  - do not use `npx create-launchkit@latest`;
+  - do not run package-manager installs;
+  - do not run generated app code;
+  - do not start Docker;
+  - do not connect to databases.
+
+Manual verification:
+
+- Created temporary manual verification directory:
+  - `/private/tmp/launchkit-cli-step11.BRebqW`
+- Ran the built CLI from that directory:
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js my-app --yes`
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js full-app --yes --ui shadcn --database postgres --orm prisma --auth authjs-credentials --docker postgres`
+- Both commands exited `0` and printed next steps with:
+  - `cd <project>`;
+  - `npm install`;
+  - `npm run dev`.
+- Verified default generated project includes:
+  - `my-app/.env.example`;
+  - `my-app/.gitignore`;
+  - `my-app/README.md`;
+  - `my-app/app/globals.css`;
+  - `my-app/app/layout.tsx`;
+  - `my-app/app/page.tsx`;
+  - `my-app/next.config.ts`;
+  - `my-app/package.json`;
+  - `my-app/postcss.config.mjs`;
+  - `my-app/tsconfig.json`.
+- Verified full MVP generated project includes:
+  - `full-app/components.json`;
+  - `full-app/components/ui/button.tsx`;
+  - `full-app/lib/utils.ts`;
+  - `full-app/prisma/schema.prisma`;
+  - `full-app/prisma.config.ts`;
+  - `full-app/lib/db.ts`;
+  - `full-app/auth.ts`;
+  - `full-app/app/api/auth/[...nextauth]/route.ts`;
+  - `full-app/docker-compose.yml`;
+  - `full-app/.env.example`;
+  - `full-app/package.json`;
+  - `full-app/README.md`.
+- Verified no generated `src/` directory:
+  - `find . -name src -type d -print` produced no output.
+- Verified dependencies were not installed by default:
+  - `find . -name node_modules -o -name package-lock.json -o -name pnpm-lock.yaml` produced no output.
+- Created `blocked-app/notes.txt`, then ran:
+  - `node /Users/dovudxonasrorxonov/Desktop/Workspace/launchkit/packages/cli/dist/index.js blocked-app --yes`
+- CLI exited `1` and printed:
+  - `Target directory is not empty.`
+  - `Choose an empty directory or run without --yes to confirm adding LaunchKit files.`
+- Verified `blocked-app` still contained only:
+  - `blocked-app/notes.txt`
+- Did not manually verify real `--install` because it would perform network-dependent package installation.
+- Did not run `npm install`.
+- Did not run generated project code.
+- Did not run `npm run dev`.
+- Did not start Docker containers.
+- Did not run Prisma commands.
+- Did not connect to databases.
+
+Notes/blockers:
+
+- Phase 9 is complete.
+- CLI MVP is ready for local use.
+- Publishing was not performed.
+- The package remains private and unpublished.
+- `packages/cli/dist/` was regenerated by builds and remains ignored by the root `dist` gitignore rule.
+- Historical tracker entries still mention older CLI wording, but current docs, README files, and website copy no longer claim the CLI is nonexistent/deferred or publicly available.
+- `.agents/prompts/phase-09/step-11.md` is untracked prompt context and was left untouched.
+- The temporary manual verification directory under `/private/tmp` was left in place for inspection.
+
+Next suggested step:
+
+- Prepare publishing/release workflow only when the user explicitly asks.
 
 ### 2026-07-07
 

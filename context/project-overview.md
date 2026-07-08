@@ -4,7 +4,7 @@
 
 LaunchKit is a developer tool for generating ready-to-use project starters.
 
-The first product surface will be a website where developers choose a stack, click a button, and download a generated project as a zip file. Later, LaunchKit should also support a CLI experience such as:
+The first product surface is a website where developers choose a stack, click a button, and download a generated project as a zip file. LaunchKit now also has a local CLI package in the repo, but it has not been published yet. Future public CLI usage is expected to look like:
 
 ```bash
 npx create-launchkit@latest
@@ -253,14 +253,14 @@ Example response:
 my-app.zip
 ```
 
-## Future CLI Flow
+## CLI Flow
 
 The CLI should use the same schema and generator.
 
 Example flow:
 
 ```txt
-npx create-launchkit@latest
+Future publish command: npx create-launchkit@latest
   -> ask project name
   -> ask framework
   -> ask database

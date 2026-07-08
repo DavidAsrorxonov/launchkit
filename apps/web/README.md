@@ -4,7 +4,8 @@ Next.js website for the LaunchKit project builder.
 
 LaunchKit is a TypeScript-first developer project generator. The MVP is a
 website-first generator where users configure a project, preview the output, and
-download a zip. The future CLI is deferred.
+download a zip. A local CLI package exists in the repo but has not been
+published yet.
 
 ## Supported MVP Stack
 
@@ -82,12 +83,12 @@ Feature-specific notes:
 ## Roadmap
 
 - Keep the website MVP stable first.
-- Add a shared-generator CLI later.
+- Prepare publishing/release workflow for the existing shared-generator CLI.
 - Add more stack options only after the core generation flow is reliable.
 
 ## Limitations
 
-- CLI generation is not part of the MVP.
+- The CLI package is available locally in this repo but is not published.
 - Only Next.js is supported.
 - Only TypeScript is supported.
 - Only App Router is supported.

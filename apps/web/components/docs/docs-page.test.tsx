@@ -38,7 +38,7 @@ describe("Phase 8 docs page", () => {
     expect(docsSource).toContain("Optional Features");
     expect(docsSource).toContain("Environment Variables");
     expect(docsSource).toContain("Compatibility Rules");
-    expect(docsSource).toContain("Future CLI");
+    expect(docsSource).toContain("CLI Status");
     expect(docsSource).toContain("Troubleshooting");
 
     expect(labels(frameworkMetadata)).toEqual(["Next.js"]);
@@ -54,9 +54,9 @@ describe("Phase 8 docs page", () => {
 
   it("documents current limitations without claiming the CLI is available", () => {
     expect(docsSource).toContain(
-      "CLI generation is planned but not part of the current MVP.",
+      "The CLI package exists in the repo for local use but has not been published yet.",
     );
-    expect(docsSource).toContain("Planned CLI, coming later");
+    expect(docsSource).toContain("Future publish command, not available yet");
     expect(docsSource).toContain("npx create-launchkit@latest");
     expect(docsSource).toContain("Generated projects do not use `src/`.");
     expect(docsSource).toContain("Auth.js credentials output is a scaffold");
