@@ -1,13 +1,40 @@
 {
   "name": "create-launchkit",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
+  "description": "Create a TypeScript-first Next.js project with LaunchKit.",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "create-launchkit": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavidAsrorxonov/launchkit.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/DavidAsrorxonov/launchkit#readme",
+  "bugs": {
+    "url": "https://github.com/DavidAsrorxonov/launchkit/issues"
+  },
+  "keywords": [
+    "create",
+    "nextjs",
+    "typescript",
+    "tailwind",
+    "starter",
+    "project-generator"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",

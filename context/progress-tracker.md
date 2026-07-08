@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 9 complete
-Primary focus: CLI MVP is ready for local use; publishing was not performed and should only be prepared when explicitly requested
+Current phase: Phase 10 Step 1 complete
+Primary focus: CLI npm publishing preparation has started; package remains private and unpublished
 ```
 
 ## Phase Progress
@@ -24,12 +24,190 @@ Primary focus: CLI MVP is ready for local use; publishing was not performed and 
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
+| Phase 10 | npm Release Preparation              | In Progress | Step 1 prepared package metadata and release strategy; no publish or tarball test was performed. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
 
 ### 2026-07-08
+
+Phase 10 Step 1 completed: Prepare npm package metadata and release strategy
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 10 Step 1 prompt before making changes.
+- Confirmed Phase 9 is documented as complete.
+- Confirmed the built CLI works locally by running the compiled CLI with `--version`.
+- Implemented only this package metadata and release-strategy step.
+- Did not publish to npm.
+- Did not run `npm publish`.
+- Did not run `npm publish --dry-run`.
+- Did not create a GitHub release.
+- Did not change CLI behavior beyond the version string.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Decisions confirmed:
+
+- Public package name: `create-launchkit`
+- Public command: `npx create-launchkit@latest`
+- npm create command: `npm create launchkit@latest`
+- Initial version: `0.1.0`
+- Dependency strategy: Option B, bundle LaunchKit internals into `create-launchkit` for the first public release.
+- Private flag strategy: keep `private: true` until package tarball tests pass, then remove it in the final publish-prep step.
+- Package files strategy: use the `package.json` `files` allowlist.
+- Package files allowlist: `dist`, `README.md`, `package.json`.
+- Node engine: `>=18`
+- License: `MIT`
+- Repository URL: `git+https://github.com/DavidAsrorxonov/launchkit.git`
+- Homepage URL: `https://github.com/DavidAsrorxonov/launchkit#readme`
+- Bugs URL: `https://github.com/DavidAsrorxonov/launchkit/issues`
+
+Changes made:
+
+- Updated `create-launchkit` package metadata for future npm publishing:
+  - version `0.1.0`;
+  - description;
+  - license;
+  - files allowlist;
+  - repository, homepage, and bugs URLs;
+  - keywords;
+  - Node engine.
+- Kept `private: true` so accidental publishing remains blocked before tarball verification.
+- Updated CLI `--version` output to `0.1.0`.
+- Added an npm-focused CLI README with:
+  - what the CLI generates;
+  - current MVP stack;
+  - future public commands marked as pending;
+  - local repository usage;
+  - supported options;
+  - limitations;
+  - no `src/` folder note;
+  - Auth.js credentials scaffold note.
+- Confirmed website/docs wording already says the CLI package is local and unpublished.
+- Refreshed `package-lock.json` with the updated CLI package metadata.
+
+Release checklist for remaining publish steps:
+
+- Phase 10 Step 2: Bundle CLI for publishing.
+- Phase 10 Step 3: Test npm package tarball locally.
+- Phase 10 Step 4: Publish beta/canary release.
+- Phase 10 Step 5: Publish stable release.
+- Phase 10 Step 6: Update docs and landing page command status.
+
+Files changed:
+
+- `package-lock.json`
+- `packages/cli/package.json`
+- `packages/cli/README.md`
+- `packages/cli/src/args.ts`
+- `packages/cli/src/__tests__/args.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-10/step-1.md
+rg --files
+sed -n '1,260p' context/architecture.md
+sed -n '1,320p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '1,240p' context/ui-rules.md
+sed -n '241,520p' .agents/prompts/phase-10/step-1.md
+sed -n '261,620p' context/architecture.md
+sed -n '321,700p' context/build-plan.md
+sed -n '261,620p' context/project-overview.md
+sed -n '241,520p' context/ui-rules.md
+sed -n '1,220p' packages/cli/package.json
+sed -n '621,980p' context/architecture.md
+sed -n '701,1120p' context/build-plan.md
+sed -n '621,980p' context/project-overview.md
+sed -n '241,520p' context/progress-tracker.md
+rg -n "npx create-launchkit|npm create launchkit|CLI package|published|Publishing|Future npm|create-launchkit" README.md apps/web context packages/cli -g '!**/dist/**' -g '!node_modules/**'
+sed -n '981,1160p' context/architecture.md
+sed -n '1,220p' package.json
+test -f packages/cli/README.md && sed -n '1,240p' packages/cli/README.md || true
+test -f LICENSE && sed -n '1,80p' LICENSE || true
+test -f packages/cli/dist/index.js && sed -n '1,12p' packages/cli/dist/index.js || true
+git status --short
+rg -n '"node_modules/create-launchkit"|"packages/cli"|"create-launchkit"' package-lock.json
+sed -n '1,220p' README.md
+sed -n '1,140p' apps/web/components/docs/docs-page.tsx
+sed -n '300,340p' apps/web/components/docs/docs-page.tsx
+sed -n '1,80p' apps/web/components/landing/command-card.tsx
+sed -n '6546,6560p' package-lock.json
+sed -n '13176,13205p' package-lock.json
+sed -n '90,140p' packages/cli/src/args.ts
+sed -n '1,80p' packages/schema/package.json
+sed -n '1,80p' packages/generator/package.json
+rg -n "CLI_VERSION|version" packages/cli/src package.json packages/cli
+sed -n '1,90p' packages/cli/src/args.ts
+sed -n '1,220p' packages/cli/src/__tests__/args.test.ts
+sed -n '1,220p' packages/cli/tsconfig.json
+git remote -v
+sed -n '1,220p' packages/cli/src/__tests__/index.test.ts
+npm install
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+node packages/cli/dist/index.js --version
+sed -n '1,8p' packages/cli/dist/index.js
+npm test
+npm run typecheck
+npm run build
+npm run build
+git diff -- packages/cli/package.json packages/cli/src/args.ts packages/cli/src/__tests__/args.test.ts packages/cli/README.md package-lock.json
+git diff --check
+git status --short
+sed -n '13178,13208p' package-lock.json
+rg -n "0\\.0\\.0|0\\.1\\.0" packages/cli package-lock.json -g '!dist/**'
+sed -n '1,32p' package-lock.json
+```
+
+Verification result:
+
+- `npm install` passed.
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed: 8 files, 123 tests.
+- `npm run build -w create-launchkit` passed.
+- `node packages/cli/dist/index.js --version` printed `0.1.0`.
+- Built `packages/cli/dist/index.js` still starts with `#!/usr/bin/env node`.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 8 files, 123 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run typecheck` passed across workspaces:
+  - web;
+  - create-launchkit;
+  - generator;
+  - schema;
+  - shared;
+  - templates.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces:
+  - `/`, `/_not-found`, `/builder`, and `/docs` prerendered as static content;
+  - `/api/generate` remains server-rendered on demand;
+  - `create-launchkit`, generator, schema, shared, and templates built successfully.
+- `git diff --check` passed.
+
+Notes/blockers:
+
+- The CLI package remains private and unpublished.
+- Public npm commands must remain documented as future/pending until an actual npm publish step succeeds.
+- The current package allowlist does not include `LICENSE` because no root/package license file exists in the repo yet.
+- Bundling internals into the CLI is confirmed for the first public release, but the actual bundle setup belongs to Phase 10 Step 2.
+- `.agents/prompts/phase-10/` is untracked prompt context and was left untouched.
+
+Next suggested step:
+
+- Phase 10 Step 2: Bundle CLI for publishing.
 
 Phase 9 Step 11 completed: Verify Phase 9 completion
 
