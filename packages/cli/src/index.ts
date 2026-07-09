@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from "node:url";
+import { realpath } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
 import {
   CliArgumentError,
@@ -159,7 +160,7 @@ export async function main(
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (await isCliEntrypoint(process.argv[1], import.meta.url)) {
   process.exitCode = await main();
 }
 
@@ -188,4 +189,29 @@ async function shouldInstallDependencies(input: {
     message: "Install dependencies now?",
     default: false,
   });
+}
+
+async function isCliEntrypoint(
+  argvPath: string | undefined,
+  moduleUrl: string,
+): Promise<boolean> {
+  if (!argvPath) {
+    return false;
+  }
+
+  const modulePath = fileURLToPath(moduleUrl);
+  const [argvRealPath, moduleRealPath] = await Promise.all([
+    resolveRealPath(argvPath),
+    resolveRealPath(modulePath),
+  ]);
+
+  return argvRealPath === moduleRealPath;
+}
+
+async function resolveRealPath(filePath: string): Promise<string> {
+  try {
+    return await realpath(filePath);
+  } catch {
+    return filePath;
+  }
 }

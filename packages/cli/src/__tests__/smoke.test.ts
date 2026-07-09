@@ -5,6 +5,7 @@ import {
   readdir,
   rm,
   stat,
+  symlink,
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -61,6 +62,20 @@ describe("built CLI smoke checks", () => {
     ]);
     await expectNoSrcDirectory(cwd, "my-app");
     await expectNoDependencyInstallArtifacts(cwd, "my-app");
+  });
+
+  it("runs through a package bin symlink", async () => {
+    const cwd = await createTempRoot();
+    const binDir = path.join(cwd, "node_modules", ".bin");
+    const binPath = path.join(binDir, "create-launchkit");
+    await mkdir(binDir, { recursive: true });
+    await symlink(cliEntry, binPath);
+
+    const result = await runCliCommand(binPath, ["--help"], cwd);
+
+    assertExitCode(result, 0);
+    expect(result.stdout).toContain("Usage:");
+    expect(result.stdout).toContain("create-launchkit [project-name] [options]");
   });
 
   it("generates the all-compatible MVP config with expected files", async () => {
@@ -135,6 +150,14 @@ async function runBuiltCli(args: string[], cwd: string): Promise<CliRunResult> {
   const command = process.execPath;
   const commandArgs = [cliEntry, ...args];
 
+  return runCliCommand(command, commandArgs, cwd);
+}
+
+async function runCliCommand(
+  command: string,
+  commandArgs: string[],
+  cwd: string,
+): Promise<CliRunResult> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, commandArgs, { cwd });
     const stdout: Buffer[] = [];

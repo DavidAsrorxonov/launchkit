@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 10 Step 2 complete
-Primary focus: CLI is bundled for future npm packaging; package remains private and unpublished
+Current phase: Phase 10 Step 3 complete
+Primary focus: CLI npm tarball installs and runs locally; package remains private and unpublished
 ```
 
 ## Phase Progress
@@ -24,11 +24,262 @@ Primary focus: CLI is bundled for future npm packaging; package remains private 
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
-| Phase 10 | npm Release Preparation              | In Progress | Step 2 bundles the CLI and copies template assets into dist; no publish or tarball test was performed. |
+| Phase 10 | npm Release Preparation              | In Progress | Step 3 verified the local npm tarball installs, exposes the bin, includes templates, and generates default/full projects. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-09
+
+Phase 10 Step 3 completed: Test npm package tarball locally
+
+Scope and prerequisite note:
+
+- Read all context files, the progress tracker, and the Phase 10 Step 3 prompt before making changes.
+- Confirmed Phase 10 Step 2 is documented as complete.
+- Confirmed the CLI is bundled for publishing and templates are copied into `packages/cli/dist/templates`.
+- Implemented only this tarball testing step.
+- Did not move to Phase 10 Step 4.
+- Did not publish to npm.
+- Did not run `npm publish`.
+- Did not create a GitHub release.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Fixed the CLI entrypoint guard so npm bin symlinks run `main()`.
+- Added CLI smoke coverage for a package-bin symlink invoking `--help`.
+- Built the CLI package.
+- Inspected `npm pack --dry-run` output.
+- Created a local npm tarball.
+- Installed the tarball in a temporary npm project.
+- Verified the installed binary runs through both `npx create-launchkit` and `./node_modules/.bin/create-launchkit`.
+- Verified default project generation from the tarball.
+- Verified all-compatible MVP project generation from the tarball.
+- Verified package contents do not include `src/`, tests, coverage, `node_modules`, temporary generated projects, or workspace-only config files.
+- Verified the installed package does not contain `workspace:` dependency specs and does not install `@launchkit` workspace packages.
+- Verified template assets are included in the installed package and generated outputs contain real template contents.
+- Cleaned up temporary tarball and install directories from `/private/tmp`.
+
+Files changed:
+
+- `packages/cli/src/index.ts`
+- `packages/cli/src/__tests__/smoke.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-10/step-3.md
+rg --files
+sed -n '1,260p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '1,340p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/architecture.md
+sed -n '361,760p' context/build-plan.md
+sed -n '341,760p' context/project-overview.md
+sed -n '261,620p' context/ui-rules.md
+sed -n '241,520p' .agents/prompts/phase-10/step-3.md
+git status --short
+sed -n '1,220p' packages/cli/package.json
+sed -n '1,240p' packages/cli/README.md
+sed -n '1,260p' packages/cli/scripts/build.mjs
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+test -f packages/cli/dist/index.js
+sed -n '1p' packages/cli/dist/index.js
+find packages/cli/dist -maxdepth 4 -type f | sort
+npm pack --dry-run -w create-launchkit
+npm pack --dry-run -w create-launchkit
+mktemp -d /private/tmp/launchkit-cli-step3-pack.XXXXXX
+npm pack -w create-launchkit --pack-destination /private/tmp/launchkit-cli-step3-pack.frPivd
+mktemp -d /private/tmp/launchkit-cli-step3-install.XXXXXX
+npm init -y
+npm install /private/tmp/launchkit-cli-step3-pack.frPivd/create-launchkit-0.1.0.tgz
+npm install /private/tmp/launchkit-cli-step3-pack.frPivd/create-launchkit-0.1.0.tgz
+npx create-launchkit --help
+./node_modules/.bin/create-launchkit --help
+node -p "require('./node_modules/create-launchkit/package.json')"
+sed -n '1,260p' packages/cli/src/index.ts
+sed -n '1,300p' packages/cli/src/args.ts
+sed -n '1,220p' packages/cli/src/__tests__/index.test.ts
+sed -n '1,260p' packages/cli/src/__tests__/smoke.test.ts
+sed -n '220,520p' packages/cli/src/__tests__/index.test.ts
+sed -n '1,220p' packages/cli/vitest.smoke.config.ts
+npm run typecheck -w create-launchkit
+npm test -w create-launchkit
+npm run build -w create-launchkit
+npm run test:smoke -w create-launchkit
+npm pack --dry-run -w create-launchkit
+mktemp -d /private/tmp/launchkit-cli-step3-pack-fixed.XXXXXX
+npm pack -w create-launchkit --pack-destination /private/tmp/launchkit-cli-step3-pack-fixed.r1nFwK
+mktemp -d /private/tmp/launchkit-cli-step3-install-fixed.XXXXXX
+npm init -y
+npm install /private/tmp/launchkit-cli-step3-pack-fixed.r1nFwK/create-launchkit-0.1.0.tgz
+npx create-launchkit --help
+./node_modules/.bin/create-launchkit --help
+node -p "JSON.stringify(require('./node_modules/create-launchkit/package.json'), null, 2)"
+rg -n "workspace:" node_modules/create-launchkit/package.json package-lock.json
+find node_modules/create-launchkit -maxdepth 3 -type f | sort
+ls -l node_modules/.bin/create-launchkit node_modules/create-launchkit/dist/index.js
+npx create-launchkit my-app --yes
+test -f my-app/package.json
+test -f my-app/app/page.tsx
+test -f my-app/README.md
+test ! -e my-app/src
+sed -n '1,120p' my-app/app/page.tsx
+sed -n '1,120p' my-app/README.md
+npx create-launchkit full-app --yes --ui shadcn --database postgres --orm prisma --auth authjs-credentials --docker postgres
+test -f full-app/components.json && test -f full-app/components/ui/button.tsx && test -f full-app/lib/utils.ts && test -f full-app/prisma/schema.prisma && test -f full-app/lib/db.ts && test -f full-app/auth.ts && test -f 'full-app/app/api/auth/[...nextauth]/route.ts' && test -f full-app/docker-compose.yml && test -f full-app/.env.example && test -f full-app/package.json && test -f full-app/README.md && test ! -e full-app/src
+sed -n '1,180p' full-app/components/ui/button.tsx
+sed -n '1,160p' full-app/prisma/schema.prisma
+sed -n '1,160p' full-app/docker-compose.yml
+sed -n '1,180p' full-app/app/layout.tsx
+sed -n '1,180p' full-app/package.json
+find node_modules/create-launchkit/dist/templates -type f | sort
+find node_modules -maxdepth 2 -type d -name '@launchkit' -print
+rg -n "@launchkit/(generator|schema)|workspace:" node_modules/create-launchkit/dist/index.js node_modules/create-launchkit/package.json package-lock.json
+find . -maxdepth 3 -name src -type d -print
+git status --short
+rg -n "workspace:" node_modules/create-launchkit/package.json package-lock.json
+npx create-launchkit --version
+sed -n '1p' node_modules/create-launchkit/dist/index.js
+test -x node_modules/create-launchkit/dist/index.js
+rm -rf /private/tmp/launchkit-cli-step3-pack.frPivd /private/tmp/launchkit-cli-step3-install.KpY96t /private/tmp/launchkit-cli-step3-pack-fixed.r1nFwK /private/tmp/launchkit-cli-step3-install-fixed.k62Mwp
+```
+
+Pack dry-run result:
+
+- Initial sandboxed `npm pack --dry-run -w create-launchkit` failed because npm could not write to the user npm cache:
+  - `EPERM`;
+  - `Your cache folder contains root-owned files`.
+- Escalated `npm pack --dry-run -w create-launchkit` passed.
+- Final dry run reported:
+  - package name: `create-launchkit`;
+  - version: `0.1.0`;
+  - filename: `create-launchkit-0.1.0.tgz`;
+  - package size: `98.3 kB`;
+  - unpacked size: `614.2 kB`;
+  - total files: `41`.
+- Included expected files:
+  - `package.json`;
+  - `README.md`;
+  - `dist/index.js`;
+  - declaration files under `dist`;
+  - template assets under `dist/templates/base` and `dist/templates/features`.
+- Did not include unexpected files:
+  - `src/`;
+  - `*.test.ts`;
+  - `coverage/`;
+  - `node_modules/`;
+  - temporary generated projects;
+  - workspace-only config files.
+
+Tarball install result:
+
+- Created fixed tarball at:
+  - `/private/tmp/launchkit-cli-step3-pack-fixed.r1nFwK/create-launchkit-0.1.0.tgz`
+- Installed that tarball into:
+  - `/private/tmp/launchkit-cli-step3-install-fixed.k62Mwp`
+- Initial sandboxed `npm install /private/tmp/launchkit-cli-step3-pack.frPivd/create-launchkit-0.1.0.tgz` failed with the same npm cache ownership `EPERM`.
+- Escalated tarball installs passed:
+  - `added 26 packages`;
+  - `found 0 vulnerabilities`.
+- `npx create-launchkit --help` passed and printed usage.
+- `./node_modules/.bin/create-launchkit --help` passed and printed usage.
+- `npx create-launchkit --version` passed and printed `0.1.0`.
+- Installed binary symlink:
+  - `node_modules/.bin/create-launchkit -> ../create-launchkit/dist/index.js`
+- Installed CLI entry:
+  - starts with `#!/usr/bin/env node`;
+  - is executable.
+
+Generation verification:
+
+- `npx create-launchkit my-app --yes` passed.
+- Verified default output includes:
+  - `my-app/package.json`;
+  - `my-app/app/page.tsx`;
+  - `my-app/README.md`.
+- Verified default output does not include:
+  - `my-app/src`.
+- Verified default output contains real template content in `app/page.tsx` and `README.md`.
+- `npx create-launchkit full-app --yes --ui shadcn --database postgres --orm prisma --auth authjs-credentials --docker postgres` passed.
+- Verified all-compatible output includes:
+  - `full-app/components.json`;
+  - `full-app/components/ui/button.tsx`;
+  - `full-app/lib/utils.ts`;
+  - `full-app/prisma/schema.prisma`;
+  - `full-app/lib/db.ts`;
+  - `full-app/auth.ts`;
+  - `full-app/app/api/auth/[...nextauth]/route.ts`;
+  - `full-app/docker-compose.yml`;
+  - `full-app/.env.example`;
+  - `full-app/package.json`;
+  - `full-app/README.md`.
+- Verified all-compatible output does not include:
+  - `full-app/src`.
+- Verified real template contents in:
+  - `full-app/components/ui/button.tsx`;
+  - `full-app/prisma/schema.prisma`;
+  - `full-app/docker-compose.yml`;
+  - `full-app/app/layout.tsx`;
+  - `full-app/package.json`.
+- Verified installed package template assets include base, Tailwind, shadcn, PostgreSQL, Prisma, Auth.js credentials, and Docker PostgreSQL template files.
+
+Packaging bug found and fixed:
+
+- The first tarball-installed `npx create-launchkit --help` and `./node_modules/.bin/create-launchkit --help` exited with code `0` but printed no output.
+- Cause:
+  - the CLI entrypoint guard compared `import.meta.url` to `process.argv[1]`;
+  - npm bin execution uses a symlink under `node_modules/.bin`;
+  - the symlink path did not match the real `dist/index.js` path, so `main()` did not run.
+- Fix:
+  - resolve the argv path and module path with `realpath` before comparing them.
+- Coverage:
+  - added a smoke test that creates a package-bin symlink and verifies `--help` prints usage through that symlink.
+- Retest:
+  - rebuilt the CLI;
+  - reran smoke tests;
+  - recreated the tarball;
+  - installed the fixed tarball in a fresh temp project;
+  - verified installed binary help/version and both generation flows.
+
+Workspace dependency safety:
+
+- `rg -n "workspace:" node_modules/create-launchkit/package.json package-lock.json` returned no matches.
+- No `node_modules/@launchkit` directory was installed in the temp project.
+- `node_modules/create-launchkit/dist/index.js` does not contain runtime imports of `@launchkit/generator` or `@launchkit/schema`.
+- The packed package still includes dev-only metadata in `package.json` for local workspace development, but the temp install did not install or require unpublished internal packages.
+
+Verification result:
+
+- `npm run typecheck -w create-launchkit` passed.
+- `npm test -w create-launchkit` passed:
+  - 8 files;
+  - 123 tests.
+- `npm run build -w create-launchkit` passed.
+- `npm run test:smoke -w create-launchkit` passed:
+  - 1 file;
+  - 5 tests.
+- `npm pack --dry-run -w create-launchkit` passed after npm cache escalation.
+- `npm pack -w create-launchkit --pack-destination ...` passed after npm cache escalation.
+- Tarball installation passed after npm cache escalation.
+
+Notes/blockers:
+
+- The local npm cache has ownership issues under `/Users/dovudxonasrorxonov/.npm`, causing sandboxed `npm pack` and `npm install` to fail with `EPERM`; approved escalated npm commands worked.
+- The package remains `private: true` and unpublished. This was not changed in Step 3.
+- Temporary tarball and install directories created under `/private/tmp` were removed after verification.
+
+Next suggested step:
+
+- Phase 10 Step 4: Publish beta/canary release.
 
 ### 2026-07-08
 
