@@ -1,48 +1,44 @@
-import { CheckCircle2, Copy, Terminal } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Check, Copy } from "lucide-react";
+
+const command = "npx @baseforge/create@latest";
 
 export function CommandCard() {
-  return (
-    <div className="w-full max-w-lg rounded-lg border border-border bg-card/95 p-4 text-card-foreground shadow-2xl shadow-primary/10 backdrop-blur">
-      <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <Terminal className="h-4 w-4" aria-hidden="true" />
-          </span>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-foreground">
-              CLI available
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Published as @baseforge/create
-            </p>
-          </div>
-        </div>
-        <Copy
-          className="h-4 w-4 shrink-0 text-muted-foreground"
-          aria-hidden="true"
-        />
-      </div>
+  const [copied, setCopied] = useState(false);
 
-      <div className="mt-4 overflow-x-auto rounded-md bg-muted p-3">
+  async function copyCommand() {
+    await navigator.clipboard.writeText(command);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1500);
+  }
+
+  return (
+    <div className="flex w-full items-center gap-3 rounded-md border border-border bg-card/90 p-2 text-card-foreground backdrop-blur">
+      <div className="min-w-0 flex-1 overflow-x-auto px-3 py-2 text-left">
         <code className="whitespace-nowrap font-mono text-sm text-foreground">
-          <span className="text-muted-foreground">$</span> npx
-          @baseforge/create@latest
+          {command}
         </code>
       </div>
-
-      <ul className="mt-4 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-        {["Website builder works today", "CLI package is published"].map(
-          (item) => (
-            <li key={item} className="flex min-w-0 items-center gap-2">
-              <CheckCircle2
-                className="h-4 w-4 shrink-0 text-primary"
-                aria-hidden="true"
-              />
-              <span>{item}</span>
-            </li>
-          ),
+      <button
+        type="button"
+        onClick={copyCommand}
+        aria-label={copied ? "Copied command" : "Copy command"}
+        title={copied ? "Copied" : "Copy command"}
+        className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-md border border-border bg-background px-3 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      >
+        {copied ? (
+          <>
+            <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+            <span className="hidden text-xs font-medium text-foreground sm:inline">
+              Copied
+            </span>
+          </>
+        ) : (
+          <Copy className="h-4 w-4" aria-hidden="true" />
         )}
-      </ul>
+      </button>
     </div>
   );
 }
