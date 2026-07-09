@@ -1,10 +1,10 @@
-# LaunchKit UI Rules
+# BaseForge UI Rules
 
-Use this file as the visual and interaction guide for building the LaunchKit website.
+Use this file as the visual and interaction guide for building the BaseForge website.
 
 ## UI Goal
 
-LaunchKit should feel like a focused developer tool.
+BaseForge should feel like a focused developer tool.
 
 The interface should be:
 
@@ -77,7 +77,7 @@ Rules:
 
 ## Layout Rules
 
-The first screen should show the actual LaunchKit builder experience.
+The first screen should show the actual BaseForge builder experience.
 
 Do not build a marketing-only homepage.
 
@@ -109,7 +109,7 @@ Mobile should use a single-column layout with preview below the current step.
 
 ## Wizard Rules
 
-LaunchKit should use a step-by-step wizard.
+BaseForge should use a step-by-step wizard.
 
 Suggested steps:
 
@@ -407,7 +407,7 @@ Avoid:
 
 ## Final UI Principle
 
-LaunchKit should look and behave like a serious developer workflow tool:
+BaseForge should look and behave like a serious developer workflow tool:
 
 ```txt
 Choose stack -> Preview output -> Generate ZIP

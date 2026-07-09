@@ -80,11 +80,11 @@ const limitations = [
   "Only PostgreSQL is supported as a database option.",
   "Only Prisma is supported as an ORM option.",
   "Auth.js credentials is a scaffold, not complete production auth.",
-  "LaunchKit does not host databases.",
-  "LaunchKit does not install generated dependencies.",
-  "LaunchKit does not run generated project code on the server.",
-  "LaunchKit does not save project presets.",
-  "LaunchKit does not provide user accounts in the MVP.",
+  "BaseForge does not host databases.",
+  "BaseForge does not install generated dependencies.",
+  "BaseForge does not run generated project code on the server.",
+  "BaseForge does not save project presets.",
+  "BaseForge does not provide user accounts in the MVP.",
 ] as const;
 
 const troubleshooting = [
@@ -109,12 +109,12 @@ export function DocsPage() {
             <Link
               href="/"
               className="flex min-w-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label="LaunchKit home"
+              aria-label="BaseForge home"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-                LK
+                BF
               </span>
-              <span className="text-sm font-semibold text-foreground">LaunchKit</span>
+              <span className="text-sm font-semibold text-foreground">BaseForge</span>
             </Link>
             <nav
               aria-label="Primary documentation navigation"
@@ -145,7 +145,7 @@ export function DocsPage() {
           <div className="max-w-3xl py-6">
             <p className="text-sm font-medium text-primary">Documentation</p>
             <h1 className="mt-2 text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
-              Build, preview, and download a LaunchKit project.
+              Build, preview, and download a BaseForge project.
             </h1>
             <p className="mt-4 text-base leading-7 text-muted-foreground">
               Practical notes for the current website-first MVP, the generated
@@ -171,7 +171,7 @@ export function DocsPage() {
         <div className="min-w-0">
           <DocsSection id="overview" eyebrow="01" title="Overview">
             <p>
-              LaunchKit is a TypeScript-first developer project generator. The
+              BaseForge is a TypeScript-first developer project generator. The
               MVP is website-first: users choose options, preview generated
               output, and download a zip.
             </p>
@@ -321,8 +321,11 @@ npm run build`}</CodeBlock>
               `@baseforge/create` package and uses the same shared generator
               core as the website.
             </p>
-            <CodeBlock>{`npx @baseforge/create@latest
-npm create @baseforge@latest`}</CodeBlock>
+            <CodeBlock>{`npx @baseforge/create@latest my-app`}</CodeBlock>
+            <p>
+              Future publishes must keep the package public with
+              `npm publish -w @baseforge/create --access public`.
+            </p>
             <p>
               Website and terminal output stay aligned because both entrypoints
               use the same generation pipeline.

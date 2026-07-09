@@ -101,7 +101,7 @@ export async function ensureSafeTargetDirectory(input: {
     }
 
     const confirmed = await input.confirm(
-      "The target directory is not empty. Continue and add LaunchKit files?",
+      "The target directory is not empty. Continue and add BaseForge files?",
     );
 
     if (!confirmed) {
@@ -132,7 +132,7 @@ export function formatConflictingPathsError(conflictingPaths: string[]): string 
 function formatNonEmptyDirectoryError(): string {
   return [
     "Target directory is not empty.",
-    "Choose an empty directory or run without --yes to confirm adding LaunchKit files.",
+    "Choose an empty directory or run without --yes to confirm adding BaseForge files.",
   ].join("\n");
 }
 

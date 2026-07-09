@@ -25,7 +25,7 @@ const supportedStackGroups = [
       ["Package manager", "npm or pnpm"],
       ["Install", "Run dependencies locally after download"],
       ["Secrets", "Set real production environment values"],
-      ["Server", "Generated code is not run by LaunchKit"],
+      ["Server", "Generated code is not run by BaseForge"],
     ],
   },
 ] as const;
@@ -35,7 +35,7 @@ const limitations = [
   "Only Next.js, TypeScript, App Router, no-src, and Tailwind CSS are supported.",
   "Auth.js credentials is a scaffold and needs real user lookup, password verification, and AUTH_SECRET.",
   "PostgreSQL Docker Compose is for local development only.",
-  "LaunchKit does not install dependencies or run generated project code on the server.",
+  "BaseForge does not install dependencies or run generated project code on the server.",
 ] as const;
 
 const setupCommands = [
@@ -59,7 +59,7 @@ export function SupportedStackSection() {
           Supported stack
         </h2>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-          LaunchKit generates a TypeScript-first Next.js starter as a downloadable
+          BaseForge generates a TypeScript-first Next.js starter as a downloadable
           zip. The shared-generator CLI is published as @baseforge/create.
         </p>
       </div>

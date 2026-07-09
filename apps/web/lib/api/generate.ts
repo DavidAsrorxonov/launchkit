@@ -37,7 +37,7 @@ export async function handleGenerateProjectRequest(
     return jsonErrorResponse({
       status: 400,
       code: "invalid_config",
-      message: "Request body must be a valid LaunchKit config.",
+      message: "Request body must be a valid BaseForge config.",
       issues: parsedConfig.error.issues,
     });
   }
@@ -78,7 +78,7 @@ export async function handleGenerateProjectRequest(
       return jsonErrorResponse({
         status: 400,
         code: "invalid_config",
-        message: "Request body must be a valid LaunchKit config.",
+        message: "Request body must be a valid BaseForge config.",
         issues: error.issues,
       });
     }

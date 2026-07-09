@@ -1,14 +1,14 @@
-# LaunchKit Progress Tracker
+# BaseForge Progress Tracker
 
 Use this file to track development progress, changes made, decisions, notes, blockers, and next steps.
 
 ## Current Status
 
 ```txt
-Project: LaunchKit
+Project: BaseForge
 Stage: Foundation setup
-Current phase: Phase 10 Step 5 complete
-Primary focus: Stable package `@baseforge/create@0.1.0` is published to npm with the `latest` dist-tag and manual post-publish verification passed
+Current phase: Phase 10 Step 6 complete
+Primary focus: Public docs, website copy, package command examples, and planning context now reflect BaseForge and `npx @baseforge/create@latest my-app`
 ```
 
 ## Phase Progress
@@ -24,13 +24,191 @@ Primary focus: Stable package `@baseforge/create@0.1.0` is published to npm with
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
-| Phase 10 | npm Release Preparation              | In Progress | Step 5 stable publish completed for `@baseforge/create@0.1.0`; user reported latest publish and post-publish checks passed. |
+| Phase 10 | npm Release Preparation              | In Progress | Step 6 completed BaseForge public docs/command update; `@baseforge/create@0.1.0` remains the stable latest npm package. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
 
 ### 2026-07-09
+
+Phase 10 Step 6 completed: Update BaseForge package command and public docs
+
+Important publishing change:
+
+- Original intended public package: `create-launchkit`
+- Final public npm package: `@baseforge/create`
+- Final public command: `npx @baseforge/create@latest my-app`
+- Reason: `create-launchkit`/LaunchKit npm naming was unavailable for the intended public release path.
+
+Branding decision:
+
+- Product/project name: BaseForge
+- Public package name: `@baseforge/create`
+- CLI binary name: `create-baseforge`
+- Internal package namespace: unchanged as `@launchkit/schema`, `@launchkit/generator`, and `@launchkit/templates`
+- Internal TypeScript schema names such as `LaunchKitConfig` remain unchanged for now.
+
+Scope and prerequisite note:
+
+- Confirmed Phase 10 Step 5 is complete.
+- Confirmed the stable package was reported published as `@baseforge/create@0.1.0` with the `latest` dist-tag.
+- Implemented only Phase 10 Step 6.
+- Did not publish to npm.
+- Did not mass-rename internal packages.
+- Did not change generator behavior.
+- Did not add new product options.
+- Did not start Docker.
+- Did not connect to databases.
+
+Changes made:
+
+- Updated root README and web README to use BaseForge product wording.
+- Added verified public CLI quick-start examples using `npx @baseforge/create@latest my-app`.
+- Updated CLI README command examples to the verified scoped `npx` command and removed unverified `npm create @baseforge@latest` examples.
+- Documented the scoped public package publish requirement: `npm publish -w @baseforge/create --access public`.
+- Updated CLI package description casing from `Baseforge` to `BaseForge`.
+- Updated website metadata, landing navigation, docs header, builder header, command card, landing status copy, supported-stack copy, and limitation copy to use BaseForge where user-facing.
+- Updated API/CLI user-facing validation and directory-safety messages to say BaseForge.
+- Updated docs tests and CLI tests for the new public command/copy.
+- Updated `context/architecture.md`, `context/build-plan.md`, `context/project-overview.md`, and `context/ui-rules.md` to reflect BaseForge and the current `@baseforge/create` public package while preserving internal `@launchkit/*` package names.
+- Removed stale active public command examples for `npx create-launchkit@latest`, `npm create launchkit@latest`, and unverified scoped `npm create` usage.
+
+Files changed:
+
+- `README.md`
+- `apps/web/README.md`
+- `apps/web/app/docs/page.tsx`
+- `apps/web/app/layout.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/components/builder/supported-stack-section.tsx`
+- `apps/web/components/docs/docs-page.tsx`
+- `apps/web/components/docs/docs-page.test.tsx`
+- `apps/web/components/landing/command-card.tsx`
+- `apps/web/components/landing/landing-hero.tsx`
+- `apps/web/components/landing/landing-nav.tsx`
+- `apps/web/components/landing/landing-page.tsx`
+- `apps/web/components/landing/logo-strip.tsx`
+- `apps/web/lib/api/client.test.ts`
+- `apps/web/lib/api/generate.ts`
+- `context/architecture.md`
+- `context/build-plan.md`
+- `context/project-overview.md`
+- `context/ui-rules.md`
+- `context/progress-tracker.md`
+- `packages/cli/README.md`
+- `packages/cli/package.json`
+- `packages/cli/src/directory-safety.ts`
+- `packages/cli/src/validate-config.ts`
+- `packages/cli/src/__tests__/directory-safety.test.ts`
+- `packages/cli/src/__tests__/index.test.ts`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,240p' .agents/prompts/phase-10/step-6.md
+git status --short
+sed -n '241,520p' .agents/prompts/phase-10/step-6.md
+rg --files context | sort
+wc -l context/*
+sed -n '1,260p' context/architecture.md
+sed -n '1,280p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,620p' context/architecture.md
+sed -n '281,760p' context/build-plan.md
+sed -n '261,674p' context/project-overview.md
+sed -n '261,416p' context/ui-rules.md
+sed -n '621,996p' context/architecture.md
+sed -n '761,1122p' context/build-plan.md
+rg -n "create-launchkit|npm create launchkit|npx create-launchkit|LaunchKit CLI|@baseforge/create|BaseForge|LaunchKit" README.md packages/cli apps/web context -g '!**/dist/**'
+find . -maxdepth 3 -name package.json -print | sort
+sed -n '1,180p' package.json
+sed -n '1,180p' packages/cli/package.json
+sed -n '1,140p' README.md
+sed -n '1,130p' apps/web/README.md
+sed -n '1,420p' apps/web/components/docs/docs-page.tsx
+sed -n '1,120p' apps/web/components/landing/command-card.tsx
+sed -n '1,220p' apps/web/components/landing/landing-page.tsx
+sed -n '1,120p' apps/web/components/landing/landing-nav.tsx
+sed -n '1,220p' apps/web/components/landing/landing-hero.tsx
+sed -n '1,120p' apps/web/components/landing/logo-strip.tsx
+sed -n '1,200p' apps/web/components/builder/supported-stack-section.tsx
+sed -n '90,145p' apps/web/components/builder/builder-shell.tsx
+sed -n '1,80p' apps/web/app/layout.tsx
+sed -n '1,60p' apps/web/app/docs/page.tsx
+sed -n '1,110p' packages/cli/README.md
+sed -n '1,120p' apps/web/components/docs/docs-page.test.tsx
+rg -n "LaunchKit|Baseforge|npx @baseforge/create@latest|npm create @baseforge@latest|create-launchkit|npm create launchkit|npx create-launchkit" README.md apps/web packages/cli package.json package-lock.json -g '!**/dist/**'
+rg -n "create-launchkit|npm create launchkit|npx create-launchkit" . -g '!node_modules/**' -g '!**/dist/**'
+rg -n "@baseforge/create@latest" README.md apps/web packages/cli -g '!**/dist/**'
+perl -0pi -e 's/\bLaunchKit\b/BaseForge/g' context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md
+sed -n '340,380p' context/architecture.md
+sed -n '840,890p' context/architecture.md
+sed -n '920,1040p' context/build-plan.md
+sed -n '1,24p' context/project-overview.md && sed -n '74,90p' context/project-overview.md && sed -n '256,270p' context/project-overview.md && sed -n '600,610p' context/project-overview.md
+rg -n "create-launchkit|npm create launchkit|npx create-launchkit" context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md README.md apps/web packages/cli package.json package-lock.json -g '!**/dist/**'
+rg -n "LaunchKit" context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md README.md apps/web packages/cli -g '!**/dist/**'
+rg -n "Baseforge|LaunchKit config|LaunchKit files|npm create @baseforge@latest" README.md apps/web packages/cli context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md -g '!**/dist/**'
+npm run typecheck -w @baseforge/create
+npm test -w @baseforge/create
+npm run build -w @baseforge/create
+npm run typecheck
+npm test
+npm run build
+npm run build
+mktemp -d /private/tmp/baseforge-step6-npx.XXXXXX
+npx @baseforge/create@latest --help
+npx @baseforge/create@latest my-app --yes
+test -f my-app/package.json
+test -f my-app/app/page.tsx
+test -f my-app/README.md
+test ! -d my-app/src
+rg -n "create-launchkit|npm create launchkit|npx create-launchkit" . -g '!node_modules/**' -g '!**/dist/**'
+rg -n "npx @baseforge/create@latest" README.md apps/web packages/cli context -g '!**/dist/**'
+git status --short
+```
+
+Verification result:
+
+- `npm run typecheck -w @baseforge/create` passed.
+- `npm test -w @baseforge/create` passed: 8 files, 123 tests.
+- `npm run build -w @baseforge/create` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm test` passed across all workspace tests:
+  - web: 5 files, 49 tests;
+  - `@baseforge/create`: 8 files, 123 tests;
+  - `@launchkit/generator`: 11 files, 127 tests;
+  - `@launchkit/schema`: 5 files, 87 tests;
+  - `@launchkit/templates`: 1 file, 52 tests.
+- Initial sandboxed `npm run build` failed because Next/Turbopack could not create a process and bind to a port while compiling CSS:
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across all workspaces.
+- Initial sandboxed public `npx` verification failed because DNS access to `registry.npmjs.org` was blocked by the sandbox:
+  - `getaddrinfo ENOTFOUND registry.npmjs.org`.
+- Escalated public `npx` verification passed:
+  - `npx @baseforge/create@latest --help` installed/resolved `@baseforge/create@0.1.0` and printed `create-baseforge` usage;
+  - `npx @baseforge/create@latest my-app --yes` created `my-app`;
+  - verified generated `my-app/package.json`, `my-app/app/page.tsx`, and `my-app/README.md`;
+  - verified generated `my-app/src` does not exist.
+- Active public docs/package search shows `npx @baseforge/create@latest my-app` examples in README, web README, CLI README, docs page, and planning context.
+- Stale `create-launchkit` matches remain only in historical notes:
+  - `context/progress-tracker.md` older entries;
+  - `memory.md` older session notes;
+  - explicit context notes explaining the original unscoped `create-launchkit` package name was unavailable.
+- `@launchkit/schema`, `@launchkit/generator`, and `@launchkit/templates` remain unchanged.
+
+Notes/blockers:
+
+- No current blocker for Phase 10 Step 6.
+- Did not run `npm publish`.
+- Did not verify generated app runtime with `npm install` inside the generated app.
+- The untracked prompt file `.agents/prompts/phase-10/step-6.md` existed before implementation and was left as-is.
+
+Next suggested step:
+
+- Phase 10 Step 7: Run final release/docs polish or any remaining post-publish QA requested by the next prompt.
 
 Phase 10 Step 5 completed: Publish stable release
 

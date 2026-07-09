@@ -1,18 +1,12 @@
 # @baseforge/create
 
-Create a TypeScript-first Next.js project with Baseforge.
+Create a TypeScript-first Next.js project with BaseForge.
 
 The stable CLI package is published under `@baseforge/create`.
 Run it with:
 
 ```bash
-npx @baseforge/create@latest
-```
-
-The npm create form is:
-
-```bash
-npm create @baseforge@latest
+npx @baseforge/create@latest my-app
 ```
 
 ## What It Generates
@@ -42,16 +36,13 @@ available in the MVP.
 Stable command:
 
 ```bash
-npx @baseforge/create@latest
-```
-
-Create command:
-
-```bash
-npm create @baseforge@latest
+npx @baseforge/create@latest my-app
 ```
 
 The installed binary is `create-baseforge`.
+
+Because this is a scoped public npm package, future publishes must use
+`npm publish -w @baseforge/create --access public`.
 
 ## Local Repository Usage
 

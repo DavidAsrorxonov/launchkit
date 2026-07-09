@@ -10,12 +10,12 @@ export function LandingNav() {
         <Link
           href="/"
           className="flex min-w-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label="LaunchKit home"
+          aria-label="BaseForge home"
         >
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-            LK
+            BF
           </span>
-          <span className="text-sm font-semibold text-foreground">LaunchKit</span>
+          <span className="text-sm font-semibold text-foreground">BaseForge</span>
         </Link>
 
         <nav

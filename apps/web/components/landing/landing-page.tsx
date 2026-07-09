@@ -41,7 +41,7 @@ export function LandingPage() {
               A narrow stack surface so generated projects stay predictable.
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
-              LaunchKit does not expose every framework or provider yet. The MVP
+              BaseForge does not expose every framework or provider yet. The MVP
               focuses on a TypeScript-first Next.js starter that can be previewed
               and downloaded from the website.
             </p>

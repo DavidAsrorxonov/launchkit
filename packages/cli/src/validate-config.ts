@@ -139,7 +139,7 @@ function mapSchemaIssue(issue: SchemaIssue): CliValidationError {
     );
   }
 
-  return createSchemaError("invalid_config", "Invalid LaunchKit configuration.", path);
+  return createSchemaError("invalid_config", "Invalid BaseForge configuration.", path);
 }
 
 function createSchemaError(

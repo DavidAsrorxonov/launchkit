@@ -17,7 +17,10 @@ export function CommandCard() {
             </p>
           </div>
         </div>
-        <Copy className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+        <Copy
+          className="h-4 w-4 shrink-0 text-muted-foreground"
+          aria-hidden="true"
+        />
       </div>
 
       <div className="mt-4 overflow-x-auto rounded-md bg-muted p-3">
@@ -28,12 +31,17 @@ export function CommandCard() {
       </div>
 
       <ul className="mt-4 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-        {["Website builder works today", "CLI package is published"].map((item) => (
-          <li key={item} className="flex min-w-0 items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-            <span>{item}</span>
-          </li>
-        ))}
+        {["Website builder works today", "CLI package is published"].map(
+          (item) => (
+            <li key={item} className="flex min-w-0 items-center gap-2">
+              <CheckCircle2
+                className="h-4 w-4 shrink-0 text-primary"
+                aria-hidden="true"
+              />
+              <span>{item}</span>
+            </li>
+          ),
+        )}
       </ul>
     </div>
   );

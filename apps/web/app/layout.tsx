@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LaunchKit",
+  title: "BaseForge",
   description: "Build and download TypeScript project starters.",
 };
 

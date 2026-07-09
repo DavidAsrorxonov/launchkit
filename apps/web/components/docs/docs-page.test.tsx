@@ -56,8 +56,11 @@ describe("Phase 8 docs page", () => {
     expect(docsSource).toContain(
       "The CLI package is published as @baseforge/create.",
     );
-    expect(docsSource).toContain("npx @baseforge/create@latest");
-    expect(docsSource).toContain("npm create @baseforge@latest");
+    expect(docsSource).toContain("npx @baseforge/create@latest my-app");
+    expect(docsSource).not.toContain("npm create @baseforge@latest");
+    expect(docsSource).toContain(
+      "npm publish -w @baseforge/create --access public",
+    );
     expect(docsSource).toContain("Generated projects do not use `src/`.");
     expect(docsSource).toContain("Auth.js credentials output is a scaffold");
   });

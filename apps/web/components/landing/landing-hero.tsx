@@ -29,11 +29,11 @@ export function LandingHero() {
       <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--card)_0%,transparent_50%,var(--background)_100%)] opacity-75" />
       <HeroOrbitLines />
 
-      <div className="relative z-10 mx-auto flex min-h-[640px] max-w-6xl flex-col items-center justify-center px-4 py-16 text-center sm:px-6 lg:min-h-[720px] lg:px-10">
+      <div className="relative z-10 mx-auto flex min-h-160 max-w-6xl flex-col items-center justify-center px-4 py-16 text-center sm:px-6 lg:min-h-180 lg:px-10">
         <div className="mb-6 inline-flex max-w-full items-center gap-2 rounded-md border border-border bg-card/85 px-3 py-2 text-sm text-muted-foreground shadow-sm backdrop-blur">
           <span className="h-2 w-2 rounded-full bg-primary" />
           <span className="truncate">
-            Website generator live now. CLI planned for Phase 9.
+            Website generator and CLI are live now.
           </span>
         </div>
 
