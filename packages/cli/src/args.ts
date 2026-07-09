@@ -44,7 +44,7 @@ export class CliArgumentError extends Error {
   }
 }
 
-export const CLI_VERSION = "0.1.0-beta.0";
+export const CLI_VERSION = "0.1.0";
 
 export function parseCliArgs(argv: string[] = process.argv.slice(2)): CliArgs {
   let parsed: ReturnType<typeof parseArgs>;

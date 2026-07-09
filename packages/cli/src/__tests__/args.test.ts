@@ -142,6 +142,6 @@ describe("help and version text", () => {
   });
 
   it("returns the CLI version", () => {
-    expect(getVersionText()).toBe("0.1.0-beta.0");
+    expect(getVersionText()).toBe("0.1.0");
   });
 });

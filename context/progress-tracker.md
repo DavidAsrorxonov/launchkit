@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 10 Step 4 complete
-Primary focus: Beta package `@baseforge/create@0.1.0-beta.0` is published to npm with the `beta` dist-tag and manual npm install-path tests passed
+Current phase: Phase 10 Step 5 complete
+Primary focus: Stable package `@baseforge/create@0.1.0` is published to npm with the `latest` dist-tag and manual post-publish verification passed
 ```
 
 ## Phase Progress
@@ -24,13 +24,345 @@ Primary focus: Beta package `@baseforge/create@0.1.0-beta.0` is published to npm
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
-| Phase 10 | npm Release Preparation              | In Progress | Step 4 beta publish completed for `@baseforge/create@0.1.0-beta.0`; user reported npm publish and beta npx tests passed. |
+| Phase 10 | npm Release Preparation              | In Progress | Step 5 stable publish completed for `@baseforge/create@0.1.0`; user reported latest publish and post-publish checks passed. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
 
 ### 2026-07-09
+
+Phase 10 Step 5 completed: Publish stable release
+
+Release details:
+
+- Package: `@baseforge/create`
+- Version: `0.1.0`
+- Dist-tag: `latest`
+- npm user: `david021106`
+- npm org/scope: `baseforge`
+- Registry: `https://registry.npmjs.org/`
+- Package access: public scoped package
+- CLI binary: `create-baseforge`
+
+Scope and prerequisite note:
+
+- User manually completed the stable publish after the previous OTP-blocked attempt.
+- User reported `@baseforge/create@0.1.0` was published to npm as the latest stable version.
+- User reported post-publish verification completed successfully.
+- User reported the published latest version was tested and verified.
+- Did not move to Phase 10 Step 6.
+- Did not run generated app code as part of this tracker update.
+- Did not start Docker.
+- Did not connect to databases.
+
+Changes made:
+
+- Updated this progress tracker to mark Phase 10 Step 5 as complete.
+- No source/package code changes were made in this tracker-only update.
+
+Files changed:
+
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,330p' context/progress-tracker.md
+git status --short
+```
+
+Pre-publish verification result:
+
+- Previous automated pre-publish verification passed before the manual stable publish:
+  - beta package verification;
+  - stable package version set to `0.1.0`;
+  - docs and landing copy updated for stable CLI availability;
+  - `npm run typecheck -w @baseforge/create`;
+  - `npm test -w @baseforge/create`;
+  - `npm run build -w @baseforge/create`;
+  - `npm run test:smoke -w @baseforge/create`;
+  - `npm run typecheck`;
+  - `npm test`;
+  - `npm run test:cli-smoke`;
+  - escalated `npm run build`;
+  - escalated `npm pack --dry-run -w @baseforge/create`;
+  - optional local tarball install test for `baseforge-create-0.1.0.tgz`.
+
+Publish result:
+
+- User reported the stable package was published successfully to npm.
+- Intended publish command:
+  - `npm publish -w @baseforge/create --tag latest --access public --otp <current-code>`
+
+Post-publish verification:
+
+- User reported the latest version was verified after publishing.
+- Expected stable verification commands included:
+  - `npm view @baseforge/create name version dist-tags versions --json`;
+  - `npx @baseforge/create@latest --help`;
+  - `npx @baseforge/create@latest my-app --yes`;
+  - `npm create @baseforge@latest my-create-app -- --yes`.
+
+Docs update:
+
+- Current docs and landing copy were already updated to show stable CLI availability.
+- The CLI is no longer described as future-only or unpublished in active docs.
+
+Notes/blockers:
+
+- No current blocker for Phase 10 Step 5.
+- `@baseforge/create@0.1.0` is the stable npm release.
+
+Next suggested step:
+
+- Phase 10 Step 6: Update docs and landing page command status, if any follow-up polish remains.
+
+Phase 10 Step 5: Blocked by npm one-time password requirement
+
+Release details:
+
+- Package: `@baseforge/create`
+- Target stable version: `0.1.0`
+- Intended dist-tag: `latest`
+- npm user: `david021106`
+- npm org/scope: `baseforge`
+- Registry: `https://registry.npmjs.org/`
+- Package access: public scoped package
+- CLI binary: `create-baseforge`
+
+Scope and prerequisite note:
+
+- Confirmed Phase 10 Step 4 is complete in this tracker.
+- Confirmed the user explicitly wanted to implement Phase 10 Step 5.
+- Confirmed the published beta package exists on npm.
+- Confirmed beta verification passed before stable publish attempt.
+- Implemented only Phase 10 Step 5.
+- Did not move to Phase 10 Step 6.
+- Did not publish a stable release because npm requires OTP.
+- Did not run generated app code.
+- Did not start Docker.
+- Did not connect to databases.
+
+Changes made:
+
+- Set `@baseforge/create` package version from `0.1.0-beta.0` to `0.1.0`.
+- Updated CLI version output to `0.1.0`.
+- Updated CLI version test expectation to `0.1.0`.
+- Refreshed `package-lock.json`.
+- Updated CLI README from beta/future wording to stable `@baseforge/create` usage.
+- Updated root README and web README to say the CLI package is published as `@baseforge/create`.
+- Updated website docs, landing command card, and supported-stack copy to remove stale "not published" CLI wording.
+- Updated docs tests to assert stable CLI availability wording.
+- Ran beta verification against the published npm package before the stable publish attempt.
+- Ran stable package and workspace pre-publish checks.
+- Ran npm pack dry-run and inspected package contents.
+- Ran optional local tarball install test for `baseforge-create-0.1.0.tgz`.
+- Attempted stable publish with:
+  - `npm publish -w @baseforge/create --tag latest --access public`.
+- Verified the failed stable publish did not create `0.1.0` on npm.
+
+Files changed:
+
+- `package.json`
+- `package-lock.json`
+- `packages/cli/package.json`
+- `packages/cli/README.md`
+- `packages/cli/src/args.ts`
+- `packages/cli/src/__tests__/args.test.ts`
+- `README.md`
+- `apps/web/README.md`
+- `apps/web/components/landing/command-card.tsx`
+- `apps/web/components/docs/docs-page.tsx`
+- `apps/web/components/docs/docs-page.test.tsx`
+- `apps/web/components/builder/supported-stack-section.tsx`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+rg --files context | sort
+sed -n '1,260p' .agents/prompts/phase-10/step-5.md
+sed -n '261,620p' .agents/prompts/phase-10/step-5.md
+git status --short
+sed -n '1,260p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+wc -l context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md context/progress-tracker.md
+sed -n '261,999p' context/architecture.md
+sed -n '361,999p' context/build-plan.md
+sed -n '261,999p' context/project-overview.md
+sed -n '261,999p' context/ui-rules.md
+sed -n '1,180p' packages/cli/package.json
+sed -n '1,140p' packages/cli/README.md
+rg -n "0\\.1\\.0-beta\\.0|@baseforge/create@beta|@baseforge/create@latest|not published|future|coming soon|CLI package is not published|CLI generation exists locally|create-baseforge|@baseforge/create" package.json package-lock.json packages/cli apps/web README.md context/progress-tracker.md -g '!**/dist/**'
+sed -n '70,105p' README.md
+sed -n '80,105p' apps/web/README.md
+sed -n '1,90p' apps/web/components/landing/command-card.tsx
+sed -n '300,335p' apps/web/components/docs/docs-page.tsx
+sed -n '1,90p' apps/web/components/docs/docs-page.test.tsx
+rg -n "CLI package exists|not been published|not published|Future publish command|available today|@baseforge/create@latest|CLI package is not published|Local CLI ready|CLI Status|0\\.1\\.0-beta\\.0|0\\.1\\.0" packages/cli apps/web README.md apps/web/README.md package.json package-lock.json -g '!**/dist/**'
+sed -n '1,35p' README.md
+sed -n '1,35p' apps/web/README.md
+sed -n '60,85p' apps/web/components/docs/docs-page.tsx
+sed -n '160,190p' apps/web/components/docs/docs-page.tsx
+sed -n '1,80p' apps/web/components/builder/supported-stack-section.tsx
+npm install --package-lock-only --ignore-scripts
+rg -n "0\\.1\\.0-beta\\.0|@baseforge/create@beta|not published|has not been published|future publish|not available today|CLI package is not published|CLI package exists in the repo" package.json package-lock.json packages/cli apps/web README.md -g '!**/dist/**'
+rg -n "workspace:" packages/cli/package.json package-lock.json
+sed -n '1,100p' packages/cli/package.json
+sed -n '1,90p' packages/cli/README.md
+npm whoami
+npm view @baseforge/create name version dist-tags versions --json
+mktemp -d /private/tmp/baseforge-step5-beta.XXXXXX
+npx @baseforge/create@beta --help
+npx @baseforge/create@beta my-app --yes
+test -f my-app/package.json && test -f my-app/app/page.tsx && test -f my-app/README.md && test ! -d my-app/src
+npm run typecheck -w @baseforge/create
+npm test -w @baseforge/create
+npm run build -w @baseforge/create
+npm run test:smoke -w @baseforge/create
+npm run typecheck
+npm test
+npm run test:cli-smoke
+npm run build
+npm pack --dry-run -w @baseforge/create
+npm run build
+npm pack --dry-run -w @baseforge/create
+mktemp -d /private/tmp/baseforge-step5-pack.XXXXXX
+mktemp -d /private/tmp/baseforge-step5-install.XXXXXX
+npm pack -w @baseforge/create --pack-destination /private/tmp/baseforge-step5-pack.l5QB1c
+npm init -y
+npm install /private/tmp/baseforge-step5-pack.l5QB1c/baseforge-create-0.1.0.tgz
+npx create-baseforge --help
+npx create-baseforge my-app --yes
+test -f my-app/package.json && test -f my-app/app/page.tsx && test -f my-app/README.md && test ! -d my-app/src
+npm publish -w @baseforge/create --tag latest --access public
+npm view @baseforge/create name version dist-tags versions --json
+sed -n '1,70p' context/progress-tracker.md
+```
+
+Beta verification result:
+
+- `npm view @baseforge/create name version dist-tags versions --json` before stable publish showed:
+  - package: `@baseforge/create`;
+  - published version: `0.1.0-beta.0`;
+  - `beta: 0.1.0-beta.0`;
+  - `latest: 0.1.0-beta.0`.
+- Note: `latest` already pointed to the beta before this stable attempt.
+- `npx @baseforge/create@beta --help` passed and printed usage.
+- `npx @baseforge/create@beta my-app --yes` passed.
+- Generated beta output verification passed:
+  - `my-app/package.json` exists;
+  - `my-app/app/page.tsx` exists;
+  - `my-app/README.md` exists;
+  - `my-app/src` does not exist.
+
+Pre-publish verification result:
+
+- `npm whoami` passed:
+  - `david021106`.
+- `rg -n "workspace:" packages/cli/package.json package-lock.json` returned no matches.
+- Active package/docs scan found no stale `0.1.0-beta.0`, `@baseforge/create@beta`, or "not published" wording in current active package/docs files.
+- `npm run typecheck -w @baseforge/create` passed.
+- `npm test -w @baseforge/create` passed:
+  - 8 files;
+  - 123 tests.
+- `npm run build -w @baseforge/create` passed.
+- `npm run test:smoke -w @baseforge/create` passed:
+  - 1 file;
+  - 5 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 8 files, 123 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run test:cli-smoke` passed:
+  - 1 file;
+  - 5 tests.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces.
+- Initial sandboxed `npm pack --dry-run -w @baseforge/create` failed because npm could not write to the user npm cache/log directory.
+- Escalated `npm pack --dry-run -w @baseforge/create` passed.
+
+Pack dry-run result:
+
+- Package name: `@baseforge/create`
+- Version: `0.1.0`
+- Filename: `baseforge-create-0.1.0.tgz`
+- Package size: `98.3 kB`
+- Unpacked size: `614.1 kB`
+- Total files: `41`
+- Included expected files:
+  - `package.json`;
+  - `README.md`;
+  - `dist/index.js`;
+  - declaration files under `dist`;
+  - template assets under `dist/templates/base` and `dist/templates/features`.
+
+Optional final tarball test:
+
+- Created tarball at:
+  - `/private/tmp/baseforge-step5-pack.l5QB1c/baseforge-create-0.1.0.tgz`
+- Installed it in:
+  - `/private/tmp/baseforge-step5-install.tj478p`
+- `npx create-baseforge --help` passed.
+- `npx create-baseforge my-app --yes` passed.
+- Generated tarball output verification passed:
+  - `my-app/package.json` exists;
+  - `my-app/app/page.tsx` exists;
+  - `my-app/README.md` exists;
+  - `my-app/src` does not exist.
+
+Publish result:
+
+- Publish command attempted:
+  - `npm publish -w @baseforge/create --tag latest --access public`
+- npm prepared the correct `@baseforge/create@0.1.0` tarball and attempted to publish to:
+  - `https://registry.npmjs.org/`
+- Publish failed with npm one-time password error:
+
+```txt
+npm error code EOTP
+npm error This operation requires a one-time password from your authenticator.
+npm error You can provide a one-time password by passing --otp=<code> to the command you ran.
+npm error If you already provided a one-time password then it is likely that you either typoed
+npm error it, or it timed out. Please try again.
+```
+
+Post-publish verification:
+
+- `npm view @baseforge/create name version dist-tags versions --json` still reports only:
+  - version: `0.1.0-beta.0`;
+  - `beta: 0.1.0-beta.0`;
+  - `latest: 0.1.0-beta.0`;
+  - versions: `["0.1.0-beta.0"]`.
+- This confirms `@baseforge/create@0.1.0` was not published.
+- Did not run `npx @baseforge/create@latest --help` as a stable post-publish check because stable publish did not succeed.
+- Did not run `npm create @baseforge@latest ...` because stable publish did not succeed.
+
+Docs update:
+
+- Docs and landing copy were prepared for CLI availability and no longer describe the CLI as unavailable.
+- Stable docs are prepared locally but should be considered pending until `@baseforge/create@0.1.0` is actually published.
+
+Notes/blockers:
+
+- Publishing is blocked by npm one-time password/2FA.
+- To continue, rerun publish with a valid current OTP:
+  - `npm publish -w @baseforge/create --tag latest --access public --otp <current-code>`
+- The local package metadata is prepared for stable publish at `0.1.0`.
+- The npm registry still has only `0.1.0-beta.0`.
+
+Next suggested step:
+
+- Provide a current npm OTP or publish manually with the OTP command above, then rerun post-publish verification for Step 5.
 
 Phase 10 Step 4 completed: Publish beta/canary release
 

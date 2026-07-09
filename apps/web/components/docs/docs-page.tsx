@@ -71,7 +71,7 @@ const compatibilityRules = [
 ] as const;
 
 const limitations = [
-  "The CLI package exists in the repo for local use but has not been published yet.",
+  "The CLI package is published as @baseforge/create.",
   "Only Next.js is supported.",
   "Only TypeScript is supported.",
   "Only App Router is supported.",
@@ -177,8 +177,8 @@ export function DocsPage() {
             </p>
             <p>
               The generated project is intended to be unzipped and edited
-              locally. The shared generator core is also used by the local CLI
-              package in this repo, though that package has not been published.
+              locally. The shared generator core is also used by the published
+              `@baseforge/create` CLI package.
             </p>
           </DocsSection>
 
@@ -317,15 +317,15 @@ npm run build`}</CodeBlock>
 
           <DocsSection id="cli-status" eyebrow="12" title="CLI Status">
             <p>
-              CLI generation exists locally in `packages/cli`, but the package
-              has not been published. The public command is shown as a future
-              publishing target, not something that is available today.
+              CLI generation is available through the published
+              `@baseforge/create` package and uses the same shared generator
+              core as the website.
             </p>
-            <CodeBlock>{`# Future publish command, not available yet
-npx @baseforge/create@latest`}</CodeBlock>
+            <CodeBlock>{`npx @baseforge/create@latest
+npm create @baseforge@latest`}</CodeBlock>
             <p>
-              The local CLI reuses the same shared generator core as the website
-              so website and terminal output stay aligned.
+              Website and terminal output stay aligned because both entrypoints
+              use the same generation pipeline.
             </p>
           </DocsSection>
 

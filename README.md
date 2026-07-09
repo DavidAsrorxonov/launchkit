@@ -3,8 +3,8 @@
 LaunchKit is a TypeScript-first developer project generator.
 
 The MVP is website-first: users configure a project, preview the generated
-output, and download a zip. A local CLI package now exists in this repo at
-`packages/cli`, but it has not been published to npm yet.
+output, and download a zip. The shared-generator CLI is published as
+`@baseforge/create`.
 
 ## Supported MVP Stack
 
@@ -85,7 +85,7 @@ docker compose down
 
 ## Limitations
 
-- The CLI package is available locally in this repo but is not published.
+- The CLI package is published as `@baseforge/create`.
 - Only Next.js is supported.
 - Only TypeScript is supported.
 - Only App Router is supported.
