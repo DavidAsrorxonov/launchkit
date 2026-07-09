@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="h-full antialiased"
+      className="dark h-full antialiased"
       data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col">{children}</body>
