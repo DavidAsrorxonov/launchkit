@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 10 Step 3 complete
-Primary focus: CLI npm tarball installs and runs locally; package remains private and unpublished
+Current phase: Phase 10 Step 4 ready for manual publish
+Primary focus: Scoped beta package metadata is prepared for `@baseforge/create`; npm publish is pending user-run publish with OTP
 ```
 
 ## Phase Progress
@@ -24,11 +24,646 @@ Primary focus: CLI npm tarball installs and runs locally; package remains privat
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
-| Phase 10 | npm Release Preparation              | In Progress | Step 3 verified the local npm tarball installs, exposes the bin, includes templates, and generates default/full projects. |
+| Phase 10 | npm Release Preparation              | In Progress | Step 4 scoped beta publish target is now `@baseforge/create@0.1.0-beta.0`; user owns the `baseforge` npm org and publish is pending manual OTP publish. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-09
+
+Phase 10 Step 4 package rename: Baseforge npm scope prepared
+
+Release details:
+
+- Package: `@baseforge/create`
+- Version: `0.1.0-beta.0`
+- Intended dist-tag: `beta`
+- npm user: `david021106`
+- npm org/scope: `baseforge`
+- Registry: `https://registry.npmjs.org/`
+- Package access: public scoped package
+- CLI binary: `create-baseforge`
+
+Scope and prerequisite note:
+
+- User decided to use the Baseforge name and created a new npm org named `baseforge`.
+- Treated this as a package/scope change from `@launchkit/create` to `@baseforge/create`.
+- Left internal monorepo package names such as `@launchkit/schema` and `@launchkit/generator` unchanged.
+- Did not publish to npm in this update.
+- Did not move to Phase 10 Step 5.
+- Did not publish a stable `latest` release.
+
+Changes made:
+
+- Changed CLI package name from `@launchkit/create` to `@baseforge/create`.
+- Changed installed CLI binary from `create-launchkit` to `create-baseforge`.
+- Updated CLI help text, usage examples, and tests for `create-baseforge`.
+- Updated root `test:cli-smoke` workspace target to `@baseforge/create`.
+- Updated CLI README beta/latest command examples to `npx @baseforge/create@...`.
+- Updated current web command/docs examples to `npx @baseforge/create@latest`.
+- Refreshed `package-lock.json`.
+- Verified npm org access:
+  - `npm org ls baseforge` returned `david021106 - owner`.
+- Verified `@baseforge/create` is not currently published:
+  - `npm view @baseforge/create name version dist-tags versions --json` returned 404.
+- Verified `npm access list packages baseforge --json` returned `{}`.
+
+Files changed:
+
+- `package.json`
+- `package-lock.json`
+- `packages/cli/package.json`
+- `packages/cli/README.md`
+- `packages/cli/src/args.ts`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/__tests__/args.test.ts`
+- `packages/cli/src/__tests__/smoke.test.ts`
+- `apps/web/components/landing/command-card.tsx`
+- `apps/web/components/docs/docs-page.tsx`
+- `apps/web/components/docs/docs-page.test.tsx`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+git status --short
+rg -n "@launchkit/create|@launchkit/create@|@launchkit/create@beta|@launchkit/create@latest|@launchkit/create|create-launchkit|launchkit-create|test:cli-smoke" package.json package-lock.json packages/cli README.md apps context .agents -g '!**/dist/**'
+sed -n '1,180p' packages/cli/package.json
+sed -n '1,160p' package.json
+sed -n '1,180p' packages/cli/src/args.ts
+sed -n '100,150p' packages/cli/src/__tests__/args.test.ts
+sed -n '1,130p' packages/cli/src/__tests__/smoke.test.ts
+sed -n '130,175p' packages/cli/src/index.ts
+sed -n '1,80p' apps/web/components/landing/command-card.tsx
+sed -n '300,340p' apps/web/components/docs/docs-page.tsx
+sed -n '50,70p' apps/web/components/docs/docs-page.test.tsx
+sed -n '1,120p' packages/cli/README.md
+npm install --package-lock-only --ignore-scripts
+rg -n "@launchkit/create|create-launchkit|npx create-launchkit|npm run .* -w create-launchkit|node_modules/create-launchkit|launchkit-create" package.json package-lock.json packages/cli apps/web README.md -g '!**/dist/**'
+rg -n "@baseforge/create|create-baseforge|baseforge-create|node_modules/@baseforge/create|test:cli-smoke" package.json package-lock.json packages/cli apps/web -g '!**/dist/**'
+npm org ls baseforge
+npm view @baseforge/create name version dist-tags versions --json
+npm access list packages baseforge --json
+npm run typecheck -w @baseforge/create
+npm test -w @baseforge/create
+npm run build -w @baseforge/create
+npm run test:smoke -w @baseforge/create
+npm run typecheck
+npm test
+npm run test:cli-smoke
+npm run build
+npm pack --dry-run -w @baseforge/create
+npm run build
+npm pack --dry-run -w @baseforge/create
+```
+
+Verification result:
+
+- `npm org ls baseforge` passed:
+  - `david021106 - owner`.
+- `npm view @baseforge/create name version dist-tags versions --json` returned 404:
+  - acceptable for a first publish attempt.
+- `npm access list packages baseforge --json` returned `{}`:
+  - no packages are currently published under the org.
+- Active source/package search found no remaining `@launchkit/create` or `create-launchkit` references in:
+  - `package.json`;
+  - `package-lock.json`;
+  - `packages/cli`;
+  - `apps/web`;
+  - `README.md`.
+- `npm run typecheck -w @baseforge/create` passed.
+- `npm test -w @baseforge/create` passed:
+  - 8 files;
+  - 123 tests.
+- `npm run build -w @baseforge/create` passed.
+- `npm run test:smoke -w @baseforge/create` passed:
+  - 1 file;
+  - 5 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 8 files, 123 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- `npm run test:cli-smoke` passed and uses workspace `@baseforge/create`.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces.
+- Initial sandboxed `npm pack --dry-run -w @baseforge/create` failed because npm could not write to the user npm cache:
+  - `EPERM`;
+  - `Your cache folder contains root-owned files`.
+- Escalated `npm pack --dry-run -w @baseforge/create` passed.
+
+Pack dry-run result:
+
+- Package name: `@baseforge/create`
+- Version: `0.1.0-beta.0`
+- Filename: `baseforge-create-0.1.0-beta.0.tgz`
+- Package size: `98.4 kB`
+- Unpacked size: `614.3 kB`
+- Total files: `41`
+- Included expected files:
+  - `package.json`;
+  - `README.md`;
+  - `dist/index.js`;
+  - declaration files under `dist`;
+  - template assets under `dist/templates/base` and `dist/templates/features`.
+
+Publish status:
+
+- Not published by the assistant.
+- User intends to publish manually.
+- Recommended manual publish command:
+  - `npm publish -w @baseforge/create --tag beta --access public --otp <current-code>`
+
+Next suggested step:
+
+- User should run the manual beta publish command with a fresh npm OTP, then verify:
+  - `npm view @baseforge/create version dist-tags versions --json`
+  - `npx @baseforge/create@beta --help`
+  - `npx @baseforge/create@beta my-app --yes`
+
+Phase 10 Step 4 rerun: Blocked by npm one-time password requirement
+
+Release details:
+
+- Package: `@launchkit/create`
+- Version: `0.1.0-beta.0`
+- Intended dist-tag: `beta`
+- npm user: `david021106`
+- Registry: `https://registry.npmjs.org/`
+- Package access: public scoped package
+- CLI binary: `create-launchkit`
+
+Scope and prerequisite note:
+
+- Reran `.agents/prompts/phase-10/step-4.md` after the user reported beta publish errors.
+- Read all files in `context/` and confirmed Phase 10 Step 3 is documented as complete.
+- Confirmed prior local npm tarball testing is documented as passed.
+- Used the previously selected scoped beta package target: `@launchkit/create`.
+- Implemented only Phase 10 Step 4.
+- Did not move to Phase 10 Step 5.
+- Did not publish a stable `latest` release.
+- Did not run generated app code.
+- Did not start Docker.
+- Did not connect to databases.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- No package metadata changes were needed in this rerun.
+- Verified the package remains publish-ready as `@launchkit/create@0.1.0-beta.0`.
+- Verified `packages/cli/package.json` has no `private: true`.
+- Verified `publishConfig.access` is `public`.
+- Verified the installed CLI binary remains `create-launchkit`.
+- Reran pre-publish package and workspace checks.
+- Reran npm pack dry-run and inspected package contents.
+- Attempted beta publish with:
+  - `npm publish -w @launchkit/create --tag beta --access public`.
+- Verified the failed publish did not create `@launchkit/create` in the registry.
+
+Files changed:
+
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,240p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-10/step-4.md
+git status --short
+rg --files context | sort
+sed -n '1,260p' context/architecture.md
+sed -n '1,320p' context/build-plan.md
+sed -n '1,260p' context/project-overview.md
+sed -n '1,260p' context/ui-rules.md
+sed -n '261,520p' .agents/prompts/phase-10/step-4.md
+sed -n '1,220p' package.json
+sed -n '1,220p' packages/cli/package.json
+sed -n '1,220p' packages/cli/README.md
+npm whoami
+npm view @launchkit/create name version dist-tags versions --json
+rg -n "workspace:" packages/cli/package.json package-lock.json
+npm run typecheck -w @launchkit/create
+npm test -w @launchkit/create
+npm run build -w @launchkit/create
+npm run test:smoke -w @launchkit/create
+npm run typecheck
+npm test
+npm run build
+npm run build
+npm pack --dry-run -w @launchkit/create
+npm pack --dry-run -w @launchkit/create
+npm publish -w @launchkit/create --tag beta --access public
+npm view @launchkit/create name version dist-tags versions --json
+```
+
+Pre-publish verification result:
+
+- Initial sandboxed npm registry commands failed with DNS/network restriction:
+  - `ENOTFOUND registry.npmjs.org`.
+- Escalated `npm whoami` passed:
+  - `david021106`.
+- Escalated `npm view @launchkit/create name version dist-tags versions --json` returned 404 before publish:
+  - acceptable for a first publish attempt.
+- `rg -n "workspace:" packages/cli/package.json package-lock.json` returned no matches.
+- `npm run typecheck -w @launchkit/create` passed.
+- `npm test -w @launchkit/create` passed:
+  - 8 files;
+  - 123 tests.
+- `npm run build -w @launchkit/create` passed.
+- `npm run test:smoke -w @launchkit/create` passed:
+  - 1 file;
+  - 5 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 8 files, 123 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces.
+
+Pack dry-run result:
+
+- Initial sandboxed `npm pack --dry-run -w @launchkit/create` failed because npm could not write to the user npm cache:
+  - `EPERM`;
+  - `Your cache folder contains root-owned files`.
+- Escalated `npm pack --dry-run -w @launchkit/create` passed.
+- Dry run reported:
+  - package name: `@launchkit/create`;
+  - version: `0.1.0-beta.0`;
+  - filename: `launchkit-create-0.1.0-beta.0.tgz`;
+  - package size: `98.4 kB`;
+  - unpacked size: `614.3 kB`;
+  - total files: `41`.
+- Included expected files:
+  - `package.json`;
+  - `README.md`;
+  - `dist/index.js`;
+  - declaration files under `dist`;
+  - template assets under `dist/templates/base` and `dist/templates/features`.
+- Did not include unexpected files:
+  - `src/`;
+  - `*.test.ts`;
+  - `coverage/`;
+  - `node_modules/`;
+  - temporary generated projects;
+  - workspace-only config files.
+
+Publish result:
+
+- Publish command attempted:
+  - `npm publish -w @launchkit/create --tag beta --access public`
+- npm prepared the correct tarball and attempted to publish to:
+  - `https://registry.npmjs.org/`
+- Publish failed with npm one-time password error:
+
+```txt
+npm error code EOTP
+npm error This operation requires a one-time password from your authenticator.
+npm error You can provide a one-time password by passing --otp=<code> to the command you ran.
+npm error If you already provided a one-time password then it is likely that you either typoed
+npm error it, or it timed out. Please try again.
+```
+
+Post-publish verification:
+
+- `npm view @launchkit/create name version dist-tags versions --json` still returns 404:
+  - `@launchkit/create@* is not in this registry`.
+- This confirms the failed publish did not create the package.
+- Did not run `npx @launchkit/create@beta --help`.
+- Did not run `npx @launchkit/create@beta my-app --yes`.
+- Did not run the all-compatible `npx @launchkit/create@beta full-app ...` command.
+- Post-publish npx tests are blocked until npm publish succeeds.
+
+Notes/blockers:
+
+- Publishing is blocked by npm one-time password/2FA.
+- To continue, rerun publish with a valid current OTP:
+  - `npm publish -w @launchkit/create --tag beta --access public --otp <current-code>`
+- Alternative:
+  - configure an npm granular automation token that can publish under `@launchkit` with the required 2FA behavior.
+- The package remains unpublished on npm.
+- The scoped package metadata remains prepared locally for the next publish attempt.
+
+Next suggested step:
+
+- Fix the listed publish blocker before retrying beta publish.
+
+Phase 10 Step 4 rerun: Blocked by npm 2FA requirement
+
+Release details:
+
+- Package: `@launchkit/create`
+- Version: `0.1.0-beta.0`
+- Intended dist-tag: `beta`
+- npm user: `david021106`
+- Registry: `https://registry.npmjs.org/`
+- Package access: public scoped package
+- CLI binary: `create-launchkit`
+
+Scope and prerequisite note:
+
+- User selected `npx @launchkit/create` as the professional package command target.
+- Confirmed Phase 10 Step 3 is documented as complete.
+- Confirmed local npm tarball testing passed in Step 3.
+- Confirmed the user explicitly wanted to rerun Step 4 with the scoped package name.
+- Implemented only the scoped beta publish attempt.
+- Did not move to Phase 10 Step 5.
+- Did not publish a stable `latest` release.
+- Did not run generated app code.
+- Did not start Docker.
+- Did not connect to databases.
+- Used npm workspaces and Vitest.
+- Did not introduce Node's built-in test runner.
+
+Changes made:
+
+- Changed the CLI package name from `create-launchkit` to `@launchkit/create`.
+- Set the prerelease version to `0.1.0-beta.0`.
+- Removed `private: true` from the CLI package for publish readiness.
+- Added public scoped package publish config:
+  - `publishConfig.access: public`.
+- Kept the installed CLI binary as `create-launchkit`.
+- Updated the root `test:cli-smoke` script to use workspace `@launchkit/create`.
+- Updated CLI version output to `0.1.0-beta.0`.
+- Updated CLI version test expectations.
+- Updated the CLI README to document the planned `@launchkit/create@beta` command without claiming it is live while publish remains blocked.
+- Refreshed `package-lock.json`.
+- Ran pre-publish package and workspace checks.
+- Ran npm pack dry-run and inspected package contents.
+- Attempted beta publish with:
+  - `npm publish -w @launchkit/create --tag beta --access public`.
+- Fixed npm's package metadata warning with `npm pkg fix -w @launchkit/create`.
+- Reran npm pack dry-run after the metadata fix.
+- Verified the failed publish did not create `@launchkit/create` in the registry.
+
+Files changed:
+
+- `package.json`
+- `package-lock.json`
+- `packages/cli/package.json`
+- `packages/cli/README.md`
+- `packages/cli/src/args.ts`
+- `packages/cli/src/__tests__/args.test.ts`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,220p' context/progress-tracker.md
+sed -n '1,360p' .agents/prompts/phase-10/step-4.md
+git status --short
+sed -n '1,220p' packages/cli/package.json
+sed -n '1,220p' package-lock.json
+npm whoami
+npm view @launchkit/create name version dist-tags versions --json
+npm org ls launchkit --json
+npm access ls-packages launchkit --json
+npm access list packages launchkit --json
+rg -n "create-launchkit|npm create launchkit|@launchkit/create|0\\.1\\.0" packages/cli package.json package-lock.json README.md apps/web context -g '!context/progress-tracker.md'
+sed -n '1,220p' package.json
+sed -n '1,240p' packages/cli/src/args.ts
+npm install --package-lock-only --ignore-scripts
+sed -n '1,120p' packages/cli/package.json
+rg -n '"(@launchkit/create|create-launchkit)"|node_modules/(@launchkit/create|create-launchkit)|0\\.1\\.0-beta\\.0|test:cli-smoke' package-lock.json package.json packages/cli/package.json packages/cli/README.md packages/cli/src packages/cli/src/__tests__
+rg -n "npx create-launchkit|npm create launchkit|create-launchkit@latest|npm run build -w create-launchkit" packages/cli README.md apps/web packages -g '!dist/**'
+git diff --stat
+npm run typecheck -w @launchkit/create
+npm test -w @launchkit/create
+npm run build -w @launchkit/create
+npm run test:smoke -w @launchkit/create
+npm run typecheck
+npm test
+npm run build
+npm run build
+npm pack --dry-run -w @launchkit/create
+npm pack --dry-run -w @launchkit/create
+npm publish -w @launchkit/create --tag beta --access public
+npm pkg fix -w @launchkit/create
+sed -n '1,90p' packages/cli/package.json
+git diff -- packages/cli/package.json
+npm pack --dry-run -w @launchkit/create
+npm view @launchkit/create name version dist-tags versions --json
+rg -n "workspace:" packages/cli/package.json package-lock.json
+git status --short
+git diff --stat
+```
+
+Pre-publish verification result:
+
+- `npm whoami` passed:
+  - `david021106`.
+- `npm view @launchkit/create name version dist-tags versions --json` returned 404 before publish:
+  - acceptable for a first publish attempt.
+- `npm org ls launchkit --json` returned `{}`.
+- `npm access list packages launchkit --json` showed scope access:
+  - `@launchkit/identity: read-write`.
+- `npm run typecheck -w @launchkit/create` passed.
+- `npm test -w @launchkit/create` passed:
+  - 8 files;
+  - 123 tests.
+- `npm run build -w @launchkit/create` passed.
+- `npm run test:smoke -w @launchkit/create` passed:
+  - 1 file;
+  - 5 tests.
+- `npm run typecheck` passed across workspaces.
+- `npm test` passed across workspaces:
+  - web: 5 files, 49 tests;
+  - cli: 8 files, 123 tests;
+  - generator: 11 files, 127 tests;
+  - schema: 5 files, 87 tests;
+  - templates: 1 file, 52 tests.
+- Initial sandboxed `npm run build` failed due to the known Turbopack sandbox process/port restriction:
+  - `creating new process`;
+  - `binding to a port`;
+  - `Operation not permitted (os error 1)`.
+- Escalated `npm run build` passed across workspaces.
+- `rg -n "workspace:" packages/cli/package.json package-lock.json` returned no matches.
+
+Pack dry-run result:
+
+- Initial sandboxed `npm pack --dry-run -w @launchkit/create` failed because npm could not write to the user npm cache:
+  - `EPERM`;
+  - `Your cache folder contains root-owned files`.
+- Escalated `npm pack --dry-run -w @launchkit/create` passed.
+- Final dry run after `npm pkg fix` reported:
+  - package name: `@launchkit/create`;
+  - version: `0.1.0-beta.0`;
+  - filename: `launchkit-create-0.1.0-beta.0.tgz`;
+  - package size: `98.3 kB`;
+  - unpacked size: `614.1 kB`;
+  - total files: `41`.
+- Included expected files:
+  - `package.json`;
+  - `README.md`;
+  - `dist/index.js`;
+  - declaration files under `dist`;
+  - template assets under `dist/templates/base` and `dist/templates/features`.
+- Did not include unexpected files:
+  - `src/`;
+  - `*.test.ts`;
+  - `coverage/`;
+  - `node_modules/`;
+  - temporary generated projects;
+  - workspace-only config files.
+
+Publish result:
+
+- Publish command attempted:
+  - `npm publish -w @launchkit/create --tag beta --access public`
+- npm prepared the correct tarball and attempted to publish to:
+  - `https://registry.npmjs.org/`
+- Publish failed with npm security error:
+
+```txt
+npm error code E403
+npm error 403 403 Forbidden - PUT https://registry.npmjs.org/@launchkit%2fcreate - Two-factor authentication or granular access token with bypass 2fa enabled is required to publish packages.
+```
+
+- npm also warned before the failed publish:
+
+```txt
+npm warn publish "bin[create-launchkit]" script name was cleaned
+```
+
+- Fixed the warning with:
+  - `npm pkg fix -w @launchkit/create`
+- The fix normalized the bin path from:
+  - `./dist/index.js`
+  to:
+  - `dist/index.js`
+- Reran pack dry-run after the fix; no publish metadata warning appeared.
+
+Post-publish verification:
+
+- `npm view @launchkit/create name version dist-tags versions --json` still returns 404:
+  - `@launchkit/create@* is not in this registry`.
+- This confirms the failed publish did not create the package.
+- Did not run `npx @launchkit/create@beta --help`.
+- Did not run `npx @launchkit/create@beta my-app --yes`.
+- Did not run the all-compatible `npx @launchkit/create@beta full-app ...` command.
+- Post-publish npx tests are blocked until npm publish succeeds.
+
+Notes/blockers:
+
+- Publishing is blocked by npm two-factor authentication or the need for a granular automation token with publish/2FA bypass.
+- To continue, rerun publish with a valid OTP:
+  - `npm publish -w @launchkit/create --tag beta --access public --otp <current-code>`
+- Alternative:
+  - configure an npm granular automation token that can publish under `@launchkit`.
+- The package remains unpublished on npm.
+- The scoped package metadata remains prepared locally for the next publish attempt.
+- The package is no longer `private: true` locally, because Step 4 publish readiness requires it to be public at publish time.
+
+Next suggested step:
+
+- Provide a current npm OTP or configure an npm automation token, then retry Phase 10 Step 4 publish for `@launchkit/create@0.1.0-beta.0`.
+
+### 2026-07-09
+
+Phase 10 Step 4: Blocked
+
+Blocked by:
+
+- The npm package name `create-launchkit` already exists on the public npm registry.
+- Registry metadata shows:
+  - package: `create-launchkit`;
+  - current version: `1.2.0`;
+  - dist-tags: `latest: 1.2.0`;
+  - published versions: `1.0.0`, `1.1.0`, `1.2.0`.
+- `npm owner ls create-launchkit` shows the package owner as:
+  - `caleb.king <caleb.king@peopleintech.io>`
+- The authenticated npm user is:
+  - `david021106`
+- Step 4 requires verifying that an existing package belongs to the user/project before publishing.
+- Because ownership could not be verified, publishing was stopped.
+
+Changes made:
+
+- Updated this progress tracker with the Step 4 blocker.
+- Did not change `packages/cli/package.json`.
+- Did not set `0.1.0-beta.0`.
+- Did not remove `private: true`.
+- Did not publish to npm.
+- Did not run `npm publish`.
+- Did not change docs to claim beta npm availability.
+
+Files changed:
+
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,260p' context/progress-tracker.md
+sed -n '1,260p' .agents/prompts/phase-10/step-4.md
+rg --files context packages/cli package.json package-lock.json
+sed -n '261,620p' .agents/prompts/phase-10/step-4.md
+sed -n '261,620p' context/progress-tracker.md
+sed -n '1,260p' context/architecture.md
+sed -n '1,360p' context/build-plan.md
+sed -n '261,620p' context/architecture.md
+sed -n '361,760p' context/build-plan.md
+sed -n '1,360p' context/project-overview.md
+sed -n '1,320p' context/ui-rules.md
+sed -n '361,760p' context/project-overview.md
+sed -n '321,700p' context/ui-rules.md
+git status --short
+sed -n '1,220p' packages/cli/package.json
+sed -n '1,220p' packages/cli/README.md
+npm whoami
+npm whoami
+npm view create-launchkit name version dist-tags versions --json
+npm owner ls create-launchkit
+```
+
+Exact error/blocker:
+
+```txt
+npm view create-launchkit name version dist-tags versions --json
+{
+  "name": "create-launchkit",
+  "version": "1.2.0",
+  "dist-tags": {
+    "latest": "1.2.0"
+  },
+  "versions": [
+    "1.0.0",
+    "1.1.0",
+    "1.2.0"
+  ]
+}
+
+npm owner ls create-launchkit
+caleb.king <caleb.king@peopleintech.io>
+```
+
+Notes/blockers:
+
+- Initial sandboxed `npm whoami` failed with DNS/network access blocked:
+  - `getaddrinfo ENOTFOUND registry.npmjs.org`.
+- Escalated `npm whoami` passed:
+  - `david021106`.
+- No prerelease version was selected because the required package ownership check failed first.
+- No pre-publish checks were rerun after the ownership blocker, because publishing must not continue until the name/ownership issue is resolved.
+- The package remains private and unpublished from this repository.
+
+Next suggested step:
+
+- Resolve the npm package name/ownership blocker before retrying beta publish:
+  - obtain ownership/access to `create-launchkit`; or
+  - choose and document a different package name, then repeat Phase 10 package metadata, tarball, and beta publish steps for that name.
 
 ### 2026-07-09
 

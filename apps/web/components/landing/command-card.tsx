@@ -23,7 +23,7 @@ export function CommandCard() {
       <div className="mt-4 overflow-x-auto rounded-md bg-muted p-3">
         <code className="whitespace-nowrap font-mono text-sm text-foreground">
           <span className="text-muted-foreground">$</span> npx
-          create-launchkit@latest
+          @baseforge/create@latest
         </code>
       </div>
 

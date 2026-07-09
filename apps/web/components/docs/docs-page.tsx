@@ -322,7 +322,7 @@ npm run build`}</CodeBlock>
               publishing target, not something that is available today.
             </p>
             <CodeBlock>{`# Future publish command, not available yet
-npx create-launchkit@latest`}</CodeBlock>
+npx @baseforge/create@latest`}</CodeBlock>
             <p>
               The local CLI reuses the same shared generator core as the website
               so website and terminal output stay aligned.

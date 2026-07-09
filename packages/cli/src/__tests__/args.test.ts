@@ -116,7 +116,7 @@ describe("help and version text", () => {
   it("includes supported options", () => {
     const helpText = getHelpText();
 
-    expect(helpText).toContain("create-launchkit [project-name] [options]");
+    expect(helpText).toContain("create-baseforge [project-name] [options]");
     expect(helpText).toContain("--name <name>");
     expect(helpText).toContain("--package-manager <npm|pnpm>");
     expect(helpText).toContain("--ui <none|shadcn>");
@@ -142,6 +142,6 @@ describe("help and version text", () => {
   });
 
   it("returns the CLI version", () => {
-    expect(getVersionText()).toBe("0.1.0");
+    expect(getVersionText()).toBe("0.1.0-beta.0");
   });
 });

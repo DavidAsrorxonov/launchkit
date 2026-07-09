@@ -67,7 +67,7 @@ describe("built CLI smoke checks", () => {
   it("runs through a package bin symlink", async () => {
     const cwd = await createTempRoot();
     const binDir = path.join(cwd, "node_modules", ".bin");
-    const binPath = path.join(binDir, "create-launchkit");
+    const binPath = path.join(binDir, "create-baseforge");
     await mkdir(binDir, { recursive: true });
     await symlink(cliEntry, binPath);
 
@@ -75,7 +75,7 @@ describe("built CLI smoke checks", () => {
 
     assertExitCode(result, 0);
     expect(result.stdout).toContain("Usage:");
-    expect(result.stdout).toContain("create-launchkit [project-name] [options]");
+    expect(result.stdout).toContain("create-baseforge [project-name] [options]");
   });
 
   it("generates the all-compatible MVP config with expected files", async () => {

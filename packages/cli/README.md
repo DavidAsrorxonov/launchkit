@@ -1,10 +1,19 @@
-# create-launchkit
+# @baseforge/create
 
-Create a TypeScript-first Next.js project with LaunchKit.
+Create a TypeScript-first Next.js project with Baseforge.
 
-Publishing is pending. The package exists in this repository for local use, but
-`npx create-launchkit@latest` and `npm create launchkit@latest` are future npm
-commands until the package is published.
+The package is prepared for beta npm publishing under `@baseforge/create`.
+After the beta publish succeeds, test it with:
+
+```bash
+npx @baseforge/create@beta
+```
+
+Stable npm usage is planned for a future release:
+
+```bash
+npx @baseforge/create@latest
+```
 
 ## What It Generates
 
@@ -28,29 +37,28 @@ Unsupported frameworks, languages, routers, project structures, styling systems,
 databases, ORMs, auth providers, Docker setups, and package managers are not
 available in the MVP.
 
-## Future npm Usage
+## npm Usage
 
-After publication, the intended public commands are:
-
-```bash
-npx create-launchkit@latest
-```
-
-and:
+Planned beta command:
 
 ```bash
-npm create launchkit@latest
+npx @baseforge/create@beta
 ```
 
-`npm create launchkit` resolves to the `create-launchkit` package through npm's
-create/init convention.
+After the stable release, the intended public command is:
+
+```bash
+npx @baseforge/create@latest
+```
+
+The installed binary is `create-baseforge`.
 
 ## Local Repository Usage
 
 From this repository, build the CLI and run the compiled entrypoint directly:
 
 ```bash
-npm run build -w create-launchkit
+npm run build -w @baseforge/create
 node packages/cli/dist/index.js my-app --yes
 ```
 
@@ -65,7 +73,7 @@ npm run dev
 ## Options
 
 ```txt
-create-launchkit [project-name] [options]
+create-baseforge [project-name] [options]
 
 Options:
   --name <name>                         Set the generated project name.

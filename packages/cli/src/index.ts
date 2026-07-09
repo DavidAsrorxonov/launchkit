@@ -151,7 +151,7 @@ export async function main(
   } catch (error) {
     if (error instanceof CliArgumentError) {
       output.error(`Error: ${error.message}`);
-      output.error("Run create-launchkit --help for usage.");
+      output.error("Run create-baseforge --help for usage.");
       return 1;
     }
 

@@ -57,7 +57,7 @@ describe("Phase 8 docs page", () => {
       "The CLI package exists in the repo for local use but has not been published yet.",
     );
     expect(docsSource).toContain("Future publish command, not available yet");
-    expect(docsSource).toContain("npx create-launchkit@latest");
+    expect(docsSource).toContain("npx @baseforge/create@latest");
     expect(docsSource).toContain("Generated projects do not use `src/`.");
     expect(docsSource).toContain("Auth.js credentials output is a scaffold");
   });

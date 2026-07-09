@@ -1,12 +1,11 @@
 {
-  "name": "create-launchkit",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Create a TypeScript-first Next.js project with LaunchKit.",
+  "name": "@baseforge/create",
+  "version": "0.1.0-beta.0",
+  "description": "Create a TypeScript-first Next.js project with Baseforge.",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "create-launchkit": "./dist/index.js"
+    "create-baseforge": "dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -15,6 +14,9 @@
     "README.md",
     "package.json"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DavidAsrorxonov/launchkit.git",
@@ -26,6 +28,7 @@
   },
   "keywords": [
     "create",
+    "baseforge",
     "nextjs",
     "typescript",
     "tailwind",
