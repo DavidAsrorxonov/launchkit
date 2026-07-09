@@ -2,6 +2,7 @@ import { CliDemoSection } from "@/components/landing/cli-demo-section";
 import { LandingHero } from "@/components/landing/landing-hero";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { StackPowerSection } from "@/components/landing/stack-power-section";
+import { WorkflowComparisonSection } from "@/components/landing/workflow-comparison-section";
 
 export function LandingPage() {
   return (
@@ -12,6 +13,7 @@ export function LandingPage() {
         <LandingHero />
         <CliDemoSection />
         <StackPowerSection />
+        <WorkflowComparisonSection />
       </div>
     </main>
   );
