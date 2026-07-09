@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: LaunchKit
 Stage: Foundation setup
-Current phase: Phase 10 Step 4 ready for manual publish
-Primary focus: Scoped beta package metadata is prepared for `@baseforge/create`; npm publish is pending user-run publish with OTP
+Current phase: Phase 10 Step 4 complete
+Primary focus: Beta package `@baseforge/create@0.1.0-beta.0` is published to npm with the `beta` dist-tag and manual npm install-path tests passed
 ```
 
 ## Phase Progress
@@ -24,13 +24,95 @@ Primary focus: Scoped beta package metadata is prepared for `@baseforge/create`;
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
-| Phase 10 | npm Release Preparation              | In Progress | Step 4 scoped beta publish target is now `@baseforge/create@0.1.0-beta.0`; user owns the `baseforge` npm org and publish is pending manual OTP publish. |
+| Phase 10 | npm Release Preparation              | In Progress | Step 4 beta publish completed for `@baseforge/create@0.1.0-beta.0`; user reported npm publish and beta npx tests passed. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
 
 ### 2026-07-09
+
+Phase 10 Step 4 completed: Publish beta/canary release
+
+Release details:
+
+- Package: `@baseforge/create`
+- Version: `0.1.0-beta.0`
+- Dist-tag: `beta`
+- npm user: `david021106`
+- npm org/scope: `baseforge`
+- Registry: `https://registry.npmjs.org/`
+- Package access: public scoped package
+- CLI binary: `create-baseforge`
+
+Scope and prerequisite note:
+
+- Previous publish attempts under LaunchKit naming were blocked because the npm `@launchkit` scope/package path was not owned broadly enough by the current npm user for creating `@launchkit/create`.
+- User chose to move the public npm package naming to the new `baseforge` npm org/scope instead.
+- User manually published the beta package to npm after the Baseforge scope change.
+- User manually tested the published beta package using the provided commands/options.
+- User reported the tests executed successfully without errors.
+- Did not move to Phase 10 Step 5.
+- Did not publish a stable `latest` release.
+- Did not run generated app code as part of this tracker update.
+- Did not start Docker.
+- Did not connect to databases.
+
+Changes made:
+
+- Updated this progress tracker to mark Phase 10 Step 4 as complete.
+- No source/package code changes were made in this tracker-only update.
+
+Files changed:
+
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+sed -n '1,230p' context/progress-tracker.md
+git status --short
+```
+
+Pre-publish verification result:
+
+- Previous automated verification before manual publish passed:
+  - `npm run typecheck -w @baseforge/create`;
+  - `npm test -w @baseforge/create`;
+  - `npm run build -w @baseforge/create`;
+  - `npm run test:smoke -w @baseforge/create`;
+  - `npm run typecheck`;
+  - `npm test`;
+  - `npm run test:cli-smoke`;
+  - escalated `npm run build`;
+  - escalated `npm pack --dry-run -w @baseforge/create`.
+
+Publish result:
+
+- User reported `@baseforge/create@0.1.0-beta.0` was published successfully to npm.
+- User reported the package was published after running the manual publish flow with OTP.
+- Intended publish command:
+  - `npm publish -w @baseforge/create --tag beta --access public --otp <current-code>`
+
+Post-publish verification:
+
+- User reported testing the published package with the provided options and checks.
+- User reported those tests completed successfully without errors.
+- Expected beta test commands included:
+  - `npm view @baseforge/create version dist-tags versions --json`;
+  - `npx @baseforge/create@beta --help`;
+  - `npx @baseforge/create@beta my-app --yes`;
+  - `npx @baseforge/create@beta full-app --yes --ui shadcn --database postgres --orm prisma --auth authjs-credentials --docker postgres`.
+
+Notes/blockers:
+
+- No current blocker for Phase 10 Step 4.
+- The published beta should remain under the `beta` dist-tag.
+- Do not treat this as a stable `latest` release.
+
+Next suggested step:
+
+- Phase 10 Step 5: Publish stable release, only after deciding the beta is ready to promote.
 
 Phase 10 Step 4 package rename: Baseforge npm scope prepared
 
