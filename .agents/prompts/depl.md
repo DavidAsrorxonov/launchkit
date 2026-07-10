@@ -64,7 +64,7 @@ Then check:
 Verify manually:
 
 - landing page loads
-- command UI uses `npx @baseforge/create@latest my-app`
+- command UI uses `npx @baseforge/create@latest`
 - builder opens from landing CTA
 - builder completes default flow
 - preview works
