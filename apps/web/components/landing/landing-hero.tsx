@@ -24,7 +24,7 @@ export function LandingHero() {
         </div>
 
         <h1 className="max-w-4xl text-4xl font-normal leading-tight text-foreground sm:text-5xl lg:text-6xl">
-          BaseForge Next.js project generator
+          BaseForge - One-click project generation for modern Next.js apps
         </h1>
 
         <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
