@@ -382,7 +382,7 @@ npm run build`}</CodeBlock>
               `@baseforge/create` package and uses the same shared generator
               core as the website.
             </p>
-            <CodeBlock>{`npx @baseforge/create@latest my-app`}</CodeBlock>
+            <CodeBlock>{`npx @baseforge/create@latest`}</CodeBlock>
           </DocsSection>
 
           <DocsSection
