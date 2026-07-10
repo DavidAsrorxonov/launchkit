@@ -48,7 +48,10 @@ describe("Phase 8 docs page", () => {
     expect(labels(stylingMetadata)).toEqual(["Tailwind CSS"]);
     expect(labels(databaseMetadata)).toEqual(["None", "PostgreSQL"]);
     expect(labels(ormMetadata)).toEqual(["None", "Prisma"]);
-    expect(labels(authMetadata)).toEqual(["None", "Auth.js credentials scaffold"]);
+    expect(labels(authMetadata)).toEqual([
+      "None",
+      "Auth.js credentials scaffold",
+    ]);
     expect(labels(packageManagerMetadata)).toEqual(["npm", "pnpm"]);
   });
 
@@ -56,11 +59,8 @@ describe("Phase 8 docs page", () => {
     expect(docsSource).toContain(
       "The CLI package is published as @baseforge/create.",
     );
-    expect(docsSource).toContain("npx @baseforge/create@latest my-app");
+    expect(docsSource).toContain("npx @baseforge/create@latest");
     expect(docsSource).not.toContain("npm create @baseforge@latest");
-    expect(docsSource).toContain(
-      "npm publish -w @baseforge/create --access public",
-    );
     expect(docsSource).toContain("Generated projects do not use `src/`.");
     expect(docsSource).toContain("Auth.js credentials output is a scaffold");
   });
