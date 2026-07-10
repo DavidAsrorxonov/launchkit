@@ -139,7 +139,7 @@ describe("ensureSafeTargetDirectory", () => {
       entries: ["existing.txt"],
     });
     expect(confirmCalls).toEqual([
-      "The target directory is not empty. Continue and add LaunchKit files?",
+      "The target directory is not empty. Continue and add BaseForge files?",
     ]);
   });
 

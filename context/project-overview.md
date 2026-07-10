@@ -1,26 +1,20 @@
-# LaunchKit Project Overview
+# BaseForge Project Overview
 
 ## Purpose
 
-LaunchKit is a developer tool for generating ready-to-use project starters.
+BaseForge is a developer tool for generating ready-to-use project starters.
 
-The first product surface is a website where developers choose a stack, click a button, and download a generated project as a zip file. LaunchKit now also has a local CLI package in the repo, but it has not been published yet. Future public CLI usage is expected to look like:
-
-```bash
-npx create-launchkit@latest
-```
-
-or:
+The first product surface is a website where developers choose a stack, click a button, and download a generated project as a zip file. BaseForge now also has a published CLI package:
 
 ```bash
-npm create launchkit@latest
+npx @baseforge/create@latest my-app
 ```
 
 The long-term goal is that both the website and CLI produce the same kind of generated project from the same shared generator logic.
 
 ## Core Idea
 
-LaunchKit should not be built as only a website that happens to generate files.
+BaseForge should not be built as only a website that happens to generate files.
 
 It should be built as a shared project-generation engine with multiple interfaces:
 
@@ -43,7 +37,7 @@ The generator core is the real product.
 
 ## TypeScript-First Direction
 
-LaunchKit should be TypeScript-first.
+BaseForge should be TypeScript-first.
 
 That means:
 
@@ -57,7 +51,7 @@ JavaScript output can be added later, but it should not be part of the first ver
 
 ## Recommended Monorepo Structure
 
-LaunchKit should start as a monorepo so the website, generator, shared schema, templates, and future CLI can live together cleanly.
+BaseForge should start as a monorepo so the website, generator, shared schema, templates, and future CLI can live together cleanly.
 
 Recommended structure:
 
@@ -81,7 +75,7 @@ launchkit/
       # Shared constants, helpers, and utility types
 
     cli/
-      # Future CLI package: create-launchkit
+      # CLI package: @baseforge/create
 ```
 
 The most important package is:
@@ -94,7 +88,7 @@ The website and CLI should both call this package.
 
 ## High-Level Architecture
 
-LaunchKit should have four main layers.
+BaseForge should have four main layers.
 
 ### 1. User Interfaces
 
@@ -214,7 +208,7 @@ This means zip generation and filesystem writing should be output adapters, not 
 The website MVP should work like this:
 
 ```txt
-User opens LaunchKit
+User opens BaseForge
   -> chooses project options
   -> clicks Generate
   -> frontend sends config to API route
@@ -260,7 +254,7 @@ The CLI should use the same schema and generator.
 Example flow:
 
 ```txt
-Future publish command: npx create-launchkit@latest
+Public command: npx @baseforge/create@latest my-app
   -> ask project name
   -> ask framework
   -> ask database
@@ -374,7 +368,7 @@ Adding a new option later should mean adding or updating a feature module, not r
 
 ## Compatibility Rules
 
-LaunchKit needs compatibility rules because not all stack combinations make sense.
+BaseForge needs compatibility rules because not all stack combinations make sense.
 
 Examples:
 
@@ -394,7 +388,7 @@ The generator must also enforce the rules because the API and CLI cannot trust U
 
 ## Template Strategy
 
-LaunchKit should separate base templates from feature templates.
+BaseForge should separate base templates from feature templates.
 
 Base template:
 
@@ -506,7 +500,7 @@ The hard part is not showing many options. The hard part is generating correct, 
 
 ## Suggested Tech Stack
 
-LaunchKit itself:
+BaseForge itself:
 
 - Monorepo: npm workspaces or Turborepo
 - Website: Next.js with App Router
@@ -577,7 +571,7 @@ packages/cli/src/index.ts
 
 ### Phase 2: Website MVP
 
-- Build LaunchKit web UI
+- Build BaseForge web UI
 - Add stack selection form
 - Add API route for generation
 - Return generated project as zip
@@ -602,7 +596,7 @@ packages/cli/src/index.ts
 
 ### Phase 5: CLI
 
-- Add `create-launchkit` CLI package
+- Add `@baseforge/create` CLI package
 - Reuse shared schema
 - Reuse generator core
 - Add prompts and flags
@@ -633,13 +627,13 @@ Use base templates plus feature modules.
 
 The generated output must actually run.
 
-LaunchKit needs tests that verify generated projects can install, typecheck, and start.
+BaseForge needs tests that verify generated projects can install, typecheck, and start.
 
 ## Success Criteria For The First Version
 
 The first successful version should allow a developer to:
 
-1. Visit the LaunchKit website.
+1. Visit the BaseForge website.
 2. Choose a small set of stack options.
 3. Click a generate button.
 4. Download a zip file.
@@ -659,7 +653,7 @@ The generated project should feel like a clean starter, not a rough file dump.
 
 ## Final Architecture Principle
 
-LaunchKit should be designed as:
+BaseForge should be designed as:
 
 ```txt
 A reusable TypeScript project generator

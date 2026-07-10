@@ -1,25 +1,56 @@
 {
-  "name": "create-launchkit",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@baseforge/create",
+  "version": "0.1.0",
+  "description": "Create a TypeScript-first Next.js project with BaseForge.",
+  "license": "MIT",
   "type": "module",
   "bin": {
-    "create-launchkit": "./dist/index.js"
+    "create-baseforge": "dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavidAsrorxonov/launchkit.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/DavidAsrorxonov/launchkit#readme",
+  "bugs": {
+    "url": "https://github.com/DavidAsrorxonov/launchkit/issues"
+  },
+  "keywords": [
+    "create",
+    "baseforge",
+    "nextjs",
+    "typescript",
+    "tailwind",
+    "starter",
+    "project-generator"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node scripts/build.mjs",
     "test": "vitest run",
     "test:smoke": "npm run build -w @launchkit/schema && npm run build -w @launchkit/generator && npm run build && vitest run --config vitest.smoke.config.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@inquirer/prompts": "^8.5.2",
-    "@launchkit/generator": "0.0.0",
-    "@launchkit/schema": "0.0.0"
+    "@inquirer/prompts": "^8.5.2"
   },
   "devDependencies": {
+    "@launchkit/generator": "0.0.0",
+    "@launchkit/schema": "0.0.0",
+    "esbuild": "^0.28.1",
     "typescript": "^5.0.0"
   }
 }

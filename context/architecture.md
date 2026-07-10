@@ -1,8 +1,8 @@
-# LaunchKit Architecture
+# BaseForge Architecture
 
 ## Architecture Goal
 
-LaunchKit should be built as a reusable TypeScript project-generation system with two product interfaces:
+BaseForge should be built as a reusable TypeScript project-generation system with two product interfaces:
 
 ```txt
 1. Website interface
@@ -141,7 +141,7 @@ The `cli` package can be created later, but the architecture should leave room f
 
 The website package is responsible for:
 
-- Rendering the LaunchKit UI
+- Rendering the BaseForge UI
 - Showing available stack choices
 - Preventing obviously invalid selections in the UI
 - Submitting generation requests
@@ -161,7 +161,7 @@ It should call `packages/generator` from an API route or server action.
 
 ### `packages/schema`
 
-The schema package defines the contract for a LaunchKit project configuration.
+The schema package defines the contract for a BaseForge project configuration.
 
 It is responsible for:
 
@@ -200,7 +200,7 @@ This package should be used by:
 
 ### `packages/generator`
 
-The generator package is the core of LaunchKit.
+The generator package is the core of BaseForge.
 
 It is responsible for turning a config into a generated project.
 
@@ -360,7 +360,7 @@ Browser download
 ### Future CLI Data Flow
 
 ```txt
-User runs create-launchkit
+User runs npx @baseforge/create@latest my-app
   |
   v
 Flags and prompts
@@ -847,38 +847,34 @@ This fits the root npm workspace pattern:
 }
 ```
 
-The package should be named:
+The public package is named:
 
 ```txt
-create-launchkit
+@baseforge/create
 ```
 
-The primary future invocation is:
+The primary stable invocation is:
 
 ```bash
-npx create-launchkit@latest
+npx @baseforge/create@latest my-app
 ```
 
-The npm create form can also be documented after publication:
+The original unscoped `create-launchkit` package name was unavailable on npm.
+Document the verified scoped `npx` command unless another create/init form has
+been explicitly tested.
 
-```bash
-npm create launchkit@latest
-```
-
-npm's `create`/`init` convention maps `npm create launchkit` to `npx create-launchkit`, so both forms can be backed by the same package. Do not claim either command is available until the package is published.
-
-The CLI binary should be named:
+The CLI binary is named:
 
 ```txt
-create-launchkit
+create-baseforge
 ```
 
-The future package manifest should point the binary at compiled output:
+The package manifest should point the binary at compiled output:
 
 ```json
 {
   "bin": {
-    "create-launchkit": "./dist/index.js"
+    "create-baseforge": "./dist/index.js"
   }
 }
 ```
@@ -932,13 +928,13 @@ In the early project, all packages can move together in one repo.
 
 Later, package versions matter because the CLI may be published to npm.
 
-Future packages:
+Current package namespace split:
 
 ```txt
 @launchkit/schema
 @launchkit/generator
 @launchkit/templates
-create-launchkit
+@baseforge/create
 ```
 
 The CLI package published to npm should depend on the same generator package used by the website.
@@ -965,7 +961,7 @@ For the MVP, synchronous zip generation from an API route is acceptable.
 
 ## Final Architecture Summary
 
-LaunchKit should be structured as:
+BaseForge should be structured as:
 
 ```txt
 apps/web
@@ -993,4 +989,4 @@ The most important rule:
 Website and CLI must both call the same generator core.
 ```
 
-That keeps LaunchKit maintainable as the number of supported stacks grows.
+That keeps BaseForge maintainable as the number of supported stacks grows.

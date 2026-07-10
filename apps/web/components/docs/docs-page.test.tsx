@@ -52,12 +52,15 @@ describe("Phase 8 docs page", () => {
     expect(labels(packageManagerMetadata)).toEqual(["npm", "pnpm"]);
   });
 
-  it("documents current limitations without claiming the CLI is available", () => {
+  it("documents current limitations and stable CLI availability", () => {
     expect(docsSource).toContain(
-      "The CLI package exists in the repo for local use but has not been published yet.",
+      "The CLI package is published as @baseforge/create.",
     );
-    expect(docsSource).toContain("Future publish command, not available yet");
-    expect(docsSource).toContain("npx create-launchkit@latest");
+    expect(docsSource).toContain("npx @baseforge/create@latest my-app");
+    expect(docsSource).not.toContain("npm create @baseforge@latest");
+    expect(docsSource).toContain(
+      "npm publish -w @baseforge/create --access public",
+    );
     expect(docsSource).toContain("Generated projects do not use `src/`.");
     expect(docsSource).toContain("Auth.js credentials output is a scaffold");
   });

@@ -113,7 +113,7 @@ export function BuilderShell() {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                LaunchKit
+                BaseForge
               </p>
               <h1 className="mt-1 text-2xl font-semibold text-foreground">
                 Project builder

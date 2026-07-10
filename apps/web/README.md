@@ -1,11 +1,10 @@
-# LaunchKit Web
+# BaseForge Web
 
-Next.js website for the LaunchKit project builder.
+Next.js website for the BaseForge project builder.
 
-LaunchKit is a TypeScript-first developer project generator. The MVP is a
+BaseForge is a TypeScript-first developer project generator. The MVP is a
 website-first generator where users configure a project, preview the output, and
-download a zip. A local CLI package exists in the repo but has not been
-published yet.
+download a zip. The shared-generator CLI is published as `@baseforge/create`.
 
 ## Supported MVP Stack
 
@@ -53,6 +52,17 @@ The website MVP does not require environment variables. Generated-project values
 
 ## Downloaded Project Usage
 
+Generate from npm with the published CLI:
+
+```bash
+npx @baseforge/create@latest my-app
+cd my-app
+npm install
+npm run dev
+```
+
+Or download a zip from the website builder.
+
 For npm output:
 
 ```bash
@@ -88,7 +98,7 @@ Feature-specific notes:
 
 ## Limitations
 
-- The CLI package is available locally in this repo but is not published.
+- The CLI package is published as `@baseforge/create`.
 - Only Next.js is supported.
 - Only TypeScript is supported.
 - Only App Router is supported.
@@ -96,6 +106,11 @@ Feature-specific notes:
 - Only Tailwind CSS is supported.
 - Auth.js credentials output is a scaffold, not production-ready auth.
 - PostgreSQL Docker Compose is for local development only.
-- LaunchKit does not install dependencies for generated projects.
-- LaunchKit does not run generated project code on the server.
+- BaseForge does not install dependencies for generated projects.
+- BaseForge does not run generated project code on the server.
 - Users must configure real secrets and production environment variables.
+
+## Release Note
+
+`@baseforge/create` is a public scoped npm package. Future publishes must use
+`npm publish -w @baseforge/create --access public`.

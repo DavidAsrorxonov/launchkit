@@ -1,18 +1,18 @@
-# LaunchKit Build Plan
+# BaseForge Build Plan
 
 ## Purpose
 
-This document defines the build phases for LaunchKit.
+This document defines the build phases for BaseForge.
 
-LaunchKit will start as a website-first project generator and later add CLI support.
+BaseForge will start as a website-first project generator and later add CLI support.
 
 The website will let developers choose a stack, preview the generated project, and download it as a zip file.
 
 ## Confirmed MVP Decisions
 
-### LaunchKit Website
+### BaseForge Website
 
-The LaunchKit website itself will use:
+The BaseForge website itself will use:
 
 - Next.js
 - TypeScript
@@ -49,20 +49,20 @@ The MVP should not include:
 - CLI generation
 - Multiple frontend frameworks
 - JavaScript output
-- User accounts for LaunchKit itself
+- User accounts for BaseForge itself
 - Saved project presets
 - GitHub auth provider generation
 - Server-side dependency installation
-- Running generated project code on the LaunchKit server
+- Running generated project code on the BaseForge server
 - Every possible database, ORM, auth provider, or UI library
 
 ## Phase 1: Product And Architecture Foundation
 
-Goal: Finalize what LaunchKit is building and what the MVP includes.
+Goal: Finalize what BaseForge is building and what the MVP includes.
 
 ### 1.1 Define Product Scope
 
-Define LaunchKit as:
+Define BaseForge as:
 
 ```txt
 A website-first TypeScript project generator that later gains a CLI.
@@ -603,7 +603,7 @@ Phase 5 is complete when:
 
 ## Phase 6: Website MVP
 
-Goal: Build the LaunchKit website interface and connect it to the generator.
+Goal: Build the BaseForge website interface and connect it to the generator.
 
 ### 6.1 Create Website Foundation
 
@@ -759,11 +759,11 @@ Phase 6 is complete when:
 - User can preview generated project.
 - User can download a zip.
 - Invalid combinations are prevented or clearly rejected.
-- Website looks consistent with the LaunchKit visual direction.
+- Website looks consistent with the BaseForge visual direction.
 
 ## Phase 7: Testing, Validation, And Hardening
 
-Goal: Make LaunchKit reliable enough to generate usable projects.
+Goal: Make BaseForge reliable enough to generate usable projects.
 
 ### 7.1 Add Schema Test Coverage
 
@@ -872,7 +872,7 @@ Avoid making a marketing-only landing page.
 
 Add docs for:
 
-- what LaunchKit generates
+- what BaseForge generates
 - supported stack options
 - generated project setup
 - known limitations
@@ -929,21 +929,23 @@ Before creating `packages/cli`, confirm the Phase 8 website MVP is stable.
 Confirmed package strategy:
 
 - package location: `packages/cli`
-- package name: `create-launchkit`
-- binary name: `create-launchkit`
+- public package name: `@baseforge/create`
+- binary name: `create-baseforge`
+- internal package namespace remains `@launchkit/*`
 - package format: ESM TypeScript
 - source directory: `src/`
 - build output: `dist/`
 - future bin target: `./dist/index.js`
 
-Supported future commands after publication:
+Supported stable command after publication:
 
 ```bash
-npx create-launchkit@latest
-npm create launchkit@latest
+npx @baseforge/create@latest my-app
 ```
 
-`npm create launchkit` follows npm's create/init convention and resolves to the `create-launchkit` package. Do not document these commands as available until the package is actually published.
+The original unscoped `create-launchkit` package name was unavailable on npm.
+Document the verified scoped `npx` command unless another create/init form has
+been explicitly tested.
 
 CLI MVP responsibilities:
 
@@ -963,7 +965,7 @@ CLI MVP non-goals:
 - JavaScript output
 - Pages Router
 - generated `src/`
-- LaunchKit user accounts
+- BaseForge user accounts
 - saved presets
 - duplicated generator logic
 - running generated app code
@@ -989,7 +991,7 @@ packages/cli
 Package name:
 
 ```txt
-create-launchkit
+@baseforge/create
 ```
 
 ### 9.2 Add CLI Entry
@@ -997,15 +999,10 @@ create-launchkit
 After publication, support:
 
 ```bash
-npx create-launchkit@latest
+npx @baseforge/create@latest my-app
 ```
 
-and eventually:
-
-```bash
-npm create launchkit@latest
-pnpm create launchkit
-```
+Do not document unverified `npm create` or `pnpm create` forms.
 
 ### 9.3 Add Prompts
 
@@ -1026,7 +1023,7 @@ Framework, language, router, and project structure can start as fixed choices.
 Possible flags:
 
 ```bash
-create-launchkit my-app --db postgres --orm prisma --auth authjs --ui shadcn --docker
+npx @baseforge/create@latest my-app --database postgres --orm prisma --auth authjs-credentials --ui shadcn --docker postgres
 ```
 
 ### 9.5 Reuse Schema And Generator
@@ -1103,7 +1100,7 @@ Do not add many stack options before the generator is stable.
 
 The MVP is successful when a developer can:
 
-1. Open the LaunchKit website.
+1. Open the BaseForge website.
 2. Complete the step-by-step wizard.
 3. Preview the generated project structure.
 4. Download a zip file.

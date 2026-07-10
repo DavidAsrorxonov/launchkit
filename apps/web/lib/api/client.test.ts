@@ -51,7 +51,7 @@ describe("generateProjectRequest", () => {
           {
             error: {
               code: "invalid_config",
-              message: "Request body must be a valid LaunchKit config.",
+              message: "Request body must be a valid BaseForge config.",
               issues: [{ path: ["name"] }],
             },
           },

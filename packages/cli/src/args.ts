@@ -44,7 +44,7 @@ export class CliArgumentError extends Error {
   }
 }
 
-export const CLI_VERSION = "0.0.0";
+export const CLI_VERSION = "0.1.0";
 
 export function parseCliArgs(argv: string[] = process.argv.slice(2)): CliArgs {
   let parsed: ReturnType<typeof parseArgs>;
@@ -102,10 +102,10 @@ export function parseCliArgs(argv: string[] = process.argv.slice(2)): CliArgs {
 }
 
 export function getHelpText(): string {
-  return `create-launchkit
+  return `create-baseforge
 
 Usage:
-  create-launchkit [project-name] [options]
+  create-baseforge [project-name] [options]
 
 Options:
   --name <name>                         Set the generated project name.
@@ -122,9 +122,9 @@ Options:
   -v, --version                         Show the CLI version.
 
 Examples:
-  create-launchkit my-app
-  create-launchkit my-app --database postgres --orm prisma
-  create-launchkit --name my-app --package-manager pnpm --ui shadcn`;
+  create-baseforge my-app
+  create-baseforge my-app --database postgres --orm prisma
+  create-baseforge --name my-app --package-manager pnpm --ui shadcn`;
 }
 
 export function getVersionText(): string {

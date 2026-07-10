@@ -229,7 +229,7 @@ describe("main", () => {
     expect(output.errors).toEqual([
       [
         "Error: Target directory is not empty.",
-        "Choose an empty directory or run without --yes to confirm adding LaunchKit files.",
+        "Choose an empty directory or run without --yes to confirm adding BaseForge files.",
       ].join("\n"),
     ]);
   });
@@ -271,7 +271,7 @@ describe("main", () => {
     expect(prompts.calls).toEqual([
       {
         kind: "confirm",
-        message: "The target directory is not empty. Continue and add LaunchKit files?",
+        message: "The target directory is not empty. Continue and add BaseForge files?",
         default: false,
       },
       {

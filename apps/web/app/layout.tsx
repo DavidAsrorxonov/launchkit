@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LaunchKit",
+  title: "BaseForge",
   description: "Build and download TypeScript project starters.",
 };
 
@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="h-full antialiased"
+      className="dark h-full antialiased"
       data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col">{children}</body>

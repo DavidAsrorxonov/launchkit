@@ -9,7 +9,7 @@ const workflowItems = [
 export function LogoStrip() {
   return (
     <section
-      aria-label="LaunchKit workflow"
+      aria-label="BaseForge workflow"
       className="grid gap-3 border-t border-border py-6 sm:grid-cols-5"
     >
       {workflowItems.map((item) => (

@@ -1,14 +1,14 @@
-# LaunchKit
+# BaseForge
 
-LaunchKit is a TypeScript-first developer project generator.
+BaseForge is a TypeScript-first developer project generator.
 
 The MVP is website-first: users configure a project, preview the generated
-output, and download a zip. A local CLI package now exists in this repo at
-`packages/cli`, but it has not been published to npm yet.
+output, and download a zip. The shared-generator CLI is published as
+`@baseforge/create`.
 
 ## Supported MVP Stack
 
-LaunchKit currently generates this stack:
+BaseForge currently generates this stack:
 
 | Area | Supported options |
 | --- | --- |
@@ -29,6 +29,17 @@ systems, databases, ORMs, auth providers, Docker setups, and package managers
 are intentionally not available in the MVP.
 
 ## Downloaded Project Usage
+
+Generate from npm with the published CLI:
+
+```bash
+npx @baseforge/create@latest my-app
+cd my-app
+npm install
+npm run dev
+```
+
+Or download a zip from the website builder.
 
 For an npm project:
 
@@ -80,12 +91,12 @@ docker compose down
 ## Roadmap
 
 - Keep the website MVP stable first.
-- Prepare publishing/release workflow for the existing shared-generator CLI.
+- Keep the existing shared-generator CLI release workflow stable.
 - Add more stack options only after the core generation flow is reliable.
 
 ## Limitations
 
-- The CLI package is available locally in this repo but is not published.
+- The CLI package is published as `@baseforge/create`.
 - Only Next.js is supported.
 - Only TypeScript is supported.
 - Only App Router is supported.
@@ -93,6 +104,11 @@ docker compose down
 - Only Tailwind CSS is supported.
 - Auth.js credentials output is a scaffold, not production-ready auth.
 - PostgreSQL Docker Compose is for local development only.
-- LaunchKit does not install dependencies for generated projects.
-- LaunchKit does not run generated project code on the server.
+- BaseForge does not install dependencies for generated projects.
+- BaseForge does not run generated project code on the server.
 - Users must configure real secrets and production environment variables.
+
+## Release Note
+
+`@baseforge/create` is a public scoped npm package. Future publishes must use
+`npm publish -w @baseforge/create --access public`.
