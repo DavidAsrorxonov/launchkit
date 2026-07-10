@@ -1,4 +1,4 @@
-import type { LaunchKitConfig } from "@baseforge/schema";
+import type { BaseForgeConfig } from "@baseforge/schema";
 
 import type { FeatureId } from "../generation-plan.js";
 import {
@@ -40,6 +40,6 @@ export function getFeatureDefinition(id: FeatureId | string): FeatureDefinition 
   return feature;
 }
 
-export function getEnabledFeatures(config: LaunchKitConfig): FeatureDefinition[] {
+export function getEnabledFeatures(config: BaseForgeConfig): FeatureDefinition[] {
   return mvpFeatureDefinitions.filter((feature) => feature.isEnabled?.(config) ?? false);
 }

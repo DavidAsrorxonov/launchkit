@@ -2,20 +2,20 @@ import { describe, expect, it } from "vitest";
 
 import {
   assertCompatibleConfig,
-  defaultLaunchKitConfig,
-  LaunchKitCompatibilityError,
+  defaultBaseForgeConfig,
+  BaseForgeCompatibilityError,
   validateCompatibility,
 } from "../index";
 
 describe("compatibility rules", () => {
   it("returns no issues for the default config", () => {
-    expect(validateCompatibility(defaultLaunchKitConfig)).toEqual([]);
+    expect(validateCompatibility(defaultBaseForgeConfig)).toEqual([]);
   });
 
   it("returns an issue when Prisma is selected without PostgreSQL", () => {
     expect(
       validateCompatibility({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         orm: "prisma",
         database: "none",
       }),
@@ -29,7 +29,7 @@ describe("compatibility rules", () => {
   it("returns no issues when Prisma is selected with PostgreSQL", () => {
     expect(
       validateCompatibility({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         orm: "prisma",
         database: "postgres",
       }),
@@ -39,7 +39,7 @@ describe("compatibility rules", () => {
   it("returns an issue when PostgreSQL Docker Compose is selected without PostgreSQL", () => {
     expect(
       validateCompatibility({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         docker: "postgres",
         database: "none",
       }),
@@ -54,7 +54,7 @@ describe("compatibility rules", () => {
   it("returns no issues when PostgreSQL Docker Compose is selected with PostgreSQL", () => {
     expect(
       validateCompatibility({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         docker: "postgres",
         database: "postgres",
       }),
@@ -64,7 +64,7 @@ describe("compatibility rules", () => {
   it("allows Auth.js credentials without a database", () => {
     expect(
       validateCompatibility({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         auth: "authjs-credentials",
         database: "none",
         orm: "none",
@@ -75,7 +75,7 @@ describe("compatibility rules", () => {
   it("allows Auth.js credentials with PostgreSQL and no Prisma", () => {
     expect(
       validateCompatibility({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         auth: "authjs-credentials",
         database: "postgres",
         orm: "none",
@@ -86,7 +86,7 @@ describe("compatibility rules", () => {
   it("allows Auth.js credentials with Prisma and PostgreSQL", () => {
     expect(
       validateCompatibility({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         auth: "authjs-credentials",
         database: "postgres",
         orm: "prisma",
@@ -97,7 +97,7 @@ describe("compatibility rules", () => {
   it("returns an issue for Auth.js credentials with Prisma but no PostgreSQL", () => {
     expect(
       validateCompatibility({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         auth: "authjs-credentials",
         database: "none",
         orm: "prisma",
@@ -109,7 +109,7 @@ describe("compatibility rules", () => {
     });
     expect(
       validateCompatibility({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         auth: "authjs-credentials",
         database: "none",
         orm: "prisma",
@@ -124,7 +124,7 @@ describe("compatibility rules", () => {
   it("returns no issues when shadcn/ui is selected with Tailwind CSS", () => {
     expect(
       validateCompatibility({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         ui: "shadcn",
         styling: "tailwind",
       }),
@@ -134,21 +134,21 @@ describe("compatibility rules", () => {
   it("throws a typed compatibility error with issue details", () => {
     expect(() =>
       assertCompatibleConfig({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         docker: "postgres",
         database: "none",
       }),
-    ).toThrow(LaunchKitCompatibilityError);
+    ).toThrow(BaseForgeCompatibilityError);
 
     try {
       assertCompatibleConfig({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         docker: "postgres",
         database: "none",
       });
     } catch (error) {
-      expect(error).toBeInstanceOf(LaunchKitCompatibilityError);
-      expect((error as LaunchKitCompatibilityError).issues).toContainEqual({
+      expect(error).toBeInstanceOf(BaseForgeCompatibilityError);
+      expect((error as BaseForgeCompatibilityError).issues).toContainEqual({
         code: "docker_postgres_requires_postgresql",
         message:
           "PostgreSQL Docker Compose is only available when PostgreSQL is selected.",

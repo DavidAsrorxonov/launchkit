@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import {
   packageManagerMetadata,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
   type PackageManagerOption,
 } from "@baseforge/schema";
 
@@ -12,7 +12,7 @@ import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { ProjectStepValidation } from "@/lib/builder/validation";
 
 type ProjectStepProps = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   validation: ProjectStepValidation;
   onConfigChange: (patch: BuilderConfigPatch) => void;
 };

@@ -5,10 +5,10 @@ import {
   type GeneratedProject,
 } from "@baseforge/generator";
 import {
-  LaunchKitCompatibilityError,
-  LaunchKitConfigSchema,
+  BaseForgeCompatibilityError,
+  BaseForgeConfigSchema,
   validateCompatibility,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
 } from "@baseforge/schema";
 
 import { jsonErrorResponse, jsonResponse } from "./response";
@@ -18,7 +18,7 @@ import type { GenerateProjectResponse } from "./types";
 export const MAX_GENERATE_REQUEST_BYTES = 64 * 1024;
 
 export type GenerateProjectHandlerOptions = {
-  generate?: (config: LaunchKitConfig) => Promise<GeneratedProject>;
+  generate?: (config: BaseForgeConfig) => Promise<GeneratedProject>;
 };
 
 export async function handleGenerateProjectRequest(
@@ -31,7 +31,7 @@ export async function handleGenerateProjectRequest(
     return parsedBody.response;
   }
 
-  const parsedConfig = LaunchKitConfigSchema.safeParse(parsedBody.value);
+  const parsedConfig = BaseForgeConfigSchema.safeParse(parsedBody.value);
 
   if (!parsedConfig.success) {
     return jsonErrorResponse({
@@ -65,7 +65,7 @@ export async function handleGenerateProjectRequest(
       200,
     );
   } catch (error) {
-    if (error instanceof LaunchKitCompatibilityError) {
+    if (error instanceof BaseForgeCompatibilityError) {
       return jsonErrorResponse({
         status: 422,
         code: "incompatible_config",
@@ -108,7 +108,7 @@ export function methodNotAllowedResponse(): Response {
 }
 
 export async function generateProjectFromConfig(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): Promise<GeneratedProject> {
   const plan = createGenerationPlan(config);
 

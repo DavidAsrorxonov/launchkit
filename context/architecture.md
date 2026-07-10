@@ -176,7 +176,7 @@ It is responsible for:
 Example responsibilities:
 
 ```ts
-export const LaunchKitConfigSchema = z.object({
+export const BaseForgeConfigSchema = z.object({
   name: z.string().min(1),
   framework: z.enum(["next"]),
   language: z.enum(["typescript"]),
@@ -188,7 +188,7 @@ export const LaunchKitConfigSchema = z.object({
   packageManager: z.enum(["npm", "pnpm", "yarn", "bun"]),
 });
 
-export type LaunchKitConfig = z.infer<typeof LaunchKitConfigSchema>;
+export type BaseForgeConfig = z.infer<typeof BaseForgeConfigSchema>;
 ```
 
 This package should be used by:
@@ -225,7 +225,7 @@ Example:
 
 ```ts
 export async function generateProject(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): Promise<GeneratedProject>;
 ```
 
@@ -431,7 +431,7 @@ Example:
 
 ```ts
 type GenerationPlan = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   baseTemplate: BaseTemplateId;
   features: ResolvedFeature[];
   packageJson: PackageJsonPatch;
@@ -724,7 +724,7 @@ POST /api/generate
 The route should:
 
 1. Parse JSON body.
-2. Validate with `LaunchKitConfigSchema`.
+2. Validate with `BaseForgeConfigSchema`.
 3. Call `generateProject`.
 4. Convert generated project to zip.
 5. Return zip response.

@@ -1,21 +1,21 @@
-import { defaultLaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig } from "@baseforge/schema";
 import { describe, expect, it } from "vitest";
 
 import { validateCliConfigDraft } from "../validate-config.js";
 
 describe("validateCliConfigDraft", () => {
   it("passes a valid default draft", () => {
-    const result = validateCliConfigDraft(defaultLaunchKitConfig);
+    const result = validateCliConfigDraft(defaultBaseForgeConfig);
 
     expect(result).toMatchObject({
       ok: true,
-      config: defaultLaunchKitConfig,
+      config: defaultBaseForgeConfig,
     });
   });
 
   it("passes a valid fully selected MVP draft", () => {
     const result = validateCliConfigDraft({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "full-app",
       packageManager: "pnpm",
       ui: "shadcn",
@@ -41,7 +41,7 @@ describe("validateCliConfigDraft", () => {
 
   it("fails invalid project names with a CLI-friendly message", () => {
     const result = validateCliConfigDraft({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "Invalid_Name",
     });
 
@@ -59,7 +59,7 @@ describe("validateCliConfigDraft", () => {
 
   it("fails unsupported package managers", () => {
     const result = validateCliConfigDraft({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       packageManager: "yarn",
     });
 
@@ -77,7 +77,7 @@ describe("validateCliConfigDraft", () => {
 
   it("fails unsupported UI options", () => {
     const result = validateCliConfigDraft({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       ui: "radix",
     });
 
@@ -95,7 +95,7 @@ describe("validateCliConfigDraft", () => {
 
   it("fails unsupported database options", () => {
     const result = validateCliConfigDraft({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "mysql",
     });
 
@@ -113,7 +113,7 @@ describe("validateCliConfigDraft", () => {
 
   it("fails Prisma without PostgreSQL using shared compatibility validation", () => {
     const result = validateCliConfigDraft({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "none",
       orm: "prisma",
     });
@@ -132,7 +132,7 @@ describe("validateCliConfigDraft", () => {
 
   it("fails Docker PostgreSQL without PostgreSQL using shared compatibility validation", () => {
     const result = validateCliConfigDraft({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "none",
       docker: "postgres",
     });
@@ -152,7 +152,7 @@ describe("validateCliConfigDraft", () => {
 
   it("allows Auth.js credentials without a database", () => {
     const result = validateCliConfigDraft({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       auth: "authjs-credentials",
       database: "none",
       orm: "none",
@@ -174,7 +174,7 @@ describe("validateCliConfigDraft", () => {
     expect(result).toMatchObject({
       ok: true,
       config: {
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         name: "partial-app",
       },
     });
@@ -197,7 +197,7 @@ describe("validateCliConfigDraft", () => {
 
   it("maps schema errors without exposing raw Zod messages", () => {
     const result = validateCliConfigDraft({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       packageManager: "bun",
     });
 
@@ -214,7 +214,7 @@ describe("validateCliConfigDraft", () => {
 
   it("maps compatibility errors to CLI-friendly messages", () => {
     const result = validateCliConfigDraft({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "none",
       orm: "prisma",
     });

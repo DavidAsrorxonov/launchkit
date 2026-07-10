@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig, type LaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig, type BaseForgeConfig } from "@baseforge/schema";
 
 import type { GeneratedProject } from "../../src/file-tree";
 import { createGenerationPlan, generateProject } from "../../src/generate-project";
@@ -33,7 +33,7 @@ const templatesRoot = join(testRoot, "..", "..", "..", "templates");
 const smokeCases = [
   {
     name: "default",
-    config: defaultLaunchKitConfig,
+    config: defaultBaseForgeConfig,
     commands: [
       ["npm", ["install"]],
       ["npm", ["run", "typecheck"]],
@@ -43,7 +43,7 @@ const smokeCases = [
   {
     name: "all-compatible",
     config: {
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "full-smoke-app",
       ui: "shadcn",
       database: "postgres",
@@ -60,7 +60,7 @@ const smokeCases = [
   },
 ] as const satisfies readonly {
   name: string;
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   commands: readonly [command: string, args: readonly string[]][];
 }[];
 
@@ -84,7 +84,7 @@ describe("generated project smoke tests", () => {
   );
 });
 
-async function writeGeneratedProjectToTempDir(config: LaunchKitConfig): Promise<string> {
+async function writeGeneratedProjectToTempDir(config: BaseForgeConfig): Promise<string> {
   const project = await generateWithRealTemplates(config);
   const tempRoot = await mkdtemp(join(tmpdir(), "launchkit-smoke-"));
   const projectDir = join(tempRoot, project.name);
@@ -193,7 +193,7 @@ function formatOutput(output: string | Buffer | undefined): string {
   return output.toString();
 }
 
-async function generateWithRealTemplates(config: LaunchKitConfig): Promise<GeneratedProject> {
+async function generateWithRealTemplates(config: BaseForgeConfig): Promise<GeneratedProject> {
   const plan = createGenerationPlan(config);
 
   return generateProject(config, {

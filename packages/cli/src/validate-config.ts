@@ -1,14 +1,14 @@
 import {
-  LaunchKitConfigSchema,
-  defaultLaunchKitConfig,
+  BaseForgeConfigSchema,
+  defaultBaseForgeConfig,
   validateCompatibility,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
 } from "@baseforge/schema";
 
 export type CliValidationResult =
   | {
       ok: true;
-      config: LaunchKitConfig;
+      config: BaseForgeConfig;
     }
   | {
       ok: false;
@@ -27,7 +27,7 @@ type SchemaIssue = {
   path: PropertyKey[];
 };
 
-const unsupportedOptionMessages: Partial<Record<keyof LaunchKitConfig, string>> = {
+const unsupportedOptionMessages: Partial<Record<keyof BaseForgeConfig, string>> = {
   auth: "Unsupported auth option.",
   database: "Unsupported database option.",
   docker: "Unsupported Docker option.",
@@ -41,7 +41,7 @@ const unsupportedOptionMessages: Partial<Record<keyof LaunchKitConfig, string>> 
   ui: "Unsupported UI option.",
 };
 
-const unsupportedOptionCodes: Partial<Record<keyof LaunchKitConfig, string>> = {
+const unsupportedOptionCodes: Partial<Record<keyof BaseForgeConfig, string>> = {
   auth: "unsupported_auth",
   database: "unsupported_database",
   docker: "unsupported_docker",
@@ -56,7 +56,7 @@ const unsupportedOptionCodes: Partial<Record<keyof LaunchKitConfig, string>> = {
 };
 
 export function validateCliConfigDraft(draft: unknown): CliValidationResult {
-  const schemaResult = LaunchKitConfigSchema.safeParse(applyConfigDefaults(draft));
+  const schemaResult = BaseForgeConfigSchema.safeParse(applyConfigDefaults(draft));
 
   if (!schemaResult.success) {
     return {
@@ -94,14 +94,14 @@ function applyConfigDefaults(draft: unknown): unknown {
   );
 
   return {
-    ...defaultLaunchKitConfig,
+    ...defaultBaseForgeConfig,
     ...Object.fromEntries(definedDraftEntries),
   };
 }
 
 function mapSchemaIssue(issue: SchemaIssue): CliValidationError {
   const path = issue.path.map(String);
-  const field = path[0] as keyof LaunchKitConfig | undefined;
+  const field = path[0] as keyof BaseForgeConfig | undefined;
 
   if (field === "name") {
     if (issue.message === "Project name is required.") {

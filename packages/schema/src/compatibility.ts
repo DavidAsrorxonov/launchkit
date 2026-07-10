@@ -1,4 +1,4 @@
-import type { LaunchKitConfig } from "./config.js";
+import type { BaseForgeConfig } from "./config.js";
 
 export type CompatibilityIssue = {
   code: string;
@@ -6,18 +6,18 @@ export type CompatibilityIssue = {
   path?: string[];
 };
 
-export class LaunchKitCompatibilityError extends Error {
+export class BaseForgeCompatibilityError extends Error {
   readonly issues: CompatibilityIssue[];
 
   constructor(issues: CompatibilityIssue[]) {
     super(formatCompatibilityErrorMessage(issues));
-    this.name = "LaunchKitCompatibilityError";
+    this.name = "BaseForgeCompatibilityError";
     this.issues = issues;
   }
 }
 
 export function validateCompatibility(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): CompatibilityIssue[] {
   const issues: CompatibilityIssue[] = [];
 
@@ -61,11 +61,11 @@ export function validateCompatibility(
   return issues;
 }
 
-export function assertCompatibleConfig(config: LaunchKitConfig): void {
+export function assertCompatibleConfig(config: BaseForgeConfig): void {
   const issues = validateCompatibility(config);
 
   if (issues.length > 0) {
-    throw new LaunchKitCompatibilityError(issues);
+    throw new BaseForgeCompatibilityError(issues);
   }
 }
 
@@ -73,7 +73,7 @@ function formatCompatibilityErrorMessage(
   issues: CompatibilityIssue[],
 ): string {
   if (issues.length === 0) {
-    return "LaunchKit config is compatible.";
+    return "BaseForge config is compatible.";
   }
 
   return issues.map(({ message }) => message).join(" ");

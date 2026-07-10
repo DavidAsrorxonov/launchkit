@@ -2,7 +2,7 @@
 
 import {
   ormMetadata,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
   type OptionMetadata,
   type OrmOption,
 } from "@baseforge/schema";
@@ -11,7 +11,7 @@ import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { OrmStepValidation } from "@/lib/builder/validation";
 
 type OrmStepProps = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   validation: OrmStepValidation;
   onConfigChange: (patch: BuilderConfigPatch) => void;
 };

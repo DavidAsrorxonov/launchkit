@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig } from "@baseforge/schema";
 
 import { featureRegistry, getEnabledFeatures, getFeatureDefinition } from "../features/registry";
 
@@ -52,14 +52,14 @@ describe("feature registry", () => {
   });
 
   it("enables Next.js and Tailwind for the default config", () => {
-    expect(getEnabledFeatures(defaultLaunchKitConfig).map((feature) => feature.id)).toEqual([
+    expect(getEnabledFeatures(defaultBaseForgeConfig).map((feature) => feature.id)).toEqual([
       "next",
       "tailwind",
     ]);
   });
 
   it("does not enable shadcn/ui for the default config", () => {
-    expect(getEnabledFeatures(defaultLaunchKitConfig).map((feature) => feature.id)).not.toContain(
+    expect(getEnabledFeatures(defaultBaseForgeConfig).map((feature) => feature.id)).not.toContain(
       "shadcn",
     );
   });
@@ -87,7 +87,7 @@ describe("feature registry", () => {
 
   it("enables shadcn/ui when selected", () => {
     expect(
-      getEnabledFeatures({ ...defaultLaunchKitConfig, ui: "shadcn" }).map((feature) => feature.id),
+      getEnabledFeatures({ ...defaultBaseForgeConfig, ui: "shadcn" }).map((feature) => feature.id),
     ).toContain("shadcn");
   });
 
@@ -123,7 +123,7 @@ describe("feature registry", () => {
 
   it("enables PostgreSQL when selected", () => {
     expect(
-      getEnabledFeatures({ ...defaultLaunchKitConfig, database: "postgres" }).map(
+      getEnabledFeatures({ ...defaultBaseForgeConfig, database: "postgres" }).map(
         (feature) => feature.id,
       ),
     ).toContain("postgres");
@@ -131,7 +131,7 @@ describe("feature registry", () => {
 
   it("does not enable PostgreSQL when no database is selected", () => {
     expect(
-      getEnabledFeatures({ ...defaultLaunchKitConfig, database: "none" }).map(
+      getEnabledFeatures({ ...defaultBaseForgeConfig, database: "none" }).map(
         (feature) => feature.id,
       ),
     ).not.toContain("postgres");
@@ -160,19 +160,19 @@ describe("feature registry", () => {
 
   it("enables Prisma when selected", () => {
     expect(
-      getEnabledFeatures({ ...defaultLaunchKitConfig, orm: "prisma" }).map((feature) => feature.id),
+      getEnabledFeatures({ ...defaultBaseForgeConfig, orm: "prisma" }).map((feature) => feature.id),
     ).toContain("prisma");
   });
 
   it("does not enable Prisma when no ORM is selected", () => {
     expect(
-      getEnabledFeatures({ ...defaultLaunchKitConfig, orm: "none" }).map((feature) => feature.id),
+      getEnabledFeatures({ ...defaultBaseForgeConfig, orm: "none" }).map((feature) => feature.id),
     ).not.toContain("prisma");
   });
 
   it("enables Auth.js credentials when selected", () => {
     expect(
-      getEnabledFeatures({ ...defaultLaunchKitConfig, auth: "authjs-credentials" }).map(
+      getEnabledFeatures({ ...defaultBaseForgeConfig, auth: "authjs-credentials" }).map(
         (feature) => feature.id,
       ),
     ).toContain("authjs-credentials");
@@ -180,7 +180,7 @@ describe("feature registry", () => {
 
   it("does not enable Auth.js credentials when auth is none", () => {
     expect(
-      getEnabledFeatures({ ...defaultLaunchKitConfig, auth: "none" }).map(
+      getEnabledFeatures({ ...defaultBaseForgeConfig, auth: "none" }).map(
         (feature) => feature.id,
       ),
     ).not.toContain("authjs-credentials");
@@ -225,7 +225,7 @@ describe("feature registry", () => {
 
   it("enables PostgreSQL Docker Compose when selected", () => {
     expect(
-      getEnabledFeatures({ ...defaultLaunchKitConfig, docker: "postgres" }).map(
+      getEnabledFeatures({ ...defaultBaseForgeConfig, docker: "postgres" }).map(
         (feature) => feature.id,
       ),
     ).toContain("docker-postgres");
@@ -233,7 +233,7 @@ describe("feature registry", () => {
 
   it("does not enable PostgreSQL Docker Compose when Docker is none", () => {
     expect(
-      getEnabledFeatures({ ...defaultLaunchKitConfig, docker: "none" }).map(
+      getEnabledFeatures({ ...defaultBaseForgeConfig, docker: "none" }).map(
         (feature) => feature.id,
       ),
     ).not.toContain("docker-postgres");

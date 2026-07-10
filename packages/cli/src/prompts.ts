@@ -2,18 +2,18 @@ import { confirm, input, select } from "@inquirer/prompts";
 import {
   authMetadata,
   databaseMetadata,
-  defaultLaunchKitConfig,
+  defaultBaseForgeConfig,
   dockerMetadata,
   ormMetadata,
   packageManagerMetadata,
   uiMetadata,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
   type OptionMetadata,
 } from "@baseforge/schema";
 
 import type { CliArgs } from "./args.js";
 
-export type PromptedLaunchKitConfigDraft = Partial<LaunchKitConfig> & {
+export type PromptedBaseForgeConfigDraft = Partial<BaseForgeConfig> & {
   name: string;
   framework: "next";
   language: "typescript";
@@ -24,7 +24,7 @@ export type PromptedLaunchKitConfigDraft = Partial<LaunchKitConfig> & {
 
 export type PromptAnswers = Partial<
   Pick<
-    LaunchKitConfig,
+    BaseForgeConfig,
     "name" | "packageManager" | "ui" | "database" | "orm" | "auth" | "docker"
   >
 >;
@@ -70,7 +70,7 @@ export const defaultPromptFunctions: PromptFunctions = {
 export async function promptForConfig(
   args: CliArgs,
   promptFunctions: PromptFunctions = defaultPromptFunctions,
-): Promise<PromptedLaunchKitConfigDraft> {
+): Promise<PromptedBaseForgeConfigDraft> {
   if (args.yes) {
     return createConfigDraftFromAnswers({ args, answers: {} });
   }
@@ -91,7 +91,7 @@ export async function promptForConfig(
   if (!args.packageManager) {
     answers.packageManager = await promptFunctions.select({
       message: "Package manager",
-      default: defaultLaunchKitConfig.packageManager,
+      default: defaultBaseForgeConfig.packageManager,
       choices: toChoices(packageManagerMetadata),
     });
   }
@@ -99,7 +99,7 @@ export async function promptForConfig(
   if (!args.ui) {
     answers.ui = await promptFunctions.select({
       message: "UI library",
-      default: defaultLaunchKitConfig.ui,
+      default: defaultBaseForgeConfig.ui,
       choices: toChoices(uiMetadata),
     });
   }
@@ -107,17 +107,17 @@ export async function promptForConfig(
   if (!args.database) {
     answers.database = await promptFunctions.select({
       message: "Database",
-      default: defaultLaunchKitConfig.database,
+      default: defaultBaseForgeConfig.database,
       choices: toChoices(databaseMetadata),
     });
   }
 
-  const database = args.database ?? answers.database ?? defaultLaunchKitConfig.database;
+  const database = args.database ?? answers.database ?? defaultBaseForgeConfig.database;
 
   if (database === "postgres" && !args.orm) {
     answers.orm = await promptFunctions.select({
       message: "ORM",
-      default: defaultLaunchKitConfig.orm,
+      default: defaultBaseForgeConfig.orm,
       choices: toChoices(ormMetadata),
     });
   }
@@ -125,7 +125,7 @@ export async function promptForConfig(
   if (!args.auth) {
     answers.auth = await promptFunctions.select({
       message: "Auth",
-      default: defaultLaunchKitConfig.auth,
+      default: defaultBaseForgeConfig.auth,
       choices: toChoices(authMetadata),
     });
   }
@@ -133,7 +133,7 @@ export async function promptForConfig(
   if (database === "postgres" && !args.docker) {
     answers.docker = await promptFunctions.select({
       message: "Docker",
-      default: defaultLaunchKitConfig.docker,
+      default: defaultBaseForgeConfig.docker,
       choices: toChoices(dockerMetadata),
     });
   }
@@ -144,20 +144,20 @@ export async function promptForConfig(
 export function createConfigDraftFromAnswers(input: {
   args: CliArgs;
   answers: PromptAnswers;
-}): PromptedLaunchKitConfigDraft {
+}): PromptedBaseForgeConfigDraft {
   const { args, answers } = input;
-  const database = args.database ?? answers.database ?? defaultLaunchKitConfig.database;
+  const database = args.database ?? answers.database ?? defaultBaseForgeConfig.database;
 
   return {
-    ...defaultLaunchKitConfig,
+    ...defaultBaseForgeConfig,
     name: args.name ?? answers.name ?? getProjectNameDefault(args),
     packageManager:
-      args.packageManager ?? answers.packageManager ?? defaultLaunchKitConfig.packageManager,
-    ui: args.ui ?? answers.ui ?? defaultLaunchKitConfig.ui,
+      args.packageManager ?? answers.packageManager ?? defaultBaseForgeConfig.packageManager,
+    ui: args.ui ?? answers.ui ?? defaultBaseForgeConfig.ui,
     database,
-    orm: args.orm ?? answers.orm ?? defaultLaunchKitConfig.orm,
-    auth: args.auth ?? answers.auth ?? defaultLaunchKitConfig.auth,
-    docker: args.docker ?? answers.docker ?? defaultLaunchKitConfig.docker,
+    orm: args.orm ?? answers.orm ?? defaultBaseForgeConfig.orm,
+    auth: args.auth ?? answers.auth ?? defaultBaseForgeConfig.auth,
+    docker: args.docker ?? answers.docker ?? defaultBaseForgeConfig.docker,
     framework: "next",
     language: "typescript",
     router: "app",
@@ -205,7 +205,7 @@ export function getPromptFields(args: CliArgs): PromptField[] {
 }
 
 function getProjectNameDefault(args: CliArgs): string {
-  return args.name ?? args.targetDir ?? defaultLaunchKitConfig.name;
+  return args.name ?? args.targetDir ?? defaultBaseForgeConfig.name;
 }
 
 function toChoices<TValue extends string>(

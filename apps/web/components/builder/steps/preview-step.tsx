@@ -1,6 +1,6 @@
 "use client";
 
-import type { LaunchKitConfig } from "@baseforge/schema";
+import type { BaseForgeConfig } from "@baseforge/schema";
 
 import { DependencyList } from "@/components/builder/preview/dependency-list";
 import { EnvVarList } from "@/components/builder/preview/env-var-list";
@@ -11,7 +11,7 @@ import { createBuilderPreview } from "@/lib/builder/preview";
 import type { PreviewStepValidation } from "@/lib/builder/validation";
 
 type PreviewStepProps = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   validation: PreviewStepValidation;
 };
 

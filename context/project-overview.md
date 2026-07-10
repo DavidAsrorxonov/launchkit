@@ -133,7 +133,7 @@ The schema should be shared between the website, CLI, and generator.
 Example:
 
 ```ts
-const LaunchKitConfigSchema = z.object({
+const BaseForgeConfigSchema = z.object({
   name: z.string().min(1),
   framework: z.enum(["next"]),
   language: z.enum(["typescript"]),

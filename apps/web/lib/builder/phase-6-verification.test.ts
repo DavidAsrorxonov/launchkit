@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   authOptions,
   databaseOptions,
-  defaultLaunchKitConfig,
+  defaultBaseForgeConfig,
   dockerOptions,
   frameworkOptions,
   languageOptions,
@@ -13,7 +13,7 @@ import {
   routerOptions,
   stylingOptions,
   uiOptions,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
 } from "@baseforge/schema";
 
 import { createBuilderPreview } from "./preview";
@@ -57,16 +57,16 @@ describe("Phase 6 website wizard contract", () => {
   it("uses schema validation for project names and supported package managers", () => {
     expect(
       validateProjectStep({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         name: "Invalid Name",
       }).errors.name,
     ).toBeTruthy();
 
     expect(
       validateProjectStep({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         packageManager: "yarn",
-      } as unknown as LaunchKitConfig).errors.packageManager,
+      } as unknown as BaseForgeConfig).errors.packageManager,
     ).toBeTruthy();
   });
 
@@ -84,7 +84,7 @@ describe("Phase 6 website wizard contract", () => {
   it("keeps Auth.js credentials independent from database and ORM choices", () => {
     expect(
       validateAuthStep({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         auth: "authjs-credentials",
         database: "none",
         orm: "none",
@@ -95,7 +95,7 @@ describe("Phase 6 website wizard contract", () => {
   it("rejects Prisma and PostgreSQL Docker without PostgreSQL", () => {
     expect(
       validateBuilderConfig({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "none",
         orm: "prisma",
       }).errors.orm,
@@ -103,7 +103,7 @@ describe("Phase 6 website wizard contract", () => {
 
     expect(
       validateBuilderConfig({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "none",
         docker: "postgres",
       }).errors.docker,
@@ -111,7 +111,7 @@ describe("Phase 6 website wizard contract", () => {
   });
 
   it("previews the selected stack without unselected optional files or src paths", () => {
-    const preview = createBuilderPreview(defaultLaunchKitConfig);
+    const preview = createBuilderPreview(defaultBaseForgeConfig);
 
     expect(preview.stackSummary).toEqual(
       expect.arrayContaining([
@@ -138,7 +138,7 @@ describe("Phase 6 website wizard contract", () => {
 
   it("previews full selected stack additions", () => {
     const preview = createBuilderPreview({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       ui: "shadcn",
       database: "postgres",
       orm: "prisma",

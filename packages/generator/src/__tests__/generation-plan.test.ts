@@ -1,41 +1,41 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig } from "@baseforge/schema";
 
 import { createEmptyGenerationPlan } from "../generation-plan";
 
 describe("generation plan model", () => {
   it("creates an empty generation plan with the provided config", () => {
-    const plan = createEmptyGenerationPlan(defaultLaunchKitConfig);
+    const plan = createEmptyGenerationPlan(defaultBaseForgeConfig);
 
-    expect(plan.config).toBe(defaultLaunchKitConfig);
+    expect(plan.config).toBe(defaultBaseForgeConfig);
   });
 
   it("uses the Next.js base template by default", () => {
-    expect(createEmptyGenerationPlan(defaultLaunchKitConfig).baseTemplate).toBe("next");
+    expect(createEmptyGenerationPlan(defaultBaseForgeConfig).baseTemplate).toBe("next");
   });
 
   it("starts with no resolved features", () => {
-    expect(createEmptyGenerationPlan(defaultLaunchKitConfig).features).toEqual([]);
+    expect(createEmptyGenerationPlan(defaultBaseForgeConfig).features).toEqual([]);
   });
 
   it("starts with an empty package.json patch", () => {
-    expect(createEmptyGenerationPlan(defaultLaunchKitConfig).packageJson).toEqual({});
+    expect(createEmptyGenerationPlan(defaultBaseForgeConfig).packageJson).toEqual({});
   });
 
   it("starts with no environment variables", () => {
-    expect(createEmptyGenerationPlan(defaultLaunchKitConfig).env).toEqual([]);
+    expect(createEmptyGenerationPlan(defaultBaseForgeConfig).env).toEqual([]);
   });
 
   it("starts with no template file references", () => {
-    expect(createEmptyGenerationPlan(defaultLaunchKitConfig).templateFiles).toEqual([]);
+    expect(createEmptyGenerationPlan(defaultBaseForgeConfig).templateFiles).toEqual([]);
   });
 
   it("starts with no generated file definitions", () => {
-    expect(createEmptyGenerationPlan(defaultLaunchKitConfig).generatedFiles).toEqual([]);
+    expect(createEmptyGenerationPlan(defaultBaseForgeConfig).generatedFiles).toEqual([]);
   });
 
   it("starts with no notes", () => {
-    expect(createEmptyGenerationPlan(defaultLaunchKitConfig).notes).toEqual([]);
+    expect(createEmptyGenerationPlan(defaultBaseForgeConfig).notes).toEqual([]);
   });
 });

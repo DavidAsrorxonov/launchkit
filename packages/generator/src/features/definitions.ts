@@ -1,4 +1,4 @@
-import type { LaunchKitConfig } from "@baseforge/schema";
+import type { BaseForgeConfig } from "@baseforge/schema";
 
 import type {
   EnvVarDefinition,
@@ -19,7 +19,7 @@ export type FeatureDefinition = {
   templateFiles?: TemplateFileReference[];
   generatedFiles?: GeneratedFileDefinition[];
   notes?: string[];
-  isEnabled?: (config: LaunchKitConfig) => boolean;
+  isEnabled?: (config: BaseForgeConfig) => boolean;
 };
 
 export const nextFeature: FeatureDefinition = {

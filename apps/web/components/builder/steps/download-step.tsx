@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import type { LaunchKitConfig } from "@baseforge/schema";
+import type { BaseForgeConfig } from "@baseforge/schema";
 
 import { DownloadButton } from "@/components/builder/download/download-button";
 import { DownloadStatus } from "@/components/builder/download/download-status";
@@ -17,7 +17,7 @@ import { createProjectZip } from "@/lib/download/create-project-zip";
 type DownloadStatusState = "idle" | "generating" | "success" | "error";
 
 type DownloadStepProps = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   validation: PreviewStepValidation;
 };
 

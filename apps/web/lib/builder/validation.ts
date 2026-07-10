@@ -1,10 +1,10 @@
 import {
-  LaunchKitConfigSchema,
+  BaseForgeConfigSchema,
   validateCompatibility,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
 } from "@baseforge/schema";
 
-type ValidationErrors = Partial<Record<keyof LaunchKitConfig, string>>;
+type ValidationErrors = Partial<Record<keyof BaseForgeConfig, string>>;
 
 export type ProjectStepValidation = {
   isValid: boolean;
@@ -36,7 +36,7 @@ export type OrmStepValidation = {
 
 export type AuthStepValidation = {
   isValid: boolean;
-  errors: Partial<Record<keyof LaunchKitConfig, string>>;
+  errors: Partial<Record<keyof BaseForgeConfig, string>>;
 };
 
 export type ExtrasStepValidation = {
@@ -49,11 +49,11 @@ export type PreviewStepValidation = {
   errors: ValidationErrors;
 };
 
-export function validateBuilderConfig(config: LaunchKitConfig): {
+export function validateBuilderConfig(config: BaseForgeConfig): {
   isValid: boolean;
   errors: ValidationErrors;
 } {
-  const result = LaunchKitConfigSchema.safeParse(config);
+  const result = BaseForgeConfigSchema.safeParse(config);
 
   if (!result.success) {
     const errors: ValidationErrors = {};
@@ -62,7 +62,7 @@ export function validateBuilderConfig(config: LaunchKitConfig): {
       const field = issue.path[0];
 
       if (typeof field === "string" && !(field in errors)) {
-        errors[field as keyof LaunchKitConfig] =
+        errors[field as keyof BaseForgeConfig] =
           field === "name" ? getProjectNameError(config.name) : issue.message;
       }
     }
@@ -80,7 +80,7 @@ export function validateBuilderConfig(config: LaunchKitConfig): {
 
     for (const field of fields) {
       if (typeof field === "string" && !(field in errors)) {
-        errors[field as keyof LaunchKitConfig] = issue.message;
+        errors[field as keyof BaseForgeConfig] = issue.message;
       }
     }
   }
@@ -112,7 +112,7 @@ export function getProjectNameError(name: string): string | undefined {
 }
 
 export function validateProjectStep(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): ProjectStepValidation {
   const validation = validateBuilderConfig(config);
   const errors = {
@@ -127,7 +127,7 @@ export function validateProjectStep(
 }
 
 export function validateFrameworkStep(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): FrameworkStepValidation {
   const validation = validateBuilderConfig(config);
   const errors = {
@@ -148,7 +148,7 @@ export function validateFrameworkStep(
 }
 
 export function validateStylingUiStep(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): StylingUiStepValidation {
   const validation = validateBuilderConfig(config);
   const errors = {
@@ -163,7 +163,7 @@ export function validateStylingUiStep(
 }
 
 export function validateDatabaseStep(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): DatabaseStepValidation {
   const validation = validateBuilderConfig(config);
   const errors = {
@@ -178,7 +178,7 @@ export function validateDatabaseStep(
   };
 }
 
-export function validateOrmStep(config: LaunchKitConfig): OrmStepValidation {
+export function validateOrmStep(config: BaseForgeConfig): OrmStepValidation {
   const validation = validateBuilderConfig(config);
   const errors = {
     orm: validation.errors.orm,
@@ -191,12 +191,12 @@ export function validateOrmStep(config: LaunchKitConfig): OrmStepValidation {
   };
 }
 
-export function validateAuthStep(config: LaunchKitConfig): AuthStepValidation {
+export function validateAuthStep(config: BaseForgeConfig): AuthStepValidation {
   return validateBuilderConfig(config);
 }
 
 export function validateExtrasStep(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): ExtrasStepValidation {
   const validation = validateBuilderConfig(config);
   const errors = {
@@ -211,7 +211,7 @@ export function validateExtrasStep(
 }
 
 export function validatePreviewStep(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): PreviewStepValidation {
   return validateBuilderConfig(config);
 }

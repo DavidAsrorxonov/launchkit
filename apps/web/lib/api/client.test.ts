@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { defaultLaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig } from "@baseforge/schema";
 
 import {
   GenerateProjectApiError,
@@ -27,7 +27,7 @@ describe("generateProjectRequest", () => {
       ),
     );
 
-    await expect(generateProjectRequest(defaultLaunchKitConfig)).resolves.toEqual({
+    await expect(generateProjectRequest(defaultBaseForgeConfig)).resolves.toEqual({
       project: {
         name: "my-app",
         packageManager: "npm",
@@ -38,7 +38,7 @@ describe("generateProjectRequest", () => {
       "/api/generate",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify(defaultLaunchKitConfig),
+        body: JSON.stringify(defaultBaseForgeConfig),
       }),
     );
   });
@@ -60,7 +60,7 @@ describe("generateProjectRequest", () => {
       ),
     );
 
-    await expect(generateProjectRequest(defaultLaunchKitConfig)).rejects.toMatchObject({
+    await expect(generateProjectRequest(defaultBaseForgeConfig)).rejects.toMatchObject({
       code: "invalid_config",
       status: 400,
       message: "Check the project settings before generating.",

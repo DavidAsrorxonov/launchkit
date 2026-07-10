@@ -1,4 +1,4 @@
-import { defaultLaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig } from "@baseforge/schema";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -20,7 +20,7 @@ describe("generateProjectForCli", () => {
 
     await generateProjectForCli(
       {
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         name: "custom-app",
         packageManager: "pnpm",
       },
@@ -28,7 +28,7 @@ describe("generateProjectForCli", () => {
     );
 
     expect(generator).toHaveBeenCalledWith({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "custom-app",
       packageManager: "pnpm",
     });
@@ -42,7 +42,7 @@ describe("generateProjectForCli", () => {
     });
 
     await expect(
-      generateProjectForCli(defaultLaunchKitConfig, async () => project),
+      generateProjectForCli(defaultBaseForgeConfig, async () => project),
     ).resolves.toBe(project);
   });
 
@@ -54,7 +54,7 @@ describe("generateProjectForCli", () => {
     });
 
     await expect(
-      generateProjectForCli(defaultLaunchKitConfig, async () => project),
+      generateProjectForCli(defaultBaseForgeConfig, async () => project),
     ).rejects.toThrow(UnsafeGeneratedPathError);
   });
 
@@ -62,7 +62,7 @@ describe("generateProjectForCli", () => {
     const error = new Error("Template loader failed.");
 
     await expect(
-      generateProjectForCli(defaultLaunchKitConfig, async () => {
+      generateProjectForCli(defaultBaseForgeConfig, async () => {
         throw error;
       }),
     ).rejects.toBe(error);
@@ -76,7 +76,7 @@ describe("generateProjectForCli", () => {
     });
 
     const generatedProject = await generateProjectForCli(
-      defaultLaunchKitConfig,
+      defaultBaseForgeConfig,
       async () => project,
     );
 
@@ -89,11 +89,11 @@ describe("generateProjectForCli", () => {
   });
 
   it("works with the real generator", async () => {
-    const project = await generateProjectForCli(defaultLaunchKitConfig);
+    const project = await generateProjectForCli(defaultBaseForgeConfig);
 
     expect(project).toMatchObject({
-      name: defaultLaunchKitConfig.name,
-      packageManager: defaultLaunchKitConfig.packageManager,
+      name: defaultBaseForgeConfig.name,
+      packageManager: defaultBaseForgeConfig.packageManager,
     });
     expect(project.files.length).toBeGreaterThan(0);
     expect(project.files.map((file) => file.path)).toEqual(
@@ -103,7 +103,7 @@ describe("generateProjectForCli", () => {
 
   it("uses real templates for the all-compatible MVP config", async () => {
     const project = await generateProjectForCli({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "full-app",
       ui: "shadcn",
       database: "postgres",

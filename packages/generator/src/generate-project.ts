@@ -1,7 +1,7 @@
 import {
   assertCompatibleConfig,
-  parseLaunchKitConfig,
-  type LaunchKitConfig,
+  parseBaseForgeConfig,
+  type BaseForgeConfig,
 } from "@baseforge/schema";
 
 import { mergeEnvVars, renderEnvExample } from "./env.js";
@@ -25,8 +25,8 @@ export type GenerateProjectOptions = {
   templateIds?: string[];
 };
 
-export function createGenerationPlan(config: LaunchKitConfig): GenerationPlan {
-  const parsedConfig = parseLaunchKitConfig(config);
+export function createGenerationPlan(config: BaseForgeConfig): GenerationPlan {
+  const parsedConfig = parseBaseForgeConfig(config);
   assertCompatibleConfig(parsedConfig);
 
   const features = getEnabledFeatures(parsedConfig);
@@ -59,7 +59,7 @@ export function createGenerationPlan(config: LaunchKitConfig): GenerationPlan {
 }
 
 export async function generateProject(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
   options: GenerateProjectOptions = {},
 ): Promise<GeneratedProject> {
   const plan = createGenerationPlan(config);

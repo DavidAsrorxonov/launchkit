@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig, type LaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig, type BaseForgeConfig } from "@baseforge/schema";
 
 import { renderEnvExample } from "../env";
 import { featureRegistry } from "../features/registry";
@@ -14,7 +14,7 @@ import { mergePackageJsonPatches } from "../package-json";
 import { createInMemoryTemplateLoader } from "../template-loader";
 
 const fullMvpConfig = {
-  ...defaultLaunchKitConfig,
+  ...defaultBaseForgeConfig,
   name: "full-stack-demo",
   ui: "shadcn",
   database: "postgres",
@@ -22,7 +22,7 @@ const fullMvpConfig = {
   auth: "authjs-credentials",
   docker: "postgres",
   packageManager: "pnpm",
-} satisfies LaunchKitConfig;
+} satisfies BaseForgeConfig;
 
 describe("Phase 4 generator coverage", () => {
   it("feature definitions include labels and descriptions for every MVP feature", () => {
@@ -131,7 +131,7 @@ describe("Phase 4 generator coverage", () => {
       ],
     });
 
-    const project = await generateProject(defaultLaunchKitConfig, {
+    const project = await generateProject(defaultBaseForgeConfig, {
       templateLoader: loader,
       templateIds: ["asset"],
     });

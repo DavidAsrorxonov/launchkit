@@ -22,7 +22,7 @@ const projectNameSchema = z
     "Project name must use lowercase letters, numbers, and hyphen-separated words.",
   );
 
-export const LaunchKitConfigSchema = z
+export const BaseForgeConfigSchema = z
   .object({
     name: projectNameSchema,
     framework: z.enum(frameworkOptions),
@@ -39,8 +39,8 @@ export const LaunchKitConfigSchema = z
   })
   .strict();
 
-export type LaunchKitConfig = z.infer<typeof LaunchKitConfigSchema>;
+export type BaseForgeConfig = z.infer<typeof BaseForgeConfigSchema>;
 
-export function parseLaunchKitConfig(input: unknown): LaunchKitConfig {
-  return LaunchKitConfigSchema.parse(input);
+export function parseBaseForgeConfig(input: unknown): BaseForgeConfig {
+  return BaseForgeConfigSchema.parse(input);
 }

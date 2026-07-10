@@ -4,9 +4,9 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  LaunchKitCompatibilityError,
-  defaultLaunchKitConfig,
-  type LaunchKitConfig,
+  BaseForgeCompatibilityError,
+  defaultBaseForgeConfig,
+  type BaseForgeConfig,
 } from "@baseforge/schema";
 
 import { type GeneratedProject } from "../file-tree";
@@ -49,12 +49,12 @@ const optionalFeatureFiles = [
 const outputCases = [
   {
     name: "default",
-    config: defaultLaunchKitConfig,
+    config: defaultBaseForgeConfig,
   },
   {
     name: "shadcn",
     config: {
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "shadcn-app",
       ui: "shadcn",
     },
@@ -62,7 +62,7 @@ const outputCases = [
   {
     name: "postgres",
     config: {
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "postgres-app",
       database: "postgres",
     },
@@ -70,7 +70,7 @@ const outputCases = [
   {
     name: "prisma",
     config: {
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "prisma-app",
       database: "postgres",
       orm: "prisma",
@@ -79,7 +79,7 @@ const outputCases = [
   {
     name: "authjs-credentials",
     config: {
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "auth-app",
       auth: "authjs-credentials",
     },
@@ -87,7 +87,7 @@ const outputCases = [
   {
     name: "docker-postgres",
     config: {
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "docker-app",
       database: "postgres",
       docker: "postgres",
@@ -96,7 +96,7 @@ const outputCases = [
   {
     name: "all-compatible",
     config: {
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "full-app",
       ui: "shadcn",
       database: "postgres",
@@ -107,7 +107,7 @@ const outputCases = [
   },
 ] as const satisfies readonly {
   name: string;
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
 }[];
 
 describe("generated output snapshots", () => {
@@ -510,7 +510,7 @@ describe("generated output snapshots", () => {
   });
 
   it("includes only base files for the default config", async () => {
-    const project = await generateWithRealTemplates(defaultLaunchKitConfig);
+    const project = await generateWithRealTemplates(defaultBaseForgeConfig);
     const paths = listPaths(project);
     const envExample = readTextFile(project, ".env.example");
 
@@ -522,7 +522,7 @@ describe("generated output snapshots", () => {
 
   it("adds shadcn/ui files and dependencies without backend files", async () => {
     const project = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       ui: "shadcn",
     });
     const paths = listPaths(project);
@@ -549,7 +549,7 @@ describe("generated output snapshots", () => {
 
   it("adds PostgreSQL env and README guidance without Prisma, Auth.js, or Docker files", async () => {
     const project = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
     });
     const paths = listPaths(project);
@@ -570,11 +570,11 @@ describe("generated output snapshots", () => {
 
   it("adds Prisma files, dependencies, and scripts only when Prisma is selected", async () => {
     const postgresProject = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
     });
     const prismaProject = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       orm: "prisma",
     });
@@ -603,7 +603,7 @@ describe("generated output snapshots", () => {
 
   it("adds Auth.js credentials files, env, dependency, and warning without requiring PostgreSQL", async () => {
     const project = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       auth: "authjs-credentials",
       database: "none",
       orm: "none",
@@ -624,11 +624,11 @@ describe("generated output snapshots", () => {
 
   it("adds Docker Compose for PostgreSQL without changing package dependencies", async () => {
     const postgresProject = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
     });
     const dockerProject = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       docker: "postgres",
     });
@@ -640,7 +640,7 @@ describe("generated output snapshots", () => {
 
   it("includes all compatible MVP feature output together without a src directory", async () => {
     const project = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       ui: "shadcn",
       database: "postgres",
       orm: "prisma",
@@ -669,22 +669,22 @@ describe("generated output snapshots", () => {
   it("rejects incompatible configs at the generator boundary", async () => {
     await expect(
       generateWithRealTemplates({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "none",
         orm: "prisma",
       }),
-    ).rejects.toThrow(LaunchKitCompatibilityError);
+    ).rejects.toThrow(BaseForgeCompatibilityError);
     await expect(
       generateWithRealTemplates({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "none",
         docker: "postgres",
       }),
-    ).rejects.toThrow(LaunchKitCompatibilityError);
+    ).rejects.toThrow(BaseForgeCompatibilityError);
   });
 });
 
-async function generateWithRealTemplates(config: LaunchKitConfig): Promise<GeneratedProject> {
+async function generateWithRealTemplates(config: BaseForgeConfig): Promise<GeneratedProject> {
   const plan = createGenerationPlan(config);
 
   return generateProject(config, {

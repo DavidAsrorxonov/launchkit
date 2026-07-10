@@ -3,7 +3,7 @@
 import {
   dockerMetadata,
   type DockerOption,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
   type OptionMetadata,
 } from "@baseforge/schema";
 
@@ -11,7 +11,7 @@ import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { ExtrasStepValidation } from "@/lib/builder/validation";
 
 type ExtrasStepProps = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   validation: ExtrasStepValidation;
   onConfigChange: (patch: BuilderConfigPatch) => void;
 };

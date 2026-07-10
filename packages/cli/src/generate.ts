@@ -4,12 +4,12 @@ import {
   normalizeGeneratedPath,
   type GeneratedProject,
 } from "@baseforge/generator";
-import type { LaunchKitConfig } from "@baseforge/schema";
+import type { BaseForgeConfig } from "@baseforge/schema";
 
 import { createCliTemplateLoader } from "./template-loader.js";
 
 export type CliProjectGenerator = (
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ) => Promise<GeneratedProject>;
 
 export type GeneratedProjectPreviewOptions = {
@@ -24,7 +24,7 @@ export class UnsafeGeneratedPathError extends Error {
 }
 
 export async function generateProjectForCli(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
   projectGenerator: CliProjectGenerator = generateProjectWithCliTemplates,
 ): Promise<GeneratedProject> {
   const project = await projectGenerator(config);
@@ -77,7 +77,7 @@ export function getSafeGeneratedFilePaths(project: GeneratedProject): string[] {
 }
 
 async function generateProjectWithCliTemplates(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): Promise<GeneratedProject> {
   const plan = createGenerationPlan(config);
 

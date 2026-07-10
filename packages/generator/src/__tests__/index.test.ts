@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig } from "@baseforge/schema";
 
 import { generatorPackageReady, getGeneratorDefaultConfig } from "../index";
 
@@ -10,6 +10,6 @@ describe("@baseforge/generator package foundation", () => {
   });
 
   it("can import from @baseforge/schema", () => {
-    expect(getGeneratorDefaultConfig()).toBe(defaultLaunchKitConfig);
+    expect(getGeneratorDefaultConfig()).toBe(defaultBaseForgeConfig);
   });
 });

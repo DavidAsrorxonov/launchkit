@@ -1,4 +1,4 @@
-import type { LaunchKitConfig } from "@baseforge/schema";
+import type { BaseForgeConfig } from "@baseforge/schema";
 
 export type BaseTemplateId = "next";
 
@@ -48,7 +48,7 @@ export type ResolvedFeature = {
 };
 
 export type GenerationPlan = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   baseTemplate: BaseTemplateId;
   features: ResolvedFeature[];
   packageJson: PackageJsonPatch;
@@ -58,7 +58,7 @@ export type GenerationPlan = {
   notes: string[];
 };
 
-export function createEmptyGenerationPlan(config: LaunchKitConfig): GenerationPlan {
+export function createEmptyGenerationPlan(config: BaseForgeConfig): GenerationPlan {
   return {
     config,
     baseTemplate: "next",

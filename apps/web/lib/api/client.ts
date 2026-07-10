@@ -1,4 +1,4 @@
-import type { LaunchKitConfig } from "@baseforge/schema";
+import type { BaseForgeConfig } from "@baseforge/schema";
 
 import { getFriendlyApiErrorMessage } from "./errors";
 import type { ApiErrorResponse, GenerateProjectResponse } from "./types";
@@ -23,7 +23,7 @@ export class GenerateProjectApiError extends Error {
 }
 
 export async function generateProjectRequest(
-  config: LaunchKitConfig,
+  config: BaseForgeConfig,
 ): Promise<GenerateProjectResponse> {
   const response = await fetch("/api/generate", {
     method: "POST",

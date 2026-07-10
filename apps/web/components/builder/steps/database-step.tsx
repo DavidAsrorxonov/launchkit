@@ -3,7 +3,7 @@
 import {
   databaseMetadata,
   type DatabaseOption,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
   type OptionMetadata,
 } from "@baseforge/schema";
 
@@ -11,7 +11,7 @@ import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { DatabaseStepValidation } from "@/lib/builder/validation";
 
 type DatabaseStepProps = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   validation: DatabaseStepValidation;
   onConfigChange: (patch: BuilderConfigPatch) => void;
 };

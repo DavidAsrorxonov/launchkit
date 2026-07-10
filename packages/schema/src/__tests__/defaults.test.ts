@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig, LaunchKitConfigSchema } from "../index";
+import { defaultBaseForgeConfig, BaseForgeConfigSchema } from "../index";
 
-describe("defaultLaunchKitConfig", () => {
-  it("validates with LaunchKitConfigSchema", () => {
-    expect(LaunchKitConfigSchema.parse(defaultLaunchKitConfig)).toEqual(
-      defaultLaunchKitConfig,
+describe("defaultBaseForgeConfig", () => {
+  it("validates with BaseForgeConfigSchema", () => {
+    expect(BaseForgeConfigSchema.parse(defaultBaseForgeConfig)).toEqual(
+      defaultBaseForgeConfig,
     );
   });
 
   it("matches the confirmed MVP defaults", () => {
-    expect(defaultLaunchKitConfig).toEqual({
+    expect(defaultBaseForgeConfig).toEqual({
       name: "my-app",
       framework: "next",
       language: "typescript",

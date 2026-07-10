@@ -278,7 +278,7 @@ Goal: Create the shared configuration contract used by the website, generator, a
 
 ### 3.1 Define Config Schema
 
-Create `LaunchKitConfig` with fields for:
+Create `BaseForgeConfig` with fields for:
 
 - project name
 - framework

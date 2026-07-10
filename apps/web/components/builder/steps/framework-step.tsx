@@ -3,14 +3,14 @@ import {
   languageMetadata,
   projectStructureMetadata,
   routerMetadata,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
   type OptionMetadata,
 } from "@baseforge/schema";
 
 import type { FrameworkStepValidation } from "@/lib/builder/validation";
 
 type FrameworkStepProps = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   validation: FrameworkStepValidation;
 };
 

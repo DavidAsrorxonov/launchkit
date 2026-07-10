@@ -1,4 +1,4 @@
-import { defaultLaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig } from "@baseforge/schema";
 
 export * from "./env.js";
 export * from "./file-tree.js";
@@ -14,5 +14,5 @@ export function generatorPackageReady() {
 }
 
 export function getGeneratorDefaultConfig() {
-  return defaultLaunchKitConfig;
+  return defaultBaseForgeConfig;
 }

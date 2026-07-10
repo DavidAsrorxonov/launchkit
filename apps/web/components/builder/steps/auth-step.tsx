@@ -3,7 +3,7 @@
 import {
   authMetadata,
   type AuthOption,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
   type OptionMetadata,
 } from "@baseforge/schema";
 
@@ -11,7 +11,7 @@ import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { AuthStepValidation } from "@/lib/builder/validation";
 
 type AuthStepProps = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   validation: AuthStepValidation;
   onConfigChange: (patch: BuilderConfigPatch) => void;
 };

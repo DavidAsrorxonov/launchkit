@@ -3,7 +3,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { defaultLaunchKitConfig, type LaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig, type BaseForgeConfig } from "@baseforge/schema";
 
 import type { GenerationPlan } from "../generation-plan";
 import { type GeneratedProject } from "../file-tree";
@@ -19,31 +19,31 @@ const templatesRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..", 
 
 describe("Phase 5 completion", () => {
   it("generates expected files for the MVP template combinations using real templates", async () => {
-    const defaultProject = await generateWithRealTemplates(defaultLaunchKitConfig);
+    const defaultProject = await generateWithRealTemplates(defaultBaseForgeConfig);
     const shadcnProject = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       ui: "shadcn",
     });
     const postgresProject = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
     });
     const prismaProject = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       orm: "prisma",
     });
     const authProject = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       auth: "authjs-credentials",
     });
     const dockerProject = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       docker: "postgres",
     });
     const fullProject = await generateWithRealTemplates({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       ui: "shadcn",
       database: "postgres",
       orm: "prisma",
@@ -131,7 +131,7 @@ describe("Phase 5 completion", () => {
   });
 });
 
-async function generateWithRealTemplates(config: LaunchKitConfig): Promise<GeneratedProject> {
+async function generateWithRealTemplates(config: BaseForgeConfig): Promise<GeneratedProject> {
   const plan = createGenerationPlan(config);
 
   return generateProject(config, {

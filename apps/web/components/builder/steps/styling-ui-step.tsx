@@ -3,7 +3,7 @@
 import {
   stylingMetadata,
   uiMetadata,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
   type OptionMetadata,
   type UiOption,
 } from "@baseforge/schema";
@@ -12,7 +12,7 @@ import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { StylingUiStepValidation } from "@/lib/builder/validation";
 
 type StylingUiStepProps = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
   validation: StylingUiStepValidation;
   onConfigChange: (patch: BuilderConfigPatch) => void;
 };

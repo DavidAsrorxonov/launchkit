@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: BaseForge
 Stage: Foundation setup
-Current phase: Critical LaunchKit-to-BaseForge package namespace rename complete
-Primary focus: Step 2 renamed internal workspace packages from @launchkit/* to @baseforge/* while leaving LaunchKit TypeScript symbols and historical records for later steps
+Current phase: Critical LaunchKit-to-BaseForge exported TypeScript API symbol rename complete
+Primary focus: Step 3 renamed LaunchKit exported schema symbols to BaseForge names while leaving generated copy, fixture names, repo URLs, and historical records for later steps
 ```
 
 ## Phase Progress
@@ -24,13 +24,92 @@ Primary focus: Step 2 renamed internal workspace packages from @launchkit/* to @
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
-| Phase 10 | npm Release Preparation              | In Progress | Critical rename Step 2 completed: internal workspace packages now use `@baseforge/*`; `LaunchKit...` exported symbols remain for Step 3. |
+| Phase 10 | npm Release Preparation              | In Progress | Critical rename Step 3 completed: internal packages use `@baseforge/*` and exported schema API symbols now use `BaseForge...`. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
 
 ### 2026-07-11
+
+Critical LaunchKit-to-BaseForge rename Step 3 completed
+
+Scope:
+
+- Renamed exported schema API symbols:
+  - `LaunchKitConfig` -> `BaseForgeConfig`;
+  - `LaunchKitConfigSchema` -> `BaseForgeConfigSchema`;
+  - `parseLaunchKitConfig` -> `parseBaseForgeConfig`;
+  - `defaultLaunchKitConfig` -> `defaultBaseForgeConfig`;
+  - `LaunchKitCompatibilityError` -> `BaseForgeCompatibilityError`.
+- Updated the compatibility error name string to
+  `BaseForgeCompatibilityError`.
+- Updated the empty compatibility message to
+  `BaseForge config is compatible.`
+- Updated web, CLI, generator, schema tests, generator smoke tests, and active
+  planning-doc examples to use the new exported names.
+
+Intentionally not changed:
+
+- Root repo/package name `launchkit`.
+- GitHub URLs pointing at `DavidAsrorxonov/launchkit`.
+- Generated project copy and fixture/temp names that are not exported TypeScript
+  API symbols.
+- Historical records.
+
+Important note:
+
+- The first `npm run typecheck` failed because stale `packages/schema/dist`
+  declarations still exposed the old exported names.
+- Rebuilding `@baseforge/schema` refreshed declarations; typecheck then passed.
+- The first `npm test` failed because stale `packages/generator/dist` runtime
+  output still called `parseLaunchKitConfig`.
+- Rebuilding `@baseforge/generator` refreshed runtime output; the full test
+  suite then passed.
+- Final source/config and refreshed production build output scans found no
+  remaining `LaunchKitConfig`, `LaunchKitConfigSchema`,
+  `parseLaunchKitConfig`, `defaultLaunchKitConfig`, or
+  `LaunchKitCompatibilityError` references.
+
+Files changed:
+
+- `apps/web/components/builder/steps/*.tsx`
+- `apps/web/lib/api/*.ts`
+- `apps/web/lib/builder/*.ts`
+- `packages/cli/src/**/*.ts`
+- `packages/generator/src/**/*.ts`
+- `packages/generator/test/smoke/generated-projects.test.ts`
+- `packages/schema/src/**/*.ts`
+- `context/architecture.md`
+- `context/build-plan.md`
+- `context/project-overview.md`
+- `context/critical-release-changes.md`
+- `context/progress-tracker.md`
+
+Verification:
+
+- `npm run typecheck` passed across all workspaces after rebuilding schema
+  declarations.
+- `npm test` passed across all workspace tests after rebuilding generator
+  output:
+  - web: 5 files, 49 tests;
+  - `@baseforge/create`: 8 files, 123 tests;
+  - `@baseforge/generator`: 11 files, 127 tests;
+  - `@baseforge/schema`: 5 files, 87 tests;
+  - `@baseforge/templates`: 1 file, 52 tests.
+- `npm run build` passed across all workspaces when rerun with required sandbox
+  permission for Next/Turbopack.
+- `npm run test:cli-smoke` passed: 1 file, 5 tests.
+- `npm run test:smoke` passed when run with required sandbox permission:
+  1 file, 2 generated-project smoke tests.
+- `git diff --check` passed.
+
+Next rename steps:
+
+- Step 4: rename generated-project copy and fixture/temp names.
+- Step 5: decide whether to rename root package/repo identity and GitHub URLs.
+- Step 6: optional historical cleanup only if the repo must have zero
+  `launchkit` matches including history.
 
 Critical LaunchKit-to-BaseForge rename Step 2 completed
 

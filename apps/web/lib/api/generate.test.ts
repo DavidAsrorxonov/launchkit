@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig, type LaunchKitConfig } from "@baseforge/schema";
+import { defaultBaseForgeConfig, type BaseForgeConfig } from "@baseforge/schema";
 
 import { GET, POST } from "../../app/api/generate/route";
 import {
@@ -12,13 +12,13 @@ import {
 
 describe("generate API helpers", () => {
   it("routes POST requests through the generate handler", async () => {
-    const response = await POST(jsonRequest(defaultLaunchKitConfig));
+    const response = await POST(jsonRequest(defaultBaseForgeConfig));
     const body = await readJson(response);
 
     expect(response.status).toBe(200);
     expect(body.project).toMatchObject({
-      name: defaultLaunchKitConfig.name,
-      packageManager: defaultLaunchKitConfig.packageManager,
+      name: defaultBaseForgeConfig.name,
+      packageManager: defaultBaseForgeConfig.packageManager,
     });
   });
 
@@ -45,13 +45,13 @@ describe("generate API helpers", () => {
   });
 
   it("returns generated project data for a valid config", async () => {
-    const response = await handleGenerateProjectRequest(jsonRequest(defaultLaunchKitConfig));
+    const response = await handleGenerateProjectRequest(jsonRequest(defaultBaseForgeConfig));
     const body = await readJson(response);
 
     expect(response.status).toBe(200);
     expect(body.project).toMatchObject({
-      name: defaultLaunchKitConfig.name,
-      packageManager: defaultLaunchKitConfig.packageManager,
+      name: defaultBaseForgeConfig.name,
+      packageManager: defaultBaseForgeConfig.packageManager,
     });
     expect(body.project!.files).toEqual(
       expect.arrayContaining([
@@ -70,7 +70,7 @@ describe("generate API helpers", () => {
   it("returns 400 for invalid configs", async () => {
     const response = await handleGenerateProjectRequest(
       jsonRequest({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         name: "Invalid Name",
       }),
     );
@@ -86,7 +86,7 @@ describe("generate API helpers", () => {
   it("returns 422 when Prisma is selected without PostgreSQL", async () => {
     const response = await handleGenerateProjectRequest(
       jsonRequest({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "none",
         orm: "prisma",
       }),
@@ -109,7 +109,7 @@ describe("generate API helpers", () => {
   it("returns 422 when Docker PostgreSQL is selected without PostgreSQL", async () => {
     const response = await handleGenerateProjectRequest(
       jsonRequest({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "none",
         docker: "postgres",
       }),
@@ -133,7 +133,7 @@ describe("generate API helpers", () => {
   it("allows Auth.js credentials without a database", async () => {
     const response = await handleGenerateProjectRequest(
       jsonRequest({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         auth: "authjs-credentials",
         database: "none",
         orm: "none",
@@ -155,7 +155,7 @@ describe("generate API helpers", () => {
   it("rejects unsupported non-Tailwind styling before shadcn compatibility can run", async () => {
     const response = await handleGenerateProjectRequest(
       jsonRequest({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         ui: "shadcn",
         styling: "css",
       }),
@@ -194,7 +194,7 @@ describe("generate API helpers", () => {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          ...defaultLaunchKitConfig,
+          ...defaultBaseForgeConfig,
           extra: "x".repeat(MAX_GENERATE_REQUEST_BYTES),
         }),
       }),
@@ -215,7 +215,7 @@ describe("generate API helpers", () => {
           "content-type": "application/json",
           "content-length": String(MAX_GENERATE_REQUEST_BYTES + 1),
         },
-        body: JSON.stringify(defaultLaunchKitConfig),
+        body: JSON.stringify(defaultBaseForgeConfig),
       }),
     );
     const body = await readJson(response);
@@ -233,7 +233,7 @@ describe("generate API helpers", () => {
         headers: {
           "content-type": "text/plain",
         },
-        body: JSON.stringify(defaultLaunchKitConfig),
+        body: JSON.stringify(defaultBaseForgeConfig),
       }),
     );
     const body = await readJson(response);
@@ -251,7 +251,7 @@ describe("generate API helpers", () => {
         headers: {
           "content-type": "application/json; charset=utf-8",
         },
-        body: JSON.stringify(defaultLaunchKitConfig),
+        body: JSON.stringify(defaultBaseForgeConfig),
       }),
     );
 
@@ -273,7 +273,7 @@ describe("generate API helpers", () => {
 
   it("returns structured 500 errors for unsafe generated output", async () => {
     const response = await handleGenerateProjectRequest(
-      jsonRequest(defaultLaunchKitConfig),
+      jsonRequest(defaultBaseForgeConfig),
       {
         generate: async () => ({
           name: "unsafe",
@@ -298,7 +298,7 @@ describe("generate API helpers", () => {
 
   it("returns structured 500 errors without stack traces", async () => {
     const response = await handleGenerateProjectRequest(
-      jsonRequest(defaultLaunchKitConfig),
+      jsonRequest(defaultBaseForgeConfig),
       {
         generate: async () => {
           throw new Error("/internal/path/secret.ts exploded");
@@ -350,7 +350,7 @@ function serializeUnsafePath(path: string): void {
   });
 }
 
-function jsonRequest(config: LaunchKitConfig | Record<string, unknown>): Request {
+function jsonRequest(config: BaseForgeConfig | Record<string, unknown>): Request {
   return new Request("http://localhost/api/generate", {
     method: "POST",
     headers: {

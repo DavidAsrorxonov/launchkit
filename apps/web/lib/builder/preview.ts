@@ -11,7 +11,7 @@ import {
   routerMetadata,
   stylingMetadata,
   uiMetadata,
-  type LaunchKitConfig,
+  type BaseForgeConfig,
   type OptionMetadata,
 } from "@baseforge/schema";
 
@@ -55,7 +55,7 @@ const baseNextPreviewFiles = [
 
 const generatedSupportFiles = ["package.json", ".env.example", "README.md"] as const;
 
-export function createBuilderPreview(config: LaunchKitConfig): BuilderPreview {
+export function createBuilderPreview(config: BaseForgeConfig): BuilderPreview {
   const plan = createGenerationPlan(config);
   const packageJson = plan.packageJson;
 
@@ -78,7 +78,7 @@ export function createBuilderPreview(config: LaunchKitConfig): BuilderPreview {
   };
 }
 
-function createStackSummary(config: LaunchKitConfig): StackSummaryItem[] {
+function createStackSummary(config: BaseForgeConfig): StackSummaryItem[] {
   return [
     {
       label: "Project name",

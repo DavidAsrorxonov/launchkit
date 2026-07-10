@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  defaultLaunchKitConfig,
-  LaunchKitConfigSchema,
-  parseLaunchKitConfig,
+  defaultBaseForgeConfig,
+  BaseForgeConfigSchema,
+  parseBaseForgeConfig,
 } from "../index";
-import type { LaunchKitConfig } from "../index";
+import type { BaseForgeConfig } from "../index";
 
 const validFullConfig = {
   name: "launchkit-demo",
@@ -20,17 +20,17 @@ const validFullConfig = {
   auth: "authjs-credentials",
   docker: "postgres",
   packageManager: "pnpm",
-} satisfies LaunchKitConfig;
+} satisfies BaseForgeConfig;
 
-describe("LaunchKitConfigSchema", () => {
+describe("BaseForgeConfigSchema", () => {
   it("accepts the valid default config", () => {
-    expect(LaunchKitConfigSchema.safeParse(defaultLaunchKitConfig).success).toBe(
+    expect(BaseForgeConfigSchema.safeParse(defaultBaseForgeConfig).success).toBe(
       true,
     );
   });
 
   it("accepts a valid full MVP config", () => {
-    expect(parseLaunchKitConfig(validFullConfig)).toEqual(validFullConfig);
+    expect(parseBaseForgeConfig(validFullConfig)).toEqual(validFullConfig);
   });
 
   it("rejects invalid project names", () => {
@@ -51,8 +51,8 @@ describe("LaunchKitConfigSchema", () => {
 
     for (const name of invalidNames) {
       expect(
-        LaunchKitConfigSchema.safeParse({
-          ...defaultLaunchKitConfig,
+        BaseForgeConfigSchema.safeParse({
+          ...defaultBaseForgeConfig,
           name,
         }).success,
       ).toBe(false);
@@ -64,8 +64,8 @@ describe("LaunchKitConfigSchema", () => {
 
     for (const name of validNames) {
       expect(
-        LaunchKitConfigSchema.safeParse({
-          ...defaultLaunchKitConfig,
+        BaseForgeConfigSchema.safeParse({
+          ...defaultBaseForgeConfig,
           name,
         }).success,
       ).toBe(true);
@@ -86,8 +86,8 @@ describe("LaunchKitConfigSchema", () => {
     ["packageManager", "yarn"],
   ] as const)("rejects an unknown %s option", (field, value) => {
     expect(
-      LaunchKitConfigSchema.safeParse({
-        ...defaultLaunchKitConfig,
+      BaseForgeConfigSchema.safeParse({
+        ...defaultBaseForgeConfig,
         [field]: value,
       }).success,
     ).toBe(false);
@@ -95,8 +95,8 @@ describe("LaunchKitConfigSchema", () => {
 
   it("rejects unknown object keys", () => {
     expect(
-      LaunchKitConfigSchema.safeParse({
-        ...defaultLaunchKitConfig,
+      BaseForgeConfigSchema.safeParse({
+        ...defaultBaseForgeConfig,
         unknownOption: true,
       }).success,
     ).toBe(false);

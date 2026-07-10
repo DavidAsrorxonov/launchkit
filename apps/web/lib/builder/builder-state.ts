@@ -1,17 +1,17 @@
 import {
-  defaultLaunchKitConfig,
-  type LaunchKitConfig,
+  defaultBaseForgeConfig,
+  type BaseForgeConfig,
 } from "@baseforge/schema";
 
 export type BuilderState = {
-  config: LaunchKitConfig;
+  config: BaseForgeConfig;
 };
 
-export type BuilderConfigPatch = Partial<LaunchKitConfig>;
+export type BuilderConfigPatch = Partial<BaseForgeConfig>;
 
 export function createInitialBuilderState(): BuilderState {
   return {
-    config: { ...defaultLaunchKitConfig },
+    config: { ...defaultBaseForgeConfig },
   };
 }
 

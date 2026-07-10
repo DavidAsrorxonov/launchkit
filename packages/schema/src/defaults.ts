@@ -1,6 +1,6 @@
-import type { LaunchKitConfig } from "./config.js";
+import type { BaseForgeConfig } from "./config.js";
 
-export const defaultLaunchKitConfig = {
+export const defaultBaseForgeConfig = {
   name: "my-app",
   framework: "next",
   language: "typescript",
@@ -13,4 +13,4 @@ export const defaultLaunchKitConfig = {
   auth: "none",
   docker: "none",
   packageManager: "npm",
-} satisfies LaunchKitConfig;
+} satisfies BaseForgeConfig;

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  LaunchKitCompatibilityError,
-  defaultLaunchKitConfig,
-  type LaunchKitConfig,
+  BaseForgeCompatibilityError,
+  defaultBaseForgeConfig,
+  type BaseForgeConfig,
 } from "@baseforge/schema";
 
 import { createInMemoryTemplateLoader } from "../template-loader";
@@ -11,10 +11,10 @@ import { createGenerationPlan, generateProject } from "../generate-project";
 
 describe("generation pipeline", () => {
   it("generates a project for the default config", async () => {
-    const project = await generateProject(defaultLaunchKitConfig);
+    const project = await generateProject(defaultBaseForgeConfig);
 
-    expect(project.name).toBe(defaultLaunchKitConfig.name);
-    expect(project.packageManager).toBe(defaultLaunchKitConfig.packageManager);
+    expect(project.name).toBe(defaultBaseForgeConfig.name);
+    expect(project.packageManager).toBe(defaultBaseForgeConfig.packageManager);
     expect(project.files.map((file) => file.path)).toEqual([
       "package.json",
       ".env.example",
@@ -24,7 +24,7 @@ describe("generation pipeline", () => {
 
   it("generates package.json with the configured project name", async () => {
     const project = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "launchkit-demo",
     });
 
@@ -55,7 +55,7 @@ describe("generation pipeline", () => {
   });
 
   it("includes Tailwind dependencies for the default MVP config", async () => {
-    const project = await generateProject(defaultLaunchKitConfig);
+    const project = await generateProject(defaultBaseForgeConfig);
 
     expect(readJsonFile(project, "package.json")).toMatchObject({
       devDependencies: {
@@ -67,7 +67,7 @@ describe("generation pipeline", () => {
 
   it("generates a README with npm commands for npm configs", async () => {
     const project = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       packageManager: "npm",
     });
 
@@ -76,7 +76,7 @@ describe("generation pipeline", () => {
 
   it("generates a README with pnpm commands for pnpm configs", async () => {
     const project = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       packageManager: "pnpm",
     });
 
@@ -85,7 +85,7 @@ describe("generation pipeline", () => {
 
   it("includes DATABASE_URL when PostgreSQL is selected", async () => {
     const project = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       name: "database-demo",
       database: "postgres",
     });
@@ -97,7 +97,7 @@ describe("generation pipeline", () => {
 
   it("does not include DATABASE_URL when PostgreSQL is not selected", async () => {
     const project = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "none",
     });
 
@@ -105,9 +105,9 @@ describe("generation pipeline", () => {
   });
 
   it("includes PostgreSQL README guidance only when PostgreSQL is selected", async () => {
-    const defaultProject = await generateProject(defaultLaunchKitConfig);
+    const defaultProject = await generateProject(defaultBaseForgeConfig);
     const postgresProject = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
     });
     const defaultReadme = readTextFile(defaultProject, "README.md");
@@ -123,7 +123,7 @@ describe("generation pipeline", () => {
 
   it("does not add Prisma, Auth.js, or Docker files for PostgreSQL alone", async () => {
     const project = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
     });
     const paths = project.files.map((file) => file.path);
@@ -137,7 +137,7 @@ describe("generation pipeline", () => {
 
   it("includes AUTH_SECRET when Auth.js credentials are selected", async () => {
     const project = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       auth: "authjs-credentials",
     });
 
@@ -146,7 +146,7 @@ describe("generation pipeline", () => {
 
   it("includes Auth.js dependency and README guidance when credentials auth is selected", async () => {
     const project = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       auth: "authjs-credentials",
     });
     const packageJson = readJsonFile(project, "package.json");
@@ -167,7 +167,7 @@ describe("generation pipeline", () => {
 
   it("does not include Auth.js dependency or README guidance when auth is none", async () => {
     const project = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       auth: "none",
     });
     const packageJson = readJsonFile(project, "package.json");
@@ -179,7 +179,7 @@ describe("generation pipeline", () => {
 
   it("includes Prisma dependencies and scripts when Prisma is selected", async () => {
     const project = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       orm: "prisma",
     });
@@ -205,12 +205,12 @@ describe("generation pipeline", () => {
 
   it("includes Prisma README guidance only when Prisma is selected", async () => {
     const postgresProject = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       orm: "none",
     });
     const prismaProject = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       orm: "prisma",
     });
@@ -227,12 +227,12 @@ describe("generation pipeline", () => {
 
   it("includes Docker PostgreSQL README guidance only when Docker PostgreSQL is selected", async () => {
     const postgresProject = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       docker: "none",
     });
     const dockerProject = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       docker: "postgres",
     });
@@ -250,11 +250,11 @@ describe("generation pipeline", () => {
 
   it("does not add npm dependencies for Docker PostgreSQL", async () => {
     const postgresProject = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
     });
     const dockerProject = await generateProject({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       docker: "postgres",
     });
@@ -266,7 +266,7 @@ describe("generation pipeline", () => {
 
   it("creates a generation plan with resolved features and merged contributions", () => {
     const plan = createGenerationPlan({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       orm: "prisma",
       auth: "authjs-credentials",
@@ -336,7 +336,7 @@ describe("generation pipeline", () => {
 
   it("creates a Docker PostgreSQL generation plan without env or package contributions", () => {
     const plan = createGenerationPlan({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       database: "postgres",
       docker: "postgres",
     });
@@ -378,9 +378,9 @@ describe("generation pipeline", () => {
   });
 
   it("adds shadcn/ui dependencies and template files only when selected", () => {
-    const defaultPlan = createGenerationPlan(defaultLaunchKitConfig);
+    const defaultPlan = createGenerationPlan(defaultBaseForgeConfig);
     const shadcnPlan = createGenerationPlan({
-      ...defaultLaunchKitConfig,
+      ...defaultBaseForgeConfig,
       ui: "shadcn",
     });
 
@@ -503,12 +503,12 @@ describe("generation pipeline", () => {
       ],
     });
 
-    const defaultProject = await generateProject(defaultLaunchKitConfig, {
+    const defaultProject = await generateProject(defaultBaseForgeConfig, {
       templateLoader: loader,
     });
     const shadcnProject = await generateProject(
       {
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         ui: "shadcn",
       },
       {
@@ -517,7 +517,7 @@ describe("generation pipeline", () => {
     );
     const prismaProject = await generateProject(
       {
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "postgres",
         orm: "prisma",
       },
@@ -527,7 +527,7 @@ describe("generation pipeline", () => {
     );
     const authProject = await generateProject(
       {
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         auth: "authjs-credentials",
       },
       {
@@ -536,7 +536,7 @@ describe("generation pipeline", () => {
     );
     const dockerProject = await generateProject(
       {
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "postgres",
         docker: "postgres",
       },
@@ -611,7 +611,7 @@ describe("generation pipeline", () => {
     });
     const project = await generateProject(
       {
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "postgres",
         docker: "postgres",
       },
@@ -675,7 +675,7 @@ describe("generation pipeline", () => {
     });
     const project = await generateProject(
       {
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "postgres",
         orm: "prisma",
       },
@@ -703,7 +703,7 @@ describe("generation pipeline", () => {
       ],
     });
 
-    const project = await generateProject(defaultLaunchKitConfig, {
+    const project = await generateProject(defaultBaseForgeConfig, {
       templateLoader: loader,
       templateIds: ["base/skeleton"],
     });
@@ -714,20 +714,20 @@ describe("generation pipeline", () => {
   it("rejects invalid schema configs", async () => {
     await expect(
       generateProject({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         name: "Invalid Name",
-      } as LaunchKitConfig),
+      } as BaseForgeConfig),
     ).rejects.toThrow();
   });
 
   it("rejects incompatible configs", async () => {
     await expect(
       generateProject({
-        ...defaultLaunchKitConfig,
+        ...defaultBaseForgeConfig,
         database: "none",
         orm: "prisma",
       }),
-    ).rejects.toThrow(LaunchKitCompatibilityError);
+    ).rejects.toThrow(BaseForgeCompatibilityError);
   });
 });
 
