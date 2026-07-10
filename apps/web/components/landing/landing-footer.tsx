@@ -8,7 +8,7 @@ const githubUrl = "https://github.com/DavidAsrorxonov/launchkit";
 
 export function LandingFooter() {
   return (
-    <footer className="border-t border-border py-10">
+    <footer className="border-t border-border bg-black py-10">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a

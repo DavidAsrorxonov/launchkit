@@ -37,13 +37,22 @@ const quickStartSteps = [
 
 const builderFlow = [
   ["Project", "Project name and package manager."],
-  ["Framework", "Fixed MVP foundation: Next.js, TypeScript, App Router, and no `src/` folder."],
+  [
+    "Framework",
+    "Fixed MVP foundation: Next.js, TypeScript, App Router, and no `src/` folder.",
+  ],
   ["Styling and UI", "Tailwind CSS is fixed on. shadcn/ui is optional."],
   ["Database", "Choose no database setup or PostgreSQL."],
   ["ORM", "Choose no ORM or Prisma. Prisma requires PostgreSQL."],
   ["Auth", "Choose no auth or the Auth.js credentials scaffold."],
-  ["Extras", "Optional PostgreSQL Docker Compose plus always-generated README and `.env.example`."],
-  ["Preview", "Review stack, dependencies, env vars, scripts, and generated file tree."],
+  [
+    "Extras",
+    "Optional PostgreSQL Docker Compose plus always-generated README and `.env.example`.",
+  ],
+  [
+    "Preview",
+    "Review stack, dependencies, env vars, scripts, and generated file tree.",
+  ],
   ["Download", "Generate and download the project zip."],
 ] as const;
 
@@ -58,7 +67,10 @@ const scripts = [
   ["start", "Start the built app."],
   ["typecheck", "Run TypeScript without emitting files."],
   ["db:generate", "Optional Prisma script for generating Prisma Client."],
-  ["db:push", "Optional Prisma script for syncing the schema to a development database."],
+  [
+    "db:push",
+    "Optional Prisma script for syncing the schema to a development database.",
+  ],
   ["db:studio", "Optional Prisma script for opening Prisma Studio."],
 ] as const;
 
@@ -114,7 +126,9 @@ export function DocsPage() {
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
                 BF
               </span>
-              <span className="text-sm font-semibold text-foreground">BaseForge</span>
+              <span className="text-sm font-semibold text-foreground">
+                BaseForge
+              </span>
             </Link>
             <nav
               aria-label="Primary documentation navigation"
@@ -186,7 +200,9 @@ export function DocsPage() {
             <ol className="grid gap-2">
               {quickStartSteps.map((step, index) => (
                 <li key={step} className="flex gap-3">
-                  <span className="font-mono text-xs text-primary">{index + 1}</span>
+                  <span className="font-mono text-xs text-primary">
+                    {index + 1}
+                  </span>
                   <span>{step}</span>
                 </li>
               ))}
@@ -198,32 +214,48 @@ npm run dev
 npm run typecheck
 npm run build`}</CodeBlock>
             <div>
-              <h3 className="text-sm font-semibold text-foreground">pnpm variant</h3>
+              <h3 className="text-sm font-semibold text-foreground">
+                pnpm variant
+              </h3>
               <p className="mt-1">
-                The generated project supports pnpm guidance when pnpm is selected
-                in the builder.
+                The generated project supports pnpm guidance when pnpm is
+                selected in the builder.
               </p>
             </div>
             <CodeBlock>{`pnpm install
 pnpm dev`}</CodeBlock>
           </DocsSection>
 
-          <DocsSection id="builder-flow" eyebrow="03" title="Website Builder Flow">
+          <DocsSection
+            id="builder-flow"
+            eyebrow="03"
+            title="Website Builder Flow"
+          >
             <dl className="grid gap-3">
               {builderFlow.map(([label, description]) => (
-                <div key={label} className="rounded-lg border border-border bg-card p-4">
-                  <dt className="text-sm font-semibold text-foreground">{label}</dt>
+                <div
+                  key={label}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  <dt className="text-sm font-semibold text-foreground">
+                    {label}
+                  </dt>
                   <dd className="mt-1">{description}</dd>
                 </div>
               ))}
             </dl>
           </DocsSection>
 
-          <DocsSection id="supported-stack" eyebrow="04" title="Supported Stack">
+          <DocsSection
+            id="supported-stack"
+            eyebrow="04"
+            title="Supported Stack"
+          >
             <p>
-              These are the exact MVP option groups exposed by `@launchkit/schema`.
-              Unsupported frameworks, languages, routers, databases, ORMs, auth
-              providers, and package managers are not documented as available.
+              These are the exact MVP option groups exposed by
+              `@launchkit/schema`. Unsupported frameworks, languages, routers,
+              databases, ORMs, auth providers, and package managers are not
+              documented as available.
             </p>
             <SupportedStackTable />
           </DocsSection>
@@ -236,18 +268,29 @@ pnpm dev`}</CodeBlock>
             <GeneratedFilesSection />
           </DocsSection>
 
-          <DocsSection id="optional-features" eyebrow="06" title="Optional Features">
+          <DocsSection
+            id="optional-features"
+            eyebrow="06"
+            title="Optional Features"
+          >
             <FeatureNotes />
           </DocsSection>
 
-          <DocsSection id="environment-variables" eyebrow="07" title="Environment Variables">
+          <DocsSection
+            id="environment-variables"
+            eyebrow="07"
+            title="Environment Variables"
+          >
             <p>
               `.env.example` is only an example. Replace placeholder secrets and
               keep production values out of source control.
             </p>
             <dl className="grid gap-3 sm:grid-cols-2">
               {envVars.map(([name, description]) => (
-                <div key={name} className="rounded-lg border border-border bg-card p-4">
+                <div
+                  key={name}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
                   <dt className="font-mono text-sm font-semibold text-foreground">
                     {name}
                   </dt>
@@ -284,21 +327,30 @@ pnpm dev`}</CodeBlock>
           >
             <p>
               After download, unzip locally, install dependencies, copy
-              `.env.example` to `.env.local` when selected features need env vars,
-              configure values, and run checks before deployment.
+              `.env.example` to `.env.local` when selected features need env
+              vars, configure values, and run checks before deployment.
             </p>
             <CodeBlock>{`cp .env.example .env.local
 npm install
 npm run dev
 npm run typecheck
 npm run build`}</CodeBlock>
-            <p>The exact env setup depends on the selected optional features.</p>
+            <p>
+              The exact env setup depends on the selected optional features.
+            </p>
           </DocsSection>
 
-          <DocsSection id="compatibility-rules" eyebrow="10" title="Compatibility Rules">
+          <DocsSection
+            id="compatibility-rules"
+            eyebrow="10"
+            title="Compatibility Rules"
+          >
             <ul className="grid gap-2">
               {compatibilityRules.map((rule) => (
-                <li key={rule} className="rounded-lg border border-border bg-card p-4">
+                <li
+                  key={rule}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
                   {rule}
                 </li>
               ))}
@@ -308,7 +360,10 @@ npm run build`}</CodeBlock>
           <DocsSection id="limitations" eyebrow="11" title="Limitations">
             <ul className="grid gap-2">
               {limitations.map((limitation) => (
-                <li key={limitation} className="rounded-lg border border-border bg-card p-4">
+                <li
+                  key={limitation}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
                   {limitation}
                 </li>
               ))}
@@ -322,21 +377,22 @@ npm run build`}</CodeBlock>
               core as the website.
             </p>
             <CodeBlock>{`npx @baseforge/create@latest my-app`}</CodeBlock>
-            <p>
-              Future publishes must keep the package public with
-              `npm publish -w @baseforge/create --access public`.
-            </p>
-            <p>
-              Website and terminal output stay aligned because both entrypoints
-              use the same generation pipeline.
-            </p>
           </DocsSection>
 
-          <DocsSection id="troubleshooting" eyebrow="13" title="Troubleshooting">
+          <DocsSection
+            id="troubleshooting"
+            eyebrow="13"
+            title="Troubleshooting"
+          >
             <dl className="grid gap-3">
               {troubleshooting.map(([title, description]) => (
-                <div key={title} className="rounded-lg border border-border bg-card p-4">
-                  <dt className="text-sm font-semibold text-foreground">{title}</dt>
+                <div
+                  key={title}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  <dt className="text-sm font-semibold text-foreground">
+                    {title}
+                  </dt>
                   <dd className="mt-1">{description}</dd>
                 </div>
               ))}
