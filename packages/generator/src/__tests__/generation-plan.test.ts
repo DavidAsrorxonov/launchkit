@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig } from "@launchkit/schema";
+import { defaultLaunchKitConfig } from "@baseforge/schema";
 
 import { createEmptyGenerationPlan } from "../generation-plan";
 

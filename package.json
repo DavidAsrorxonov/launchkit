@@ -11,7 +11,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:cli-smoke": "npm run test:smoke -w @baseforge/create",
-    "test:smoke": "npm run test:smoke -w @launchkit/generator",
+    "test:smoke": "npm run test:smoke -w @baseforge/generator",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "devDependencies": {

@@ -950,9 +950,9 @@ been explicitly tested.
 CLI MVP responsibilities:
 
 - ask for project options
-- validate config with `@launchkit/schema`
+- validate config with `@baseforge/schema`
 - validate compatibility with shared schema helpers
-- call `@launchkit/generator`
+- call `@baseforge/generator`
 - write generated files to a target directory
 - prevent unsafe path writes
 - handle existing directories safely

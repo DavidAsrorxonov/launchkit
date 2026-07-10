@@ -259,7 +259,7 @@ pnpm dev`}</CodeBlock>
           >
             <p>
               These are the exact MVP option groups exposed by
-              `@launchkit/schema`. Unsupported frameworks, languages, routers,
+              `@baseforge/schema`. Unsupported frameworks, languages, routers,
               databases, ORMs, auth providers, and package managers are not
               documented as available.
             </p>

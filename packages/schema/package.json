@@ -1,5 +1,5 @@
 {
-  "name": "@launchkit/schema",
+  "name": "@baseforge/schema",
   "version": "0.0.0",
   "private": true,
   "type": "module",

@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: BaseForge
 Stage: Foundation setup
-Current phase: Pre-release SEO/indexing checks complete after Phase 10 Step 6
-Primary focus: BaseForge website canonical metadata, sitemap, robots, social preview image, structured data, and Vercel deployment guidance are ready for Vercel deployment from `apps/web`
+Current phase: Critical LaunchKit-to-BaseForge package namespace rename complete
+Primary focus: Step 2 renamed internal workspace packages from @launchkit/* to @baseforge/* while leaving LaunchKit TypeScript symbols and historical records for later steps
 ```
 
 ## Phase Progress
@@ -24,11 +24,192 @@ Primary focus: BaseForge website canonical metadata, sitemap, robots, social pre
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
-| Phase 10 | npm Release Preparation              | In Progress | Pre-release website SEO/indexing checks completed for Vercel deployment; `@baseforge/create@0.1.0` remains the stable latest npm package. |
+| Phase 10 | npm Release Preparation              | In Progress | Critical rename Step 2 completed: internal workspace packages now use `@baseforge/*`; `LaunchKit...` exported symbols remain for Step 3. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-11
+
+Critical LaunchKit-to-BaseForge rename Step 2 completed
+
+Scope:
+
+- Renamed internal package namespace only:
+  - `@launchkit/schema` -> `@baseforge/schema`;
+  - `@launchkit/generator` -> `@baseforge/generator`;
+  - `@launchkit/templates` -> `@baseforge/templates`;
+  - `@launchkit/shared` -> `@baseforge/shared`.
+- Updated package manifests, root scripts, workspace dependency links,
+  `package-lock.json`, `tsconfig.base.json`, `apps/web/next.config.ts`, source
+  imports, tests, package-name assertions, and active planning-doc references.
+- Updated the CLI esbuild workspace alias plugin to resolve `@baseforge/schema`
+  and `@baseforge/generator`.
+- Refreshed local workspace symlinks with `npm install --ignore-scripts`.
+
+Intentionally not changed:
+
+- `LaunchKitConfig`, `LaunchKitConfigSchema`, `parseLaunchKitConfig`,
+  `defaultLaunchKitConfig`, and `LaunchKitCompatibilityError`.
+- Root repo/package name `launchkit`.
+- GitHub URLs pointing at `DavidAsrorxonov/launchkit`.
+- Generated project copy and fixture/temp names that are not package namespace
+  imports.
+- Historical records.
+
+Important note:
+
+- The first `npm test` run failed because stale `packages/generator/dist` output
+  still imported `@launchkit/schema`.
+- Rebuilding the internal packages refreshed `dist`; the full test suite passed
+  afterward.
+- Final source/config scans found no remaining active `@launchkit/schema`,
+  `@launchkit/generator`, `@launchkit/templates`, or `@launchkit/shared`
+  references.
+- The only post-build `@launchkit/schema` hits were stale ignored local
+  `apps/web/.next/dev/**` cache files; production `.next/server`, `.next/static`,
+  and package `dist` output were clean.
+
+Files changed:
+
+- `package.json`
+- `package-lock.json`
+- `tsconfig.base.json`
+- `apps/web/package.json`
+- `apps/web/next.config.ts`
+- `apps/web/components/builder/steps/*.tsx`
+- `apps/web/components/docs/*.tsx`
+- `apps/web/lib/api/*.ts`
+- `apps/web/lib/builder/*.ts`
+- `packages/cli/package.json`
+- `packages/cli/scripts/build.mjs`
+- `packages/cli/src/**/*.ts`
+- `packages/generator/package.json`
+- `packages/generator/src/**/*.ts`
+- `packages/generator/test/smoke/generated-projects.test.ts`
+- `packages/schema/package.json`
+- `packages/shared/package.json`
+- `packages/templates/package.json`
+- `packages/templates/src/__tests__/index.test.ts`
+- `context/architecture.md`
+- `context/build-plan.md`
+- `context/critical-release-changes.md`
+- `context/progress-tracker.md`
+
+Verification:
+
+- `npm install --package-lock-only --ignore-scripts` passed.
+- `npm install --ignore-scripts` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm test` passed across all workspace tests:
+  - web: 5 files, 49 tests;
+  - `@baseforge/create`: 8 files, 123 tests;
+  - `@baseforge/generator`: 11 files, 127 tests;
+  - `@baseforge/schema`: 5 files, 87 tests;
+  - `@baseforge/templates`: 1 file, 52 tests.
+- `npm run build` passed across all workspaces when rerun with required sandbox
+  permission for Next/Turbopack.
+- `npm run test:cli-smoke` passed: 1 file, 5 tests.
+- `npm run test:smoke` passed when rerun with required sandbox permission:
+  1 file, 2 generated-project smoke tests.
+- `git diff --check` passed.
+
+Next rename steps:
+
+- Step 3: rename exported TypeScript API symbols from `LaunchKit...` to
+  `BaseForge...`.
+- Step 4: rename generated-project copy and fixture/temp names.
+- Step 5: decide whether to rename root package/repo identity and GitHub URLs.
+- Step 6: optional historical cleanup only if the repo must have zero
+  `launchkit` matches including history.
+
+Critical LaunchKit-to-BaseForge rename Step 1 inventory completed
+
+Scope:
+
+- Completed only the inventory/classification step.
+- Did not rename package names, imports, exported TypeScript symbols, generated template copy, GitHub URLs, tests, or runtime code.
+- Created `context/critical-release-changes.md` as the release-critical rename map.
+
+Inventory result:
+
+- Active non-historical files with `launchkit`, `LaunchKit`, or `@launchkit` references: 75.
+- Historical notes with LaunchKit references:
+  - `context/progress-tracker.md`: 801 matches;
+  - `memory.md`: 9 matches.
+- `.agents/prompts/**` contains many LaunchKit-era prompt instructions and should be treated as historical unless explicitly rewriting archived prompts.
+
+Main rename areas identified:
+
+- Workspace package names and dependency graph:
+  - `@launchkit/schema`;
+  - `@launchkit/generator`;
+  - `@launchkit/templates`;
+  - `@launchkit/shared`.
+- Root/workspace scripts, package manifests, `package-lock.json`, and `tsconfig.base.json` path aliases.
+- `apps/web/next.config.ts` `transpilePackages`.
+- CLI esbuild workspace alias plugin in `packages/cli/scripts/build.mjs`.
+- Exported schema symbols:
+  - `LaunchKitConfig`;
+  - `LaunchKitConfigSchema`;
+  - `parseLaunchKitConfig`;
+  - `defaultLaunchKitConfig`;
+  - `LaunchKitCompatibilityError`.
+- User-visible generated project copy:
+  - `Generated with LaunchKit`;
+  - `Generated by LaunchKit`;
+  - `LaunchKit project`.
+- Test/temp fixture names such as `launchkit-demo`, `launchkit-smoke`, `launchkit-cli`, and `launchkit-shared`.
+- GitHub URLs pointing at `DavidAsrorxonov/launchkit`, which should change only if the repo itself is renamed.
+
+Recommendation recorded:
+
+- Step 2 should rename only the internal package namespace from `@launchkit/*` to `@baseforge/*`.
+- Step 3 should separately rename exported TypeScript symbols from `LaunchKit...` to `BaseForge...`.
+- Historical files should not be blindly rewritten unless the release requirement is zero `launchkit` matches across the entire repository.
+
+Files added:
+
+- `context/critical-release-changes.md`
+
+Files changed:
+
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+git status --short
+sed -n '1,220p' context/progress-tracker.md
+rg --files -g '!node_modules/**' -g '!.next/**' -g '!**/dist/**' -g '!**/.next/**' -g '!coverage/**' | sort
+find . -maxdepth 3 -name package.json -print | sort
+rg -n -i "launchkit" -g '!node_modules/**' -g '!**/dist/**' -g '!**/.next/**' -g '!coverage/**' .
+rg -n "@launchkit/[A-Za-z0-9_-]+" -g '!node_modules/**' -g '!**/dist/**' -g '!**/.next/**' -g '!coverage/**' .
+rg -o "LaunchKit[A-Za-z0-9_]*" -g '!node_modules/**' -g '!**/dist/**' -g '!**/.next/**' -g '!coverage/**' . | sort | uniq -c | sort -nr
+rg --count-matches -i "launchkit" -g '!node_modules/**' -g '!**/dist/**' -g '!**/.next/**' -g '!coverage/**' . | sort
+rg -n -i "launchkit" README.md package.json package-lock.json tsconfig.base.json apps packages context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md context/ui/new-ui.md -g '!**/dist/**' -g '!**/.next/**' -g '!coverage/**'
+rg -o "@launchkit/[A-Za-z0-9_-]+" README.md package.json package-lock.json tsconfig.base.json apps packages context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md context/ui/new-ui.md -g '!**/dist/**' -g '!**/.next/**' | sort | uniq -c | sort -nr
+rg -o "defaultLaunchKitConfig|LaunchKit[A-Za-z0-9_]*|parseLaunchKitConfig" apps packages context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md README.md -g '!**/dist/**' -g '!**/.next/**' | sort | uniq -c | sort -nr
+rg -n "create-launchkit|@launchkit/create|launchkit-create|npx create-launchkit|npm create launchkit" README.md package.json package-lock.json apps packages context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md context/ui/new-ui.md -g '!**/dist/**' -g '!**/.next/**'
+cat package.json
+cat apps/web/package.json && cat packages/cli/package.json && cat packages/generator/package.json && cat packages/schema/package.json && cat packages/shared/package.json && cat packages/templates/package.json
+cat tsconfig.base.json && cat apps/web/next.config.ts && sed -n '1,140p' packages/cli/scripts/build.mjs
+rg -n -i "launchkit" memory.md context/progress-tracker.md -g '!**/dist/**' | wc -l
+rg --count-matches -i "launchkit" memory.md context/progress-tracker.md | sort
+rg -n -i "launchkit" packages/templates packages/generator/test packages/generator/src/__tests__ packages/schema/src/__tests__ packages/cli/src/__tests__ apps/web -g '!**/dist/**' -g '!**/.next/**'
+rg -n "launchkit-demo|launchkit-smoke|launchkit_smoke|launchkit-cli|launchkit-shared|Generated by LaunchKit|Generated with LaunchKit|LaunchKit project|DavidAsrorxonov/launchkit" apps packages README.md package.json context -g '!**/dist/**' -g '!**/.next/**'
+rg -l -i "launchkit" README.md package.json package-lock.json tsconfig.base.json apps packages context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md context/ui/new-ui.md -g '!**/dist/**' -g '!**/.next/**' | sort
+rg -l "@launchkit/|LaunchKit|launchkit" apps packages package.json package-lock.json tsconfig.base.json README.md context/architecture.md context/build-plan.md context/project-overview.md context/ui-rules.md context/ui/new-ui.md -g '!**/dist/**' -g '!**/.next/**' | wc -l
+rg -n "Generated by LaunchKit|Generated with LaunchKit|LaunchKit project|LaunchKit config is compatible|LaunchKitCompatibilityError|LaunchKitConfigSchema|parseLaunchKitConfig|defaultLaunchKitConfig" packages apps -g '!**/dist/**' -g '!**/.next/**'
+rg -n "LaunchKit" packages/generator/src/__tests__/generated-output-snapshots.test.ts packages/generator/src/__tests__/generate-project.test.ts -g '!**/dist/**'
+rg -n "DavidAsrorxonov/launchkit|github.com/.*/launchkit|launchkit\\.git" README.md apps packages context -g '!**/dist/**' -g '!**/.next/**'
+rg -n -i "launchkit" .agents -g '!**/dist/**' -g '!**/.next/**'
+```
+
+Verification:
+
+- No automated build/test was required because this was inventory-only.
 
 ### 2026-07-10
 

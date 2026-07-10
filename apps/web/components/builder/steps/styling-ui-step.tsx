@@ -6,7 +6,7 @@ import {
   type LaunchKitConfig,
   type OptionMetadata,
   type UiOption,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { StylingUiStepValidation } from "@/lib/builder/validation";

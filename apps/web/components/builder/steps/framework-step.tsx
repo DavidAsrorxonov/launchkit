@@ -5,7 +5,7 @@ import {
   routerMetadata,
   type LaunchKitConfig,
   type OptionMetadata,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import type { FrameworkStepValidation } from "@/lib/builder/validation";
 

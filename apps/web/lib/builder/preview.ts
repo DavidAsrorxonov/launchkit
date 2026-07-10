@@ -1,4 +1,4 @@
-import { createGenerationPlan } from "@launchkit/generator";
+import { createGenerationPlan } from "@baseforge/generator";
 import {
   authMetadata,
   databaseMetadata,
@@ -13,7 +13,7 @@ import {
   uiMetadata,
   type LaunchKitConfig,
   type OptionMetadata,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 type PackageEntry = {
   name: string;

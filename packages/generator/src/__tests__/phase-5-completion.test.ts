@@ -3,7 +3,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { defaultLaunchKitConfig, type LaunchKitConfig } from "@launchkit/schema";
+import { defaultLaunchKitConfig, type LaunchKitConfig } from "@baseforge/schema";
 
 import type { GenerationPlan } from "../generation-plan";
 import { type GeneratedProject } from "../file-tree";

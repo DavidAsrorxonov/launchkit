@@ -1,4 +1,4 @@
-import type { LaunchKitConfig } from "@launchkit/schema";
+import type { LaunchKitConfig } from "@baseforge/schema";
 
 import { getFriendlyApiErrorMessage } from "./errors";
 import type { ApiErrorResponse, GenerateProjectResponse } from "./types";

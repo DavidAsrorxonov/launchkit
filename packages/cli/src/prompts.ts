@@ -9,7 +9,7 @@ import {
   uiMetadata,
   type LaunchKitConfig,
   type OptionMetadata,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import type { CliArgs } from "./args.js";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import type { LaunchKitConfig } from "@launchkit/schema";
+import type { LaunchKitConfig } from "@baseforge/schema";
 
 import { DependencyList } from "@/components/builder/preview/dependency-list";
 import { EnvVarList } from "@/components/builder/preview/env-var-list";

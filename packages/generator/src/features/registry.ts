@@ -1,4 +1,4 @@
-import type { LaunchKitConfig } from "@launchkit/schema";
+import type { LaunchKitConfig } from "@baseforge/schema";
 
 import type { FeatureId } from "../generation-plan.js";
 import {

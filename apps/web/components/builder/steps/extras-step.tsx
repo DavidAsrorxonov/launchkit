@@ -5,7 +5,7 @@ import {
   type DockerOption,
   type LaunchKitConfig,
   type OptionMetadata,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { ExtrasStepValidation } from "@/lib/builder/validation";

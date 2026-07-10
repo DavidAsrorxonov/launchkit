@@ -14,7 +14,7 @@ import {
   stylingOptions,
   uiOptions,
   type LaunchKitConfig,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import { createBuilderPreview } from "./preview";
 import { builderSteps } from "./steps";

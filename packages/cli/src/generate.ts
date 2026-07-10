@@ -3,8 +3,8 @@ import {
   generateProject,
   normalizeGeneratedPath,
   type GeneratedProject,
-} from "@launchkit/generator";
-import type { LaunchKitConfig } from "@launchkit/schema";
+} from "@baseforge/generator";
+import type { LaunchKitConfig } from "@baseforge/schema";
 
 import { createCliTemplateLoader } from "./template-loader.js";
 

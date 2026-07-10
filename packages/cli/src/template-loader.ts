@@ -10,7 +10,7 @@ import {
   type TemplateContext,
   type TemplateFile,
   type TemplateLoader,
-} from "@launchkit/generator";
+} from "@baseforge/generator";
 
 const moduleDir = dirname(fileURLToPath(import.meta.url));
 const bundledTemplatesRoot = join(moduleDir, "templates");

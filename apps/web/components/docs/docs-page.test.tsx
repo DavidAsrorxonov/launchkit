@@ -12,7 +12,7 @@ import {
   projectStructureMetadata,
   routerMetadata,
   stylingMetadata,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 const appRoot = process.cwd();
 const docsSource = readFileSync(

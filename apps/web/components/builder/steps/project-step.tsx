@@ -6,7 +6,7 @@ import {
   packageManagerMetadata,
   type LaunchKitConfig,
   type PackageManagerOption,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { ProjectStepValidation } from "@/lib/builder/validation";

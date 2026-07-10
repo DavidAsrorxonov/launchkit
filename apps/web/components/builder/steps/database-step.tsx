@@ -5,7 +5,7 @@ import {
   type DatabaseOption,
   type LaunchKitConfig,
   type OptionMetadata,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { DatabaseStepValidation } from "@/lib/builder/validation";

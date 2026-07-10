@@ -10,7 +10,7 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import type { GeneratedProject } from "@launchkit/generator";
+import type { GeneratedProject } from "@baseforge/generator";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { DirectorySafetyError } from "../directory-safety.js";

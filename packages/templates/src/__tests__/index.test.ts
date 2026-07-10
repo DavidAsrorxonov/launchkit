@@ -76,7 +76,7 @@ const requiredShadcnTemplateFiles = [
   "app/globals.css",
 ];
 
-describe("@launchkit/templates package foundation", () => {
+describe("@baseforge/templates package foundation", () => {
   it("exports a readiness placeholder", () => {
     expect(templatesPackageReady()).toBe(true);
   });

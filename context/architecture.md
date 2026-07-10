@@ -931,9 +931,9 @@ Later, package versions matter because the CLI may be published to npm.
 Current package namespace split:
 
 ```txt
-@launchkit/schema
-@launchkit/generator
-@launchkit/templates
+@baseforge/schema
+@baseforge/generator
+@baseforge/templates
 @baseforge/create
 ```
 

@@ -1,4 +1,4 @@
-import { defaultLaunchKitConfig } from "@launchkit/schema";
+import { defaultLaunchKitConfig } from "@baseforge/schema";
 import { describe, expect, it } from "vitest";
 
 import { validateCliConfigDraft } from "../validate-config.js";

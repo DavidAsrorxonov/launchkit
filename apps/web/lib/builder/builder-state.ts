@@ -1,7 +1,7 @@
 import {
   defaultLaunchKitConfig,
   type LaunchKitConfig,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 export type BuilderState = {
   config: LaunchKitConfig;

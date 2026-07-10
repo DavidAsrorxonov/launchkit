@@ -1,4 +1,4 @@
-import { defaultLaunchKitConfig } from "@launchkit/schema";
+import { defaultLaunchKitConfig } from "@baseforge/schema";
 
 export * from "./env.js";
 export * from "./file-tree.js";

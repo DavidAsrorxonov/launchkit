@@ -7,7 +7,7 @@ import {
   LaunchKitCompatibilityError,
   defaultLaunchKitConfig,
   type LaunchKitConfig,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import { type GeneratedProject } from "../file-tree";
 import { createGenerationPlan, generateProject } from "../generate-project";

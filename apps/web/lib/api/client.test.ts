@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { defaultLaunchKitConfig } from "@launchkit/schema";
+import { defaultLaunchKitConfig } from "@baseforge/schema";
 
 import {
   GenerateProjectApiError,

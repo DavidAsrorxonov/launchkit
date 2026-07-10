@@ -5,7 +5,7 @@ import {
   type LaunchKitConfig,
   type OptionMetadata,
   type OrmOption,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import type { BuilderConfigPatch } from "@/lib/builder/builder-state";
 import type { OrmStepValidation } from "@/lib/builder/validation";

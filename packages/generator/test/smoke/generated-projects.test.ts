@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig, type LaunchKitConfig } from "@launchkit/schema";
+import { defaultLaunchKitConfig, type LaunchKitConfig } from "@baseforge/schema";
 
 import type { GeneratedProject } from "../../src/file-tree";
 import { createGenerationPlan, generateProject } from "../../src/generate-project";

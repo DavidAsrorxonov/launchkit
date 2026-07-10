@@ -8,7 +8,7 @@ import {
   type TemplateContext,
   type TemplateFile,
   type TemplateLoader,
-} from "@launchkit/generator";
+} from "@baseforge/generator";
 
 const templatesRoot = join(process.cwd(), "..", "..", "packages", "templates");
 

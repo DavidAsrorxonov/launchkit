@@ -4,7 +4,7 @@ import {
   LaunchKitCompatibilityError,
   defaultLaunchKitConfig,
   type LaunchKitConfig,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import { createInMemoryTemplateLoader } from "../template-loader";
 import { createGenerationPlan, generateProject } from "../generate-project";

@@ -2,7 +2,7 @@ import {
   LaunchKitConfigSchema,
   validateCompatibility,
   type LaunchKitConfig,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 type ValidationErrors = Partial<Record<keyof LaunchKitConfig, string>>;
 

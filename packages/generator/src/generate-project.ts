@@ -2,7 +2,7 @@ import {
   assertCompatibleConfig,
   parseLaunchKitConfig,
   type LaunchKitConfig,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import { mergeEnvVars, renderEnvExample } from "./env.js";
 import { createGeneratedFile, createGeneratedProject, type GeneratedProject } from "./file-tree.js";

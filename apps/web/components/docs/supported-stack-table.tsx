@@ -11,7 +11,7 @@ import {
   stylingMetadata,
   uiMetadata,
   type OptionMetadata,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 type StackRow = {
   category: string;

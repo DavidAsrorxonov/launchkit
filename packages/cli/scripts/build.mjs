@@ -38,7 +38,7 @@ await build({
   sourcemap: false,
   legalComments: "none",
   external: ["@inquirer/prompts"],
-  plugins: [launchKitWorkspacePlugin()],
+  plugins: [baseForgeWorkspacePlugin()],
 });
 
 await cp(join(templatesSource, "base"), join(templatesOutput, "base"), {
@@ -51,16 +51,16 @@ await rm(join(distDir, "tsconfig.tsbuildinfo"), { force: true });
 await rm(join(packageRoot, "tsconfig.tsbuildinfo"), { force: true });
 await chmod(bundledEntry, 0o755);
 
-function launchKitWorkspacePlugin() {
+function baseForgeWorkspacePlugin() {
   const sourceEntries = new Map([
-    ["@launchkit/generator", join(repoRoot, "packages", "generator", "src", "index.ts")],
-    ["@launchkit/schema", join(repoRoot, "packages", "schema", "src", "index.ts")],
+    ["@baseforge/generator", join(repoRoot, "packages", "generator", "src", "index.ts")],
+    ["@baseforge/schema", join(repoRoot, "packages", "schema", "src", "index.ts")],
   ]);
 
   return {
-    name: "launchkit-workspace-source",
+    name: "baseforge-workspace-source",
     setup(buildContext) {
-      buildContext.onResolve({ filter: /^@launchkit\/(?:generator|schema)$/ }, (args) => ({
+      buildContext.onResolve({ filter: /^@baseforge\/(?:generator|schema)$/ }, (args) => ({
         path: sourceEntries.get(args.path),
       }));
     },

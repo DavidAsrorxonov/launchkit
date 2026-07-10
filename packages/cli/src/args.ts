@@ -13,7 +13,7 @@ import {
   type OrmOption,
   type PackageManagerOption,
   type UiOption,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 export type PackageManagerFlag = PackageManagerOption;
 export type UiFlag = UiOption;

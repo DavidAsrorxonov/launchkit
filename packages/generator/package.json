@@ -1,5 +1,5 @@
 {
-  "name": "@launchkit/generator",
+  "name": "@baseforge/generator",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@launchkit/schema": "0.0.0"
+    "@baseforge/schema": "0.0.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

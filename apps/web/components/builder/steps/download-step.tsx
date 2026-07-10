@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import type { LaunchKitConfig } from "@launchkit/schema";
+import type { LaunchKitConfig } from "@baseforge/schema";
 
 import { DownloadButton } from "@/components/builder/download/download-button";
 import { DownloadStatus } from "@/components/builder/download/download-status";

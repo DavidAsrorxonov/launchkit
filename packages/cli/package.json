@@ -41,15 +41,15 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "vitest run",
-    "test:smoke": "npm run build -w @launchkit/schema && npm run build -w @launchkit/generator && npm run build && vitest run --config vitest.smoke.config.ts",
+    "test:smoke": "npm run build -w @baseforge/schema && npm run build -w @baseforge/generator && npm run build && vitest run --config vitest.smoke.config.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@inquirer/prompts": "^8.5.2"
   },
   "devDependencies": {
-    "@launchkit/generator": "0.0.0",
-    "@launchkit/schema": "0.0.0",
+    "@baseforge/generator": "0.0.0",
+    "@baseforge/schema": "0.0.0",
     "esbuild": "^0.28.1",
     "typescript": "^5.0.0"
   }

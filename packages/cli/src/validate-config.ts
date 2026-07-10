@@ -3,7 +3,7 @@ import {
   defaultLaunchKitConfig,
   validateCompatibility,
   type LaunchKitConfig,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 export type CliValidationResult =
   | {

@@ -3,13 +3,13 @@ import {
   generateProject,
   normalizeGeneratedPath,
   type GeneratedProject,
-} from "@launchkit/generator";
+} from "@baseforge/generator";
 import {
   LaunchKitCompatibilityError,
   LaunchKitConfigSchema,
   validateCompatibility,
   type LaunchKitConfig,
-} from "@launchkit/schema";
+} from "@baseforge/schema";
 
 import { jsonErrorResponse, jsonResponse } from "./response";
 import { createWebTemplateLoader } from "./template-loader";

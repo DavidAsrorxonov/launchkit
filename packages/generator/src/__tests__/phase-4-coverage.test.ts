@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig, type LaunchKitConfig } from "@launchkit/schema";
+import { defaultLaunchKitConfig, type LaunchKitConfig } from "@baseforge/schema";
 
 import { renderEnvExample } from "../env";
 import { featureRegistry } from "../features/registry";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultLaunchKitConfig, type LaunchKitConfig } from "@launchkit/schema";
+import { defaultLaunchKitConfig, type LaunchKitConfig } from "@baseforge/schema";
 
 import { GET, POST } from "../../app/api/generate/route";
 import {

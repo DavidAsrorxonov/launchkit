@@ -42,8 +42,8 @@ describe("built CLI smoke checks", () => {
     const entryContents = await readFile(cliEntry, "utf8");
 
     expect(entryContents.startsWith("#!/usr/bin/env node")).toBe(true);
-    expect(entryContents).not.toContain('from "@launchkit/generator"');
-    expect(entryContents).not.toContain('from "@launchkit/schema"');
+    expect(entryContents).not.toContain('from "@baseforge/generator"');
+    expect(entryContents).not.toContain('from "@baseforge/schema"');
   });
 
   it("generates the default --yes project without installing dependencies", async () => {

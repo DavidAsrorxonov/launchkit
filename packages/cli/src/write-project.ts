@@ -4,7 +4,7 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 
-import type { GeneratedProject } from "@launchkit/generator";
+import type { GeneratedProject } from "@baseforge/generator";
 
 import {
   ensureSafeTargetDirectory,
