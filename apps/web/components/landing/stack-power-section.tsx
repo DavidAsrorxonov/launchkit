@@ -16,8 +16,7 @@ type StackItem = {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
   x: number;
   y: number;
-  anchorX: number;
-  side: "left" | "right";
+  connectorPath: string;
 };
 
 const stacks = [
@@ -26,72 +25,64 @@ const stacks = [
     color: "#f8fafc",
     icon: Nextjs,
     x: 18,
-    y: 15,
-    anchorX: 22,
-    side: "left",
+    y: 22,
+    connectorPath: "M 41 40 H 31 V 22 H 22",
   },
   {
     name: "Tailwind CSS",
     color: "#38bdf8",
     icon: TailwindCSS,
     x: 10,
-    y: 33,
-    anchorX: 14,
-    side: "left",
+    y: 39,
+    connectorPath: "M 41 47 H 22 V 39 H 14",
   },
   {
     name: "Prisma",
     color: "#5eead4",
     icon: Prisma,
     x: 13,
-    y: 58,
-    anchorX: 17,
-    side: "left",
+    y: 63,
+    connectorPath: "M 41 53 H 24 V 63 H 17",
   },
   {
     name: "Docker",
     color: "#2496ed",
     icon: Docker,
     x: 23,
-    y: 82,
-    anchorX: 27,
-    side: "left",
+    y: 80,
+    connectorPath: "M 41 60 H 31 V 80 H 27",
   },
   {
     name: "PostgreSQL",
     color: "#336791",
     icon: PostgreSQL,
     x: 82,
-    y: 15,
-    anchorX: 78,
-    side: "right",
+    y: 22,
+    connectorPath: "M 59 40 H 69 V 22 H 78",
   },
   {
     name: "shadcn/ui",
     color: "#f8fafc",
     icon: shadcnui,
     x: 90,
-    y: 33,
-    anchorX: 86,
-    side: "right",
+    y: 39,
+    connectorPath: "M 59 47 H 78 V 39 H 86",
   },
   {
     name: "Auth.js",
     color: "#a855f7",
     icon: Authjs,
     x: 87,
-    y: 58,
-    anchorX: 83,
-    side: "right",
+    y: 63,
+    connectorPath: "M 59 53 H 76 V 63 H 83",
   },
   {
     name: "npm",
     color: "#cc0000",
     icon: NPM,
     x: 77,
-    y: 82,
-    anchorX: 73,
-    side: "right",
+    y: 80,
+    connectorPath: "M 59 60 H 69 V 80 H 73",
   },
 ] satisfies StackItem[];
 
@@ -102,7 +93,7 @@ export function StackPowerSection() {
       className="relative overflow-hidden border-t border-border py-16"
     >
       <div
-        className="pointer-events-none absolute inset-x-0 top-24 mx-auto h-140 max-w-5xl bg-[linear-gradient(to_right,color-mix(in_oklch,var(--border)_78%,white)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklch,var(--border)_78%,white)_1px,transparent_1px)] bg-size-[42px_42px] opacity-55 mask-[radial-gradient(ellipse_at_center,black_0%,black_36%,transparent_78%)]"
+        className="pointer-events-none absolute inset-x-0 top-24 mx-auto h-180 max-w-5xl bg-[linear-gradient(to_right,color-mix(in_oklch,var(--border)_78%,white)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklch,var(--border)_78%,white)_1px,transparent_1px)] bg-size-[42px_42px] opacity-55 mask-[radial-gradient(ellipse_at_center,black_0%,black_36%,transparent_78%)]"
         aria-hidden="true"
       />
       <div
@@ -123,7 +114,7 @@ export function StackPowerSection() {
         </p>
       </div>
 
-      <div className="relative z-10 mt-10 hidden h-140 md:block">
+      <div className="relative z-10 mt-10 hidden h-165 md:block">
         <ConnectorLayer />
         <CenterLogo />
 
@@ -163,67 +154,31 @@ function ConnectorLayer() {
       preserveAspectRatio="none"
       aria-hidden="true"
     >
-      <defs>
-        <filter
-          id="stack-line-glow"
-          x="-30%"
-          y="-30%"
-          width="160%"
-          height="160%"
-        >
-          <feGaussianBlur stdDeviation="1.6" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      {stacks.map((stack) => {
-        const startX = stack.side === "left" ? 43 : 57;
-        const startY = 50 + (stack.y - 50) * 0.34;
-        const controlOneX = stack.side === "left" ? 38 : 62;
-        const controlTwoX =
-          stack.side === "left" ? stack.anchorX + 8 : stack.anchorX - 8;
-        const path = `M ${startX} ${startY} C ${controlOneX} ${startY}, ${controlTwoX} ${stack.y}, ${stack.anchorX} ${stack.y}`;
-
-        return (
-          <g key={stack.name}>
-            <path
-              d={path}
-              fill="none"
-              stroke={stack.color}
-              strokeOpacity="0.16"
-              strokeWidth="0.72"
-              filter="url(#stack-line-glow)"
-            />
-            <path
-              d={path}
-              fill="none"
-              stroke={stack.color}
-              strokeLinecap="round"
-              strokeOpacity="0.64"
-              strokeWidth="0.24"
-              filter="url(#stack-line-glow)"
-            />
-          </g>
-        );
-      })}
+      {stacks.map((stack) => (
+        <path
+          key={stack.name}
+          d={stack.connectorPath}
+          fill="none"
+          stroke={stack.color}
+          strokeLinecap="square"
+          strokeLinejoin="miter"
+          strokeOpacity="0.72"
+          strokeWidth="0.22"
+        />
+      ))}
     </svg>
   );
 }
 
 function CenterLogo() {
   return (
-    <div className="absolute left-1/2 top-1/2 flex h-64 w-64 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
-      <div className="absolute inset-4 rounded-full bg-[radial-gradient(circle_at_center,rgba(74,222,128,0.2),transparent_66%)] blur-2xl" />
-      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.34),rgba(255,255,255,0.12)_34%,transparent_70%)] blur-2xl" />
+    <div className="absolute left-1/2 top-1/2 flex h-56 w-56 -translate-x-1/2 -translate-y-1/2 items-center justify-center border border-white/80 bg-card/80">
       <Image
         src="/favicon/favicon.svg"
         alt="BaseForge"
         width={196}
         height={196}
-        className="relative z-10"
+        className="h-49 w-49"
       />
     </div>
   );

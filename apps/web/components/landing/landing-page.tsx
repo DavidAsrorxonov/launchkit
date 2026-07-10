@@ -1,4 +1,5 @@
 import { CliDemoSection } from "@/components/landing/cli-demo-section";
+import { LandingFooter } from "@/components/landing/landing-footer";
 import { LandingHero } from "@/components/landing/landing-hero";
 import { LandingNav } from "@/components/landing/landing-nav";
 import { StackPowerSection } from "@/components/landing/stack-power-section";
@@ -15,6 +16,8 @@ export function LandingPage() {
         <StackPowerSection />
         <WorkflowComparisonSection />
       </div>
+
+      <LandingFooter />
     </main>
   );
 }
