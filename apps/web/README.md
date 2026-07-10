@@ -46,7 +46,17 @@ npm run build -w apps/web
 npm run start -w apps/web
 ```
 
-The website MVP does not require environment variables. Generated-project values such as `DATABASE_URL` and `AUTH_SECRET` belong inside downloaded projects, not this web app.
+Vercel deployment setup:
+
+- Import the whole GitHub repository.
+- Set the Vercel Root Directory to `apps/web`.
+- Use the Next.js framework preset.
+- Set `NEXT_PUBLIC_SITE_URL=https://baseforge.dovudkhon.com` for Production.
+- Connect the custom domain `baseforge.dovudkhon.com` and configure DNS using Vercel's instructions for that subdomain.
+
+Preview deployments may still use the production canonical URL. Generated-project
+values such as `DATABASE_URL` and `AUTH_SECRET` belong inside downloaded
+projects, not this web app.
 
 `POST /api/generate` validates requests, calls the shared generator, and returns generated file data for browser-side ZIP creation. The website does not install generated dependencies, execute generated code, start generated app servers, or write generated projects to disk.
 

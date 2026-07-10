@@ -7,6 +7,7 @@ import { DocsSidebar, type DocsNavItem } from "@/components/docs/docs-sidebar";
 import { FeatureNotes } from "@/components/docs/feature-notes";
 import { GeneratedFilesSection } from "@/components/docs/generated-files-section";
 import { SupportedStackTable } from "@/components/docs/supported-stack-table";
+import Image from "next/image";
 
 const docsNavItems = [
   { id: "overview", label: "Overview" },
@@ -120,13 +121,18 @@ export function DocsPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Link
               href="/"
-              className="flex min-w-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex min-w-0 items-center gap-2 rounded-md transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="BaseForge home"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-                BF
-              </span>
-              <span className="text-sm font-semibold text-foreground">
+              <Image
+                src="/favicon/favicon-96x96.png"
+                alt=""
+                width={28}
+                height={28}
+                className="h-7 w-7 shrink-0 rounded-sm"
+                priority
+              />
+              <span className="text-lg font-semibold leading-none">
                 BaseForge
               </span>
             </Link>
@@ -159,12 +165,12 @@ export function DocsPage() {
           <div className="max-w-3xl py-6">
             <p className="text-sm font-medium text-primary">Documentation</p>
             <h1 className="mt-2 text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
-              Build, preview, and download a BaseForge project.
+              BaseForge documentation
             </h1>
             <p className="mt-4 text-base leading-7 text-muted-foreground">
-              Practical notes for the current website-first MVP, the generated
-              project output, and the local CLI package that reuses the same
-              shared generator core.
+              Practical notes for the website builder, generated project output,
+              supported stack options, and the published CLI package that reuses
+              the same shared generator core.
             </p>
             <Link
               href="/builder"

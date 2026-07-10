@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: BaseForge
 Stage: Foundation setup
-Current phase: Phase 10 Step 6 complete
-Primary focus: Public docs, website copy, package command examples, and planning context now reflect BaseForge and `npx @baseforge/create@latest my-app`
+Current phase: Pre-release SEO/indexing checks complete after Phase 10 Step 6
+Primary focus: BaseForge website canonical metadata, sitemap, robots, social preview image, structured data, and Vercel deployment guidance are ready for Vercel deployment from `apps/web`
 ```
 
 ## Phase Progress
@@ -24,11 +24,235 @@ Primary focus: Public docs, website copy, package command examples, and planning
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
-| Phase 10 | npm Release Preparation              | In Progress | Step 6 completed BaseForge public docs/command update; `@baseforge/create@0.1.0` remains the stable latest npm package. |
+| Phase 10 | npm Release Preparation              | In Progress | Pre-release website SEO/indexing checks completed for Vercel deployment; `@baseforge/create@0.1.0` remains the stable latest npm package. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
+
+### 2026-07-10
+
+Pre-release SEO and indexing checks implemented for `apps/web`
+
+Scope and deployment assumptions:
+
+- Confirmed the deployed website app lives in `apps/web`.
+- Confirmed Vercel should import the whole GitHub repo and use `apps/web` as the Root Directory.
+- Kept all implementation changes scoped to website SEO/indexing/deployment prep.
+- Did not change CLI package publishing behavior.
+- Did not change generator behavior.
+- Did not add product options.
+- Did not move the app out of `apps/web`.
+
+Changes made:
+
+- Added shared site metadata constants in `apps/web/lib/site.ts`.
+- Updated global App Router metadata in `apps/web/app/layout.tsx`:
+  - `metadataBase`;
+  - default title and title template;
+  - canonical URL;
+  - Open Graph and Twitter image metadata;
+  - index/follow robots metadata;
+  - favicon/apple icon/manifest references.
+- Added route-specific metadata for:
+  - `/` as `BaseForge - Next.js project generator`;
+  - `/builder` as `BaseForge Builder`;
+  - `/docs` as `BaseForge Docs`.
+- Added `SoftwareApplication` JSON-LD to the landing route.
+- Added `apps/web/app/sitemap.ts` with `/`, `/builder`, and `/docs`.
+- Added `apps/web/app/robots.ts` allowing `/` and referencing `https://baseforge.dovudkhon.com/sitemap.xml`.
+- Added `apps/web/.env.example` with `NEXT_PUBLIC_SITE_URL="https://baseforge.dovudkhon.com"`.
+- Updated `apps/web/.gitignore` so `.env.example` is trackable while real env files remain ignored.
+- Added `apps/web/public/og-image.png` at `1200x630`, generated from the existing `apps/web/public/favicon/web-app-manifest-512x512.png` asset and aligned with the current dark/yellow BaseForge visual direction.
+- Updated public page headings:
+  - `/`: `BaseForge Next.js project generator`;
+  - `/builder`: `Build your Next.js project`;
+  - `/docs`: `BaseForge documentation`.
+- Updated landing/docs copy so supported stack terms appear naturally.
+- Added Vercel deployment guidance to `apps/web/README.md`:
+  - import whole repo;
+  - Root Directory `apps/web`;
+  - Next.js preset;
+  - production `NEXT_PUBLIC_SITE_URL=https://baseforge.dovudkhon.com`;
+  - custom domain `baseforge.dovudkhon.com` with DNS configured from Vercel instructions.
+
+Files added:
+
+- `apps/web/.env.example`
+- `apps/web/app/robots.ts`
+- `apps/web/app/sitemap.ts`
+- `apps/web/lib/site.ts`
+- `apps/web/public/og-image.png`
+
+Files changed:
+
+- `apps/web/.gitignore`
+- `apps/web/README.md`
+- `apps/web/app/layout.tsx`
+- `apps/web/app/page.tsx`
+- `apps/web/app/builder/page.tsx`
+- `apps/web/app/docs/page.tsx`
+- `apps/web/components/landing/landing-hero.tsx`
+- `apps/web/components/builder/builder-shell.tsx`
+- `apps/web/components/docs/docs-page.tsx`
+- `context/progress-tracker.md`
+
+Verification result:
+
+- `npm run typecheck -w apps/web` passed.
+- `npm run lint -w apps/web` passed.
+- `npm test -w apps/web` passed: 5 files, 49 tests.
+- `npm run build -w apps/web` passed when rerun with required sandbox permission.
+- `npm run typecheck` passed across all workspaces.
+- `npm test` passed across all workspace tests:
+  - web: 5 files, 49 tests;
+  - `@baseforge/create`: 8 files, 123 tests;
+  - `@launchkit/generator`: 11 files, 127 tests;
+  - `@launchkit/schema`: 5 files, 87 tests;
+  - `@launchkit/templates`: 1 file, 52 tests.
+- `npm run build` passed across all workspaces when rerun with required sandbox permission.
+- `git diff --check` passed.
+- `rg "noindex|nofollow|robots" apps/web` found only the intended metadata/routes:
+  - `apps/web/app/layout.tsx`;
+  - `apps/web/app/robots.ts`.
+- `file apps/web/public/og-image.png` confirmed PNG image data at `1200 x 630`.
+
+Build/local verification notes:
+
+- Sandboxed `npm run build -w apps/web` and sandboxed `npm run build` failed because Next/Turbopack cannot create a worker process and bind a local port in the sandbox:
+  - `Operation not permitted (os error 1)`.
+- Rerunning the same builds with required sandbox permission passed.
+- `npm run start -w apps/web` was attempted for local sitemap/robots verification, but sandboxed start failed with `listen EPERM` on port 3000.
+- Escalated start on port 3000 found the port in use.
+- User asked not to continue local server verification and said they will do it themselves.
+- Did not verify local `http://localhost:3000/sitemap.xml`, `http://localhost:3000/robots.txt`, or `http://localhost:3000/og-image.png` after that request.
+
+Post-deployment verification still needed by user after Vercel deployment/domain connection:
+
+- `https://baseforge.dovudkhon.com`
+- `https://baseforge.dovudkhon.com/builder`
+- `https://baseforge.dovudkhon.com/docs`
+- `https://baseforge.dovudkhon.com/sitemap.xml`
+- `https://baseforge.dovudkhon.com/robots.txt`
+- `https://baseforge.dovudkhon.com/og-image.png`
+
+Landing page UI redesign progress logged
+
+Design direction:
+
+- Continued the InsForge-inspired landing page direction.
+- User changed the theme token direction from green accents to warm yellow accents in `apps/web/app/globals.css`.
+- Inspected the token change and confirmed no obvious technical issues.
+- Current global accent direction is dark/black surfaces with restrained yellow primary/ring/accent tokens.
+- Some newer sections intentionally use black/white/blue accents instead of theme primary where the user requested no green/yellow styling.
+
+Major UI sections completed:
+
+- Landing navbar:
+  - Full-width sticky top navbar.
+  - Dark translucent background.
+  - Local favicon plus `BaseForge`.
+  - Links: `Builder`, `Supported Stack`, `Docs`.
+  - External links: NPM, GitHub, Telegram.
+  - Navbar style is liked by the user and should not be reverted unless explicitly asked.
+
+- Hero:
+  - Removed earlier green glow/radial/orbit treatment.
+  - Added visible checkered/grid background.
+  - Reduced/lighter headline typography.
+  - Buttons are `Open Builder` and `Docs`.
+  - Command card simplified to command plus copy icon.
+  - Copy action writes the CLI command to clipboard and shows success feedback.
+
+- CLI workflow section:
+  - Replaced earlier workflow/supported-stack landing section.
+  - Added terminal UI animation that mirrors real BaseForge CLI prompts.
+  - Terminal uses black/white text and blue `>`/selection markers.
+  - Added companion explanatory cards for what BaseForge assembles.
+  - Kept `id="supported-stack"` so navbar anchor still works.
+
+- Stack power section:
+  - Added visual section showing BaseForge powering supported stack tools.
+  - Uses stack icon components for:
+    - Next.js
+    - Tailwind CSS
+    - Prisma
+    - Docker
+    - PostgreSQL
+    - shadcn/ui
+    - Auth.js
+    - npm
+  - Center logo uses `/favicon/favicon.svg`.
+  - Current center logo is inside a tight white-bordered square.
+  - Stack cards are placed left/right of the logo and intentionally scattered.
+  - Straight segmented connector lines touch the white logo-box border and connect to the stack cards.
+  - Added subtle short splash animation traveling outward from the logo toward each stack in the stack's brand color.
+  - Current stack positions and logo position are liked; do not change geometry unless asked.
+
+- Web Builder vs CLI workflow comparison:
+  - Added professional two-panel comparison section.
+  - Removed the earlier `VS` treatment after user feedback.
+  - Current version uses one framed surface with shared header:
+    - `Same generator, same project output`
+  - Left panel: web builder mock with stack selections and file preview.
+  - Right panel: CLI terminal mock and direct command snippet.
+  - Styling intentionally stays black/white/blue with no green/yellow accents.
+
+- Footer:
+  - Added simple footer component.
+  - Footer has NPM and GitHub buttons above the wordmark.
+  - Buttons use existing icon components and black/white/neutral styling with blue focus rings.
+  - Footer wordmark uses large SVG favicon plus oversized `BaseForge` text across the footer width.
+
+Files added:
+
+- `apps/web/components/landing/cli-demo-section.tsx`
+- `apps/web/components/landing/stack-power-section.tsx`
+- `apps/web/components/landing/workflow-comparison-section.tsx`
+- `apps/web/components/landing/landing-footer.tsx`
+- Icon components used by the new UI:
+  - `apps/web/components/icons/authjs.tsx`
+  - `apps/web/components/icons/docker.tsx`
+  - `apps/web/components/icons/next.tsx`
+  - `apps/web/components/icons/postgresql.tsx`
+  - `apps/web/components/icons/prisma.tsx`
+  - `apps/web/components/icons/shadcn.tsx`
+  - `apps/web/components/icons/tailwind.tsx`
+
+Files changed:
+
+- `apps/web/app/globals.css`
+- `apps/web/app/layout.tsx`
+- `apps/web/components/landing/command-card.tsx`
+- `apps/web/components/landing/landing-footer.tsx`
+- `apps/web/components/landing/landing-hero.tsx`
+- `apps/web/components/landing/landing-nav.tsx`
+- `apps/web/components/landing/landing-page.tsx`
+- `apps/web/components/landing/cli-demo-section.tsx`
+- `apps/web/components/landing/stack-power-section.tsx`
+- `apps/web/components/landing/workflow-comparison-section.tsx`
+- `context/ui/new-ui.md`
+- `context/progress-tracker.md`
+
+Verification result:
+
+- `npm run typecheck -w web` passed.
+- `npm run lint -w web` passed.
+- `git diff --check` passed.
+- `npm run build -w web` passed when rerun with required sandbox permission.
+
+Build note:
+
+- Sandboxed `npm run build -w web` repeatedly fails because Next/Turbopack cannot create a process and bind to a local worker port in the sandbox:
+  - `Operation not permitted (os error 1)`.
+- Rerunning the same build with required sandbox permission passes.
+
+Current UI notes:
+
+- User prefers the current yellow token direction over the older green token direction.
+- User prefers professional sections to avoid decorative green glow.
+- User explicitly likes the current stack-power layout after the latest left/right scatter and connector revisions.
+- User likes the simple large footer direction.
 
 ### 2026-07-09
 

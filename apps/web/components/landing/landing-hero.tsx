@@ -24,12 +24,12 @@ export function LandingHero() {
         </div>
 
         <h1 className="max-w-4xl text-4xl font-normal leading-tight text-foreground sm:text-5xl lg:text-6xl">
-          One-click project generation for modern Next.js apps
+          BaseForge Next.js project generator
         </h1>
 
         <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-          Choose your stack, preview the output, and download a ready-to-edit
-          TypeScript project without running generated code on the server.
+          Generate a ready-to-edit TypeScript project with Tailwind, optional
+          shadcn/ui, PostgreSQL, Prisma, Auth.js, and Docker Compose setup.
         </p>
 
         <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">

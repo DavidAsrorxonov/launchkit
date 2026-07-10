@@ -116,7 +116,7 @@ export function BuilderShell() {
                 BaseForge
               </p>
               <h1 className="mt-1 text-2xl font-semibold text-foreground">
-                Project builder
+                Build your Next.js project
               </h1>
             </div>
           </div>
