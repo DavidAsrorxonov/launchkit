@@ -154,18 +154,89 @@ function ConnectorLayer() {
       preserveAspectRatio="none"
       aria-hidden="true"
     >
-      {stacks.map((stack) => (
-        <path
-          key={stack.name}
-          d={stack.connectorPath}
-          fill="none"
-          stroke={stack.color}
-          strokeLinecap="square"
-          strokeLinejoin="miter"
-          strokeOpacity="0.72"
-          strokeWidth="0.22"
-        />
-      ))}
+      <defs>
+        <filter
+          id="connector-splash-glow"
+          x="-100%"
+          y="-100%"
+          width="300%"
+          height="300%"
+        >
+          <feGaussianBlur stdDeviation="1.1" />
+        </filter>
+
+        {stacks.map((stack) => (
+          <radialGradient
+            key={stack.name}
+            id={`puff-${stack.name.replace(/[^a-zA-Z0-9]/g, "")}`}
+          >
+            <stop offset="0%" stopColor={stack.color} stopOpacity="0.9" />
+            <stop offset="60%" stopColor={stack.color} stopOpacity="0.4" />
+            <stop offset="100%" stopColor={stack.color} stopOpacity="0" />
+          </radialGradient>
+        ))}
+      </defs>
+
+      {stacks.map((stack, index) => {
+        const gradientId = `puff-${stack.name.replace(/[^a-zA-Z0-9]/g, "")}`;
+        const dur = 2.6;
+
+        return (
+          <g key={stack.name}>
+            {/* dim static wire */}
+            <path
+              d={stack.connectorPath}
+              fill="none"
+              stroke={stack.color}
+              strokeLinecap="square"
+              strokeLinejoin="miter"
+              strokeOpacity="0.72"
+              strokeWidth="0.22"
+            />
+
+            {/* soft flowing puff traveling logo -> stack */}
+            <ellipse
+              rx="2.6"
+              ry="1.5"
+              fill={`url(#${gradientId})`}
+              filter="url(#connector-splash-glow)"
+              opacity="0"
+            >
+              <animateMotion
+                dur={`${dur}s`}
+                begin={`${index * 0.22}s`}
+                repeatCount="indefinite"
+                path={stack.connectorPath}
+                rotate="auto"
+              />
+              <animate
+                attributeName="opacity"
+                values="0;0.9;0.9;0"
+                keyTimes="0;0.18;0.75;1"
+                dur={`${dur}s`}
+                begin={`${index * 0.22}s`}
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="rx"
+                values="1.6;2.8;2.8;1.8"
+                keyTimes="0;0.3;0.7;1"
+                dur={`${dur}s`}
+                begin={`${index * 0.22}s`}
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="ry"
+                values="1.3;1.6;1.6;1.4"
+                keyTimes="0;0.3;0.7;1"
+                dur={`${dur}s`}
+                begin={`${index * 0.22}s`}
+                repeatCount="indefinite"
+              />
+            </ellipse>
+          </g>
+        );
+      })}
     </svg>
   );
 }
