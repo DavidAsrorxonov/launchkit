@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["@launchkit/generator", "@launchkit/schema"],
   async headers() {
     return [
       {
