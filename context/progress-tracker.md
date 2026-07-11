@@ -7,8 +7,8 @@ Use this file to track development progress, changes made, decisions, notes, blo
 ```txt
 Project: BaseForge
 Stage: Foundation setup
-Current phase: Critical LaunchKit-to-BaseForge generated copy and fixture rename complete
-Primary focus: Step 4 renamed generated-project copy and non-public fixture/temp names while leaving root repo identity, GitHub URLs, and historical records for later steps
+Current phase: Critical LaunchKit-to-BaseForge root repo identity rename complete
+Primary focus: Step 5 renamed root package identity, GitHub URLs, and active repo-layout examples after the GitHub repo moved to baseforge
 ```
 
 ## Phase Progress
@@ -24,13 +24,93 @@ Primary focus: Step 4 renamed generated-project copy and non-public fixture/temp
 | Phase 7 | Testing, Validation, and Hardening    | Complete    | Step 7 automated hardening checks passed; user reported manual website/download QA works. |
 | Phase 8 | Launch Preparation                    | Complete    | Step 5 automated final QA passed; user reported localhost browser/responsive/download QA works. |
 | Phase 9 | Future CLI                            | Complete    | CLI MVP is ready for local use, uses shared schema/generator/templates, writes safely, supports optional installs, has unit and smoke coverage, and remains unpublished. |
-| Phase 10 | npm Release Preparation              | In Progress | Critical rename Step 4 completed: generated project copy and fixture/temp names now use BaseForge naming; root repo/GitHub identity remains for Step 5. |
+| Phase 10 | npm Release Preparation              | In Progress | Critical rename Step 5 completed: root package identity, GitHub URLs, and active repo-layout examples now use BaseForge; only optional historical cleanup remains. |
 
 ## Change Log
 
 Add entries in reverse chronological order.
 
 ### 2026-07-11
+
+Critical LaunchKit-to-BaseForge rename Step 5 completed
+
+Prerequisite:
+
+- User renamed the GitHub repository from `DavidAsrorxonov/launchkit` to
+  `DavidAsrorxonov/baseforge`.
+- User updated the local git remote and reported no issues.
+
+Scope:
+
+- Renamed root package identity:
+  - root `package.json` name `launchkit` -> `baseforge`;
+  - root `package-lock.json` name `launchkit` -> `baseforge`.
+- Updated GitHub URLs:
+  - `packages/cli/package.json` repository URL;
+  - `packages/cli/package.json` homepage;
+  - `packages/cli/package.json` bugs URL;
+  - website landing nav GitHub link;
+  - website landing footer GitHub link;
+  - `context/ui/new-ui.md` GitHub link.
+- Updated active repo-layout examples:
+  - `context/architecture.md`: `launchkit/` -> `baseforge/`;
+  - `context/project-overview.md`: `launchkit/` -> `baseforge/`.
+- Refreshed `package-lock.json` with npm.
+
+Intentionally not changed:
+
+- Historical notes saying the original unscoped `create-launchkit` npm package
+  name was unavailable.
+- Historical records in `context/progress-tracker.md`, `memory.md`, and
+  `.agents/prompts/**`.
+- Local filesystem folder name. The repo can remain checked out at a local path
+  named `launchkit` while the GitHub repo is named `baseforge`.
+
+Remaining active `launchkit` hits after Step 5:
+
+- `context/architecture.md`: historical `create-launchkit` npm availability
+  note.
+- `context/build-plan.md`: historical `create-launchkit` npm availability note.
+
+Files changed:
+
+- `package.json`
+- `package-lock.json`
+- `packages/cli/package.json`
+- `apps/web/components/landing/landing-nav.tsx`
+- `apps/web/components/landing/landing-footer.tsx`
+- `context/architecture.md`
+- `context/project-overview.md`
+- `context/ui/new-ui.md`
+- `context/critical-release-changes.md`
+- `context/progress-tracker.md`
+
+Verification:
+
+- `npm install --package-lock-only --ignore-scripts` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm test` passed across all workspace tests:
+  - web: 5 files, 49 tests;
+  - `@baseforge/create`: 8 files, 123 tests;
+  - `@baseforge/generator`: 11 files, 127 tests;
+  - `@baseforge/schema`: 5 files, 87 tests;
+  - `@baseforge/templates`: 1 file, 52 tests.
+- `npm run build` passed across all workspaces when rerun with required sandbox
+  permission for Next/Turbopack.
+- `npm run test:cli-smoke` passed: 1 file, 5 tests.
+- `npm run test:smoke` passed when run with required sandbox permission:
+  1 file, 2 generated-project smoke tests.
+- `git diff --check` passed.
+- Active source/config and refreshed production output scans found no remaining
+  `DavidAsrorxonov/launchkit`, `launchkit.git`, root `"name": "launchkit"`, or
+  repo-layout `launchkit/` references.
+- Broad active scan found only the intentionally preserved historical
+  `create-launchkit` npm availability notes.
+
+Next rename step:
+
+- Step 6: optional historical cleanup only if the repo must have zero
+  `launchkit` matches including history.
 
 Critical LaunchKit-to-BaseForge rename Step 4 completed
 

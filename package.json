@@ -1,5 +1,5 @@
 {
-  "name": "launchkit",
+  "name": "baseforge",
   "private": true,
   "workspaces": [
     "apps/*",

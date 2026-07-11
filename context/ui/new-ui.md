@@ -62,7 +62,7 @@ Use this file to continue the landing-page UI work without losing the current de
   - NPM icon plus `NPM`
     - `https://www.npmjs.com/package/@baseforge/create`
   - GitHub icon plus `GitHub`
-    - `https://github.com/DavidAsrorxonov/launchkit`
+    - `https://github.com/DavidAsrorxonov/baseforge`
   - Telegram icon only
     - `https://t.me/whoisdave02`
 

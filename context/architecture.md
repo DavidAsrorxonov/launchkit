@@ -73,7 +73,7 @@ packages/generator
 ## Recommended Monorepo Layout
 
 ```txt
-launchkit/
+baseforge/
   apps/
     web/
       app/

@@ -56,7 +56,7 @@ BaseForge should start as a monorepo so the website, generator, shared schema, t
 Recommended structure:
 
 ```txt
-launchkit/
+baseforge/
   apps/
     web/
       # Website for selecting options and downloading generated projects

@@ -4,7 +4,7 @@ import { GitHub } from "@/components/icons/github";
 import { NPM } from "@/components/icons/npm";
 
 const npmUrl = "https://www.npmjs.com/package/@baseforge/create";
-const githubUrl = "https://github.com/DavidAsrorxonov/launchkit";
+const githubUrl = "https://github.com/DavidAsrorxonov/baseforge";
 
 export function LandingFooter() {
   return (

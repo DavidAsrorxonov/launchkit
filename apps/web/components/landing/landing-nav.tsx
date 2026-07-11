@@ -5,7 +5,7 @@ import { GitHub } from "@/components/icons/github";
 import { NPM } from "@/components/icons/npm";
 import { Telegram } from "@/components/icons/telegram";
 
-const githubUrl = "https://github.com/DavidAsrorxonov/launchkit";
+const githubUrl = "https://github.com/DavidAsrorxonov/baseforge";
 const npmUrl = "https://www.npmjs.com/package/@baseforge/create";
 const telegramUrl = "https://t.me/whoisdave02";
 

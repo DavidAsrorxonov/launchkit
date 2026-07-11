@@ -19,12 +19,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DavidAsrorxonov/launchkit.git",
+    "url": "git+https://github.com/DavidAsrorxonov/baseforge.git",
     "directory": "packages/cli"
   },
-  "homepage": "https://github.com/DavidAsrorxonov/launchkit#readme",
+  "homepage": "https://github.com/DavidAsrorxonov/baseforge#readme",
   "bugs": {
-    "url": "https://github.com/DavidAsrorxonov/launchkit/issues"
+    "url": "https://github.com/DavidAsrorxonov/baseforge/issues"
   },
   "keywords": [
     "create",

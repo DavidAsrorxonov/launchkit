@@ -707,13 +707,99 @@ Verification result:
 - Step 4 target scans found no remaining generated-copy or fixture/temp
   LaunchKit names in active source/config or refreshed production output.
 
+## Step 5 Root Repo Identity And GitHub URL Rename - 2026-07-11
+
+Status: complete.
+
+Prerequisite completed outside the repo:
+
+- GitHub repository was renamed from `DavidAsrorxonov/launchkit` to
+  `DavidAsrorxonov/baseforge`.
+- Local git remote was updated by the user and reported working with no issues.
+
+Scope completed:
+
+- Renamed root package identity:
+  - root `package.json` name `launchkit` -> `baseforge`
+  - root `package-lock.json` name `launchkit` -> `baseforge`
+- Updated GitHub URLs:
+  - `packages/cli/package.json` repository URL
+  - `packages/cli/package.json` homepage
+  - `packages/cli/package.json` bugs URL
+  - website landing nav GitHub link
+  - website landing footer GitHub link
+  - `context/ui/new-ui.md` GitHub link
+- Updated active repo-layout examples:
+  - `context/architecture.md`: `launchkit/` -> `baseforge/`
+  - `context/project-overview.md`: `launchkit/` -> `baseforge/`
+- Refreshed `package-lock.json` with npm.
+
+Intentionally not changed in Step 5:
+
+- Historical notes saying the original unscoped `create-launchkit` npm package
+  name was unavailable.
+- Historical records in `context/progress-tracker.md`, `memory.md`, and
+  `.agents/prompts/**`.
+- Local filesystem folder name. The repo can remain checked out at a local path
+  named `launchkit` while the GitHub repo is named `baseforge`.
+
+Remaining active `launchkit` hits after Step 5:
+
+- `context/architecture.md`: historical `create-launchkit` npm availability
+  note.
+- `context/build-plan.md`: historical `create-launchkit` npm availability note.
+
+Files changed in Step 5:
+
+- `package.json`
+- `package-lock.json`
+- `packages/cli/package.json`
+- `apps/web/components/landing/landing-nav.tsx`
+- `apps/web/components/landing/landing-footer.tsx`
+- `context/architecture.md`
+- `context/project-overview.md`
+- `context/ui/new-ui.md`
+- `context/critical-release-changes.md`
+- `context/progress-tracker.md`
+
+Commands run:
+
+```bash
+npm install --package-lock-only --ignore-scripts
+npm run typecheck
+npm test
+npm run build
+npm run test:cli-smoke
+npm run test:smoke
+git diff --check
+```
+
+Verification result:
+
+- `npm install --package-lock-only --ignore-scripts` passed.
+- `npm run typecheck` passed across all workspaces.
+- `npm test` passed across all workspace tests:
+  - web: 5 files, 49 tests;
+  - `@baseforge/create`: 8 files, 123 tests;
+  - `@baseforge/generator`: 11 files, 127 tests;
+  - `@baseforge/schema`: 5 files, 87 tests;
+  - `@baseforge/templates`: 1 file, 52 tests.
+- `npm run build` passed across all workspaces when rerun with required sandbox
+  permission for Next/Turbopack.
+- `npm run test:cli-smoke` passed: 1 file, 5 tests.
+- `npm run test:smoke` passed when run with required sandbox permission:
+  1 file, 2 generated-project smoke tests.
+- `git diff --check` passed.
+- Active source/config and refreshed production output scans found no remaining
+  `DavidAsrorxonov/launchkit`, `launchkit.git`, root `"name": "launchkit"`, or
+  repo-layout `launchkit/` references.
+- Broad active scan found only the intentionally preserved historical
+  `create-launchkit` npm availability notes.
+
 ## Remaining Rename Plan
 
-Use this order for future sessions:
+Only optional historical cleanup remains:
 
-1. Step 5: Decide whether to rename the root package/repo identity and GitHub
-   URLs. Only change `DavidAsrorxonov/launchkit` URLs if the GitHub repository
-   itself has been renamed or redirects are confirmed.
-2. Step 6: Optional historical cleanup. Rewrite `context/progress-tracker.md`,
-   `memory.md`, and `.agents/prompts/**` only if the release requirement is zero
-   `launchkit` matches across the whole repository, including history.
+1. Step 6: Rewrite `context/progress-tracker.md`, `memory.md`, and
+   `.agents/prompts/**` only if the release requirement is zero `launchkit`
+   matches across the whole repository, including history.
