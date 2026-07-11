@@ -931,7 +931,7 @@ Confirmed package strategy:
 - package location: `packages/cli`
 - public package name: `@baseforge/create`
 - binary name: `create-baseforge`
-- internal package namespace remains `@launchkit/*`
+- internal package namespace is `@baseforge/*`
 - package format: ESM TypeScript
 - source directory: `src/`
 - build output: `dist/`

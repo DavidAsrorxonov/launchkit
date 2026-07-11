@@ -25,11 +25,11 @@ describe("generation pipeline", () => {
   it("generates package.json with the configured project name", async () => {
     const project = await generateProject({
       ...defaultBaseForgeConfig,
-      name: "launchkit-demo",
+      name: "baseforge-demo",
     });
 
     expect(readJsonFile(project, "package.json")).toMatchObject({
-      name: "launchkit-demo",
+      name: "baseforge-demo",
       version: "0.1.0",
       private: true,
       scripts: {

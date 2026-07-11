@@ -293,7 +293,7 @@ describe("writeGeneratedProject directory safety integration", () => {
 });
 
 async function createTempRoot(): Promise<string> {
-  const tempRoot = await mkdtemp(path.join(tmpdir(), "launchkit-cli-"));
+  const tempRoot = await mkdtemp(path.join(tmpdir(), "baseforge-cli-"));
   tempRoots.push(tempRoot);
 
   return tempRoot;

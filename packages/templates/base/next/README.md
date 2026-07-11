@@ -1,6 +1,6 @@
 # {{projectName}}
 
-Generated with LaunchKit.
+Generated with BaseForge.
 
 ## Getting Started
 

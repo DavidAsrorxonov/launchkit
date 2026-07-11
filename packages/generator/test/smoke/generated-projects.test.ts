@@ -79,14 +79,14 @@ describe("generated project smoke tests", () => {
         });
       }
 
-      expect(projectDir).toContain(`${sep}launchkit-smoke-`);
+      expect(projectDir).toContain(`${sep}baseforge-smoke-`);
     },
   );
 });
 
 async function writeGeneratedProjectToTempDir(config: BaseForgeConfig): Promise<string> {
   const project = await generateWithRealTemplates(config);
-  const tempRoot = await mkdtemp(join(tmpdir(), "launchkit-smoke-"));
+  const tempRoot = await mkdtemp(join(tmpdir(), "baseforge-smoke-"));
   const projectDir = join(tempRoot, project.name);
 
   await mkdir(projectDir, { recursive: true });
@@ -141,8 +141,8 @@ async function runProjectCommand(input: {
         ...process.env,
         DATABASE_URL:
           process.env.DATABASE_URL ??
-          "postgresql://postgres:postgres@localhost:5432/launchkit_smoke",
-        AUTH_SECRET: process.env.AUTH_SECRET ?? "launchkit-smoke-secret",
+          "postgresql://postgres:postgres@localhost:5432/baseforge_smoke",
+        AUTH_SECRET: process.env.AUTH_SECRET ?? "baseforge-smoke-secret",
       },
       maxBuffer: 20 * 1024 * 1024,
       timeout: 300_000,

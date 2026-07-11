@@ -140,7 +140,7 @@ type CliRunResult = {
 };
 
 async function createTempRoot(): Promise<string> {
-  const tempRoot = await mkdtemp(path.join(tmpdir(), "launchkit-cli-smoke-"));
+  const tempRoot = await mkdtemp(path.join(tmpdir(), "baseforge-cli-smoke-"));
   tempRoots.push(tempRoot);
 
   return tempRoot;

@@ -1,1 +1,1 @@
-export const launchkitSharedPlaceholder = "launchkit-shared";
+export const baseforgeSharedPlaceholder = "baseforge-shared";

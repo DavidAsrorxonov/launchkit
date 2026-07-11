@@ -8,7 +8,7 @@ import {
 import type { BaseForgeConfig } from "../index";
 
 const validFullConfig = {
-  name: "launchkit-demo",
+  name: "baseforge-demo",
   framework: "next",
   language: "typescript",
   router: "app",
@@ -60,7 +60,7 @@ describe("BaseForgeConfigSchema", () => {
   });
 
   it("accepts project names with lowercase letters, numbers, and hyphens", () => {
-    const validNames = ["my-app", "launchkit-demo", "app123", "app-123"];
+    const validNames = ["my-app", "baseforge-demo", "app123", "app-123"];
 
     for (const name of validNames) {
       expect(

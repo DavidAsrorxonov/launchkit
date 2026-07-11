@@ -657,7 +657,7 @@ Use typed errors instead of generic thrown strings.
 Recommended error types:
 
 ```txt
-LaunchKitError
+BaseForgeError
 ValidationError
 UnsupportedCombinationError
 FeatureConflictError

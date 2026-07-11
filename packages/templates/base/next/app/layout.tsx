@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "{{projectName}}",
-  description: "Generated with LaunchKit.",
+  description: "Generated with BaseForge.",
 };
 
 export default function RootLayout({
