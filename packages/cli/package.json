@@ -1,6 +1,6 @@
 {
   "name": "@baseforge/create",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create a TypeScript-first Next.js project with BaseForge.",
   "license": "MIT",
   "type": "module",
