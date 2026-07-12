@@ -42,6 +42,12 @@ export function LandingFooter() {
           >
             Privacy
           </Link>
+          <Link
+            href="/terms"
+            className="rounded-md transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          >
+            Terms
+          </Link>
         </nav>
 
         <div className="flex items-center justify-center gap-3 sm:gap-5">
