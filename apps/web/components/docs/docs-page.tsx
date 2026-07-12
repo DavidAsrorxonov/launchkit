@@ -11,18 +11,17 @@ import Image from "next/image";
 
 const docsNavItems = [
   { id: "overview", label: "Overview" },
-  { id: "quick-start", label: "Quick Start" },
-  { id: "builder-flow", label: "Website Builder Flow" },
+  { id: "web-builder-guide", label: "Web Builder Guide" },
   { id: "supported-stack", label: "Supported Stack" },
-  { id: "generated-structure", label: "Generated Project Structure" },
-  { id: "optional-features", label: "Optional Features" },
+  { id: "generated-app-setup", label: "Generated App Setup" },
+  { id: "feature-guides", label: "Feature Guides" },
+  { id: "generated-files", label: "Generated Files" },
   { id: "environment-variables", label: "Environment Variables" },
-  { id: "scripts", label: "Scripts" },
-  { id: "downloaded-project-usage", label: "Downloaded Project Usage" },
+  { id: "scripts-and-checks", label: "Scripts and Checks" },
   { id: "compatibility-rules", label: "Compatibility Rules" },
-  { id: "limitations", label: "Limitations" },
-  { id: "cli-status", label: "CLI Status" },
   { id: "troubleshooting", label: "Troubleshooting" },
+  { id: "deployment-notes", label: "Deployment Notes" },
+  { id: "limitations", label: "Limitations" },
 ] as const satisfies readonly DocsNavItem[];
 
 const quickStartSteps = [
@@ -84,7 +83,6 @@ const compatibilityRules = [
 ] as const;
 
 const limitations = [
-  "The CLI package is published as @baseforge/create.",
   "Only Next.js is supported.",
   "Only TypeScript is supported.",
   "Only App Router is supported.",
@@ -168,9 +166,8 @@ export function DocsPage() {
               BaseForge documentation
             </h1>
             <p className="mt-4 text-base leading-7 text-muted-foreground">
-              Practical notes for the website builder, generated project output,
-              supported stack options, and the published CLI package that reuses
-              the same shared generator core.
+              Practical guidance for using the website builder, setting up the
+              generated app, and understanding the web stack BaseForge creates.
             </p>
             <Link
               href="/builder"
@@ -197,12 +194,55 @@ export function DocsPage() {
             </p>
             <p>
               The generated project is intended to be unzipped and edited
-              locally. The shared generator core is also used by the published
-              `@baseforge/create` CLI package.
+              locally. These docs are organized around the website builder flow
+              and the generated web app that developers work with after
+              download.
             </p>
           </DocsSection>
 
-          <DocsSection id="quick-start" eyebrow="02" title="Quick Start">
+          <DocsSection
+            id="web-builder-guide"
+            eyebrow="02"
+            title="Web Builder Guide"
+          >
+            <p>
+              Start here to understand how the web builder turns project
+              selections into a downloadable web app.
+            </p>
+            <dl className="grid gap-3">
+              {builderFlow.map(([label, description]) => (
+                <div
+                  key={label}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  <dt className="text-sm font-semibold text-foreground">
+                    {label}
+                  </dt>
+                  <dd className="mt-1">{description}</dd>
+                </div>
+              ))}
+            </dl>
+          </DocsSection>
+
+          <DocsSection
+            id="supported-stack"
+            eyebrow="03"
+            title="Supported Stack"
+          >
+            <p>
+              These are the exact MVP option groups exposed by
+              `@baseforge/schema`. Unsupported frameworks, languages, routers,
+              databases, ORMs, auth providers, and package managers are not
+              documented as available.
+            </p>
+            <SupportedStackTable />
+          </DocsSection>
+
+          <DocsSection
+            id="generated-app-setup"
+            eyebrow="04"
+            title="Generated App Setup"
+          >
             <ol className="grid gap-2">
               {quickStartSteps.map((step, index) => (
                 <li key={step} className="flex gap-3">
@@ -233,53 +273,23 @@ pnpm dev`}</CodeBlock>
           </DocsSection>
 
           <DocsSection
-            id="builder-flow"
-            eyebrow="03"
-            title="Website Builder Flow"
-          >
-            <dl className="grid gap-3">
-              {builderFlow.map(([label, description]) => (
-                <div
-                  key={label}
-                  className="rounded-lg border border-border bg-card p-4"
-                >
-                  <dt className="text-sm font-semibold text-foreground">
-                    {label}
-                  </dt>
-                  <dd className="mt-1">{description}</dd>
-                </div>
-              ))}
-            </dl>
-          </DocsSection>
-
-          <DocsSection
-            id="supported-stack"
-            eyebrow="04"
-            title="Supported Stack"
+            id="feature-guides"
+            eyebrow="05"
+            title="Feature Guides"
           >
             <p>
-              These are the exact MVP option groups exposed by
-              `@baseforge/schema`. Unsupported frameworks, languages, routers,
-              databases, ORMs, auth providers, and package managers are not
-              documented as available.
+              Each optional feature changes the generated files, dependencies,
+              environment variables, and setup work in the downloaded app.
             </p>
-            <SupportedStackTable />
+            <FeatureNotes />
           </DocsSection>
 
           <DocsSection
-            id="generated-structure"
-            eyebrow="05"
-            title="Generated Project Structure"
+            id="generated-files"
+            eyebrow="06"
+            title="Generated Files"
           >
             <GeneratedFilesSection />
-          </DocsSection>
-
-          <DocsSection
-            id="optional-features"
-            eyebrow="06"
-            title="Optional Features"
-          >
-            <FeatureNotes />
           </DocsSection>
 
           <DocsSection
@@ -306,7 +316,11 @@ pnpm dev`}</CodeBlock>
             </dl>
           </DocsSection>
 
-          <DocsSection id="scripts" eyebrow="08" title="Scripts">
+          <DocsSection
+            id="scripts-and-checks"
+            eyebrow="08"
+            title="Scripts and Checks"
+          >
             <p>
               Common scripts are generated for every project. Prisma scripts are
               added only when Prisma is selected.
@@ -327,9 +341,46 @@ pnpm dev`}</CodeBlock>
           </DocsSection>
 
           <DocsSection
-            id="downloaded-project-usage"
+            id="compatibility-rules"
             eyebrow="09"
-            title="Downloaded Project Usage"
+            title="Compatibility Rules"
+          >
+            <ul className="grid gap-2">
+              {compatibilityRules.map((rule) => (
+                <li
+                  key={rule}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  {rule}
+                </li>
+              ))}
+            </ul>
+          </DocsSection>
+
+          <DocsSection
+            id="troubleshooting"
+            eyebrow="10"
+            title="Troubleshooting"
+          >
+            <dl className="grid gap-3">
+              {troubleshooting.map(([title, description]) => (
+                <div
+                  key={title}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  <dt className="text-sm font-semibold text-foreground">
+                    {title}
+                  </dt>
+                  <dd className="mt-1">{description}</dd>
+                </div>
+              ))}
+            </dl>
+          </DocsSection>
+
+          <DocsSection
+            id="deployment-notes"
+            eyebrow="11"
+            title="Deployment Notes"
           >
             <p>
               After download, unzip locally, install dependencies, copy
@@ -346,24 +397,7 @@ npm run build`}</CodeBlock>
             </p>
           </DocsSection>
 
-          <DocsSection
-            id="compatibility-rules"
-            eyebrow="10"
-            title="Compatibility Rules"
-          >
-            <ul className="grid gap-2">
-              {compatibilityRules.map((rule) => (
-                <li
-                  key={rule}
-                  className="rounded-lg border border-border bg-card p-4"
-                >
-                  {rule}
-                </li>
-              ))}
-            </ul>
-          </DocsSection>
-
-          <DocsSection id="limitations" eyebrow="11" title="Limitations">
+          <DocsSection id="limitations" eyebrow="12" title="Limitations">
             <ul className="grid gap-2">
               {limitations.map((limitation) => (
                 <li
@@ -374,35 +408,6 @@ npm run build`}</CodeBlock>
                 </li>
               ))}
             </ul>
-          </DocsSection>
-
-          <DocsSection id="cli-status" eyebrow="12" title="CLI Status">
-            <p>
-              CLI generation is available through the published
-              `@baseforge/create` package and uses the same shared generator
-              core as the website.
-            </p>
-            <CodeBlock>{`npx @baseforge/create@latest`}</CodeBlock>
-          </DocsSection>
-
-          <DocsSection
-            id="troubleshooting"
-            eyebrow="13"
-            title="Troubleshooting"
-          >
-            <dl className="grid gap-3">
-              {troubleshooting.map(([title, description]) => (
-                <div
-                  key={title}
-                  className="rounded-lg border border-border bg-card p-4"
-                >
-                  <dt className="text-sm font-semibold text-foreground">
-                    {title}
-                  </dt>
-                  <dd className="mt-1">{description}</dd>
-                </div>
-              ))}
-            </dl>
           </DocsSection>
         </div>
       </div>

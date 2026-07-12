@@ -31,15 +31,17 @@ function labels(metadata: readonly { label: string }[]): string[] {
 describe("Phase 8 docs page", () => {
   it("includes the required documentation sections and MVP stack source", () => {
     expect(docsSource).toContain("Overview");
-    expect(docsSource).toContain("Quick Start");
-    expect(docsSource).toContain("Website Builder Flow");
+    expect(docsSource).toContain("Web Builder Guide");
     expect(docsSource).toContain("Supported Stack");
-    expect(docsSource).toContain("Generated Project Structure");
-    expect(docsSource).toContain("Optional Features");
+    expect(docsSource).toContain("Generated App Setup");
+    expect(docsSource).toContain("Feature Guides");
+    expect(docsSource).toContain("Generated Files");
     expect(docsSource).toContain("Environment Variables");
+    expect(docsSource).toContain("Scripts and Checks");
     expect(docsSource).toContain("Compatibility Rules");
-    expect(docsSource).toContain("CLI Status");
     expect(docsSource).toContain("Troubleshooting");
+    expect(docsSource).toContain("Deployment Notes");
+    expect(docsSource).toContain("Limitations");
 
     expect(labels(frameworkMetadata)).toEqual(["Next.js"]);
     expect(labels(languageMetadata)).toEqual(["TypeScript"]);
@@ -55,14 +57,13 @@ describe("Phase 8 docs page", () => {
     expect(labels(packageManagerMetadata)).toEqual(["npm", "pnpm"]);
   });
 
-  it("documents current limitations and stable CLI availability", () => {
-    expect(docsSource).toContain(
-      "The CLI package is published as @baseforge/create.",
-    );
-    expect(docsSource).toContain("npx @baseforge/create@latest");
+  it("documents current limitations and keeps the page focused on web app usage", () => {
+    expect(docsSource).not.toContain("CLI Status");
+    expect(docsSource).not.toContain("npx @baseforge/create@latest");
     expect(docsSource).not.toContain("npm create @baseforge@latest");
     expect(docsSource).toContain("Generated projects do not use `src/`.");
     expect(docsSource).toContain("Auth.js credentials output is a scaffold");
+    expect(docsSource).toContain("website builder flow");
   });
 
   it("keeps navigation connected between landing, builder, and docs", () => {
