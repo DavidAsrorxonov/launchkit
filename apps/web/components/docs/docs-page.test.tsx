@@ -121,6 +121,8 @@ describe("Phase 8 docs page", () => {
     expect(codeBlockSource).toContain("sm:text-sm");
     expect(codeBlockSource).toContain("min-w-0");
     expect(codeBlockSource).toContain("pr-14");
+    expect(codeBlockSource).toContain('<div className="relative w-full max-w-full min-w-0">');
+    expect(codeBlockSource).toContain("<pre className=");
     expect(featureNotesSource).toContain("min-w-0");
     expect(docsSource).toContain('className="mt-3 grid min-w-0 gap-3"');
     expect(docsSource).toContain('className="mt-2 min-w-0"');
