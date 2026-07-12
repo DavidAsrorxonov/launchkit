@@ -19,6 +19,10 @@ const docsSource = readFileSync(
   join(appRoot, "components/docs/docs-page.tsx"),
   "utf8",
 );
+const featureNotesSource = readFileSync(
+  join(appRoot, "components/docs/feature-notes.tsx"),
+  "utf8",
+);
 const landingNavSource = readFileSync(
   join(appRoot, "components/landing/landing-nav.tsx"),
   "utf8",
@@ -72,6 +76,18 @@ describe("Phase 8 docs page", () => {
     expect(docsSource).toContain("BaseForge does not create the database");
     expect(docsSource).toContain("Run Prisma scripts only when Prisma is selected");
     expect(docsSource).toContain("Set production environment variables");
+  });
+
+  it("includes copy-paste examples for generated project workflows and feature setup", () => {
+    expect(docsSource).toContain("pnpm typecheck");
+    expect(docsSource).toContain("PostgreSQL plus Auth.js credentials");
+    expect(docsSource).toContain("Docker PostgreSQL plus Prisma");
+    expect(docsSource).toContain("Production environment example");
+
+    expect(featureNotesSource).toContain("Use the generated button component");
+    expect(featureNotesSource).toContain("model Post");
+    expect(featureNotesSource).toContain("Replace the generated authorize placeholder");
+    expect(featureNotesSource).toContain("docker compose up -d");
   });
 
   it("keeps navigation connected between landing, builder, and docs", () => {

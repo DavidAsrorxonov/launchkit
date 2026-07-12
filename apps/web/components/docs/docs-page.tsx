@@ -82,6 +82,20 @@ const setupStages = [
   ],
 ] as const;
 
+const npmSetupCommands = `unzip my-app.zip
+cd my-app
+npm install
+npm run dev
+npm run typecheck
+npm run build`;
+
+const pnpmSetupCommands = `unzip my-app.zip
+cd my-app
+pnpm install
+pnpm dev
+pnpm typecheck
+pnpm build`;
+
 const envVars = [
   [
     "DATABASE_URL",
@@ -91,6 +105,18 @@ const envVars = [
     "AUTH_SECRET",
     "Appears when Auth.js credentials is selected. Replace the placeholder with a strong secret before testing auth flows.",
   ],
+] as const;
+
+const envExamples = [
+  {
+    title: "PostgreSQL only",
+    code: `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/my_app"`,
+  },
+  {
+    title: "PostgreSQL plus Auth.js credentials",
+    code: `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/my_app"
+AUTH_SECRET="replace-with-a-long-random-secret"`,
+  },
 ] as const;
 
 const scripts = [
@@ -111,6 +137,27 @@ const scriptWorkflow = [
   "Use `typecheck` after changing TypeScript, Prisma helpers, Auth.js logic, or shared utilities.",
   "Use `build` before deployment because it catches errors that may not show during local development.",
   "Run Prisma scripts only when Prisma is selected and `DATABASE_URL` points at the intended development database.",
+] as const;
+
+const generatedProjectWorkflows = [
+  {
+    title: "Basic generated app checks",
+    code: `npm run dev
+npm run typecheck
+npm run build`,
+  },
+  {
+    title: "Prisma local database workflow",
+    code: `npm run db:generate
+npm run db:push
+npm run db:studio`,
+  },
+  {
+    title: "Docker PostgreSQL plus Prisma",
+    code: `docker compose up -d
+npm run db:generate
+npm run db:push`,
+  },
 ] as const;
 
 const compatibilityRules = [
@@ -157,6 +204,9 @@ const deploymentChecks = [
   "Replace Auth.js placeholder logic with real user lookup, password hashing, and verification before enabling sign-in.",
   "Review generated README notes for selected features before handing the app to another developer.",
 ] as const;
+
+const deploymentEnvExample = `DATABASE_URL="postgresql://user:password@host:5432/production_db"
+AUTH_SECRET="set-this-in-your-hosting-provider"`;
 
 export function DocsPage() {
   return (
@@ -339,12 +389,7 @@ export function DocsPage() {
                 </li>
               ))}
             </ol>
-            <CodeBlock>{`unzip my-app.zip
-cd my-app
-npm install
-npm run dev
-npm run typecheck
-npm run build`}</CodeBlock>
+            <CodeBlock>{npmSetupCommands}</CodeBlock>
             <div>
               <h3 className="text-sm font-semibold text-foreground">
                 pnpm variant
@@ -354,8 +399,7 @@ npm run build`}</CodeBlock>
                 selected in the builder.
               </p>
             </div>
-            <CodeBlock>{`pnpm install
-pnpm dev`}</CodeBlock>
+            <CodeBlock>{pnpmSetupCommands}</CodeBlock>
           </DocsSection>
 
           <DocsSection
@@ -406,6 +450,23 @@ pnpm dev`}</CodeBlock>
                 </div>
               ))}
             </dl>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                `.env.local` examples
+              </h3>
+              <div className="mt-3 grid gap-3">
+                {envExamples.map((example) => (
+                  <div key={example.title}>
+                    <h4 className="text-sm font-semibold text-foreground">
+                      {example.title}
+                    </h4>
+                    <div className="mt-2">
+                      <CodeBlock language="dotenv">{example.code}</CodeBlock>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </DocsSection>
 
           <DocsSection
@@ -440,6 +501,23 @@ pnpm dev`}</CodeBlock>
                 </div>
               ))}
             </dl>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                Command workflows
+              </h3>
+              <div className="mt-3 grid gap-3">
+                {generatedProjectWorkflows.map((workflow) => (
+                  <div key={workflow.title}>
+                    <h4 className="text-sm font-semibold text-foreground">
+                      {workflow.title}
+                    </h4>
+                    <div className="mt-2">
+                      <CodeBlock>{workflow.code}</CodeBlock>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </DocsSection>
 
           <DocsSection
@@ -497,6 +575,14 @@ npm run build`}</CodeBlock>
             <p>
               The exact env setup depends on the selected optional features.
             </p>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                Production environment example
+              </h3>
+              <div className="mt-2">
+                <CodeBlock language="dotenv">{deploymentEnvExample}</CodeBlock>
+              </div>
+            </div>
             <ul className="grid gap-2">
               {deploymentChecks.map((check) => (
                 <li
