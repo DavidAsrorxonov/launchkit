@@ -230,7 +230,7 @@ export function BuilderShell() {
             </aside>
           </div>
 
-          <SupportedStackSection />
+          {/* <SupportedStackSection /> */}
         </div>
       </div>
     </main>
