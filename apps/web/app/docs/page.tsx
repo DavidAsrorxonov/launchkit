@@ -6,14 +6,14 @@ import { ogImage, siteName } from "@/lib/site";
 export const metadata: Metadata = {
   title: "BaseForge Docs",
   description:
-    "Learn how BaseForge generates projects, which options are supported, and how to use the CLI.",
+    "Use the BaseForge web builder, configure generated projects, and understand supported web app options.",
   alternates: {
     canonical: "/docs",
   },
   openGraph: {
     title: "BaseForge Docs",
     description:
-      "Learn how BaseForge generates projects, which options are supported, and how to use the CLI.",
+      "Use the BaseForge web builder, configure generated projects, and understand supported web app options.",
     url: "/docs",
     siteName,
     type: "website",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "BaseForge Docs",
     description:
-      "Learn how BaseForge generates projects, which options are supported, and how to use the CLI.",
+      "Use the BaseForge web builder, configure generated projects, and understand supported web app options.",
     images: [ogImage.url],
   },
 };

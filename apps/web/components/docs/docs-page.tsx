@@ -2,116 +2,31 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { CodeBlock } from "@/components/docs/code-block";
+import {
+  builderFlow,
+  builderReviewChecks,
+  compatibilityRules,
+  deploymentChecks,
+  deploymentEnvExample,
+  docsNavItems,
+  envExamples,
+  envVars,
+  generatedProjectWorkflows,
+  limitations,
+  npmSetupCommands,
+  pnpmSetupCommands,
+  quickStartSteps,
+  scripts,
+  scriptWorkflow,
+  setupStages,
+  troubleshooting,
+} from "@/components/docs/docs-content";
 import { DocsSection } from "@/components/docs/docs-section";
-import { DocsSidebar, type DocsNavItem } from "@/components/docs/docs-sidebar";
+import { DocsSidebar } from "@/components/docs/docs-sidebar";
 import { FeatureNotes } from "@/components/docs/feature-notes";
 import { GeneratedFilesSection } from "@/components/docs/generated-files-section";
 import { SupportedStackTable } from "@/components/docs/supported-stack-table";
 import Image from "next/image";
-
-const docsNavItems = [
-  { id: "overview", label: "Overview" },
-  { id: "quick-start", label: "Quick Start" },
-  { id: "builder-flow", label: "Website Builder Flow" },
-  { id: "supported-stack", label: "Supported Stack" },
-  { id: "generated-structure", label: "Generated Project Structure" },
-  { id: "optional-features", label: "Optional Features" },
-  { id: "environment-variables", label: "Environment Variables" },
-  { id: "scripts", label: "Scripts" },
-  { id: "downloaded-project-usage", label: "Downloaded Project Usage" },
-  { id: "compatibility-rules", label: "Compatibility Rules" },
-  { id: "limitations", label: "Limitations" },
-  { id: "cli-status", label: "CLI Status" },
-  { id: "troubleshooting", label: "Troubleshooting" },
-] as const satisfies readonly DocsNavItem[];
-
-const quickStartSteps = [
-  "Open the builder.",
-  "Enter a project name.",
-  "Choose supported options.",
-  "Preview the generated output.",
-  "Download the zip.",
-  "Unzip the project locally.",
-  "Install dependencies.",
-  "Start development.",
-] as const;
-
-const builderFlow = [
-  ["Project", "Project name and package manager."],
-  [
-    "Framework",
-    "Fixed MVP foundation: Next.js, TypeScript, App Router, and no `src/` folder.",
-  ],
-  ["Styling and UI", "Tailwind CSS is fixed on. shadcn/ui is optional."],
-  ["Database", "Choose no database setup or PostgreSQL."],
-  ["ORM", "Choose no ORM or Prisma. Prisma requires PostgreSQL."],
-  ["Auth", "Choose no auth or the Auth.js credentials scaffold."],
-  [
-    "Extras",
-    "Optional PostgreSQL Docker Compose plus always-generated README and `.env.example`.",
-  ],
-  [
-    "Preview",
-    "Review stack, dependencies, env vars, scripts, and generated file tree.",
-  ],
-  ["Download", "Generate and download the project zip."],
-] as const;
-
-const envVars = [
-  ["DATABASE_URL", "Appears when PostgreSQL is selected."],
-  ["AUTH_SECRET", "Appears when Auth.js credentials is selected."],
-] as const;
-
-const scripts = [
-  ["dev", "Run the Next.js development server."],
-  ["build", "Build the generated Next.js app."],
-  ["start", "Start the built app."],
-  ["typecheck", "Run TypeScript without emitting files."],
-  ["db:generate", "Optional Prisma script for generating Prisma Client."],
-  [
-    "db:push",
-    "Optional Prisma script for syncing the schema to a development database.",
-  ],
-  ["db:studio", "Optional Prisma script for opening Prisma Studio."],
-] as const;
-
-const compatibilityRules = [
-  "Prisma requires PostgreSQL.",
-  "PostgreSQL Docker Compose is only available when PostgreSQL is selected.",
-  "Auth.js credentials can be generated without a database.",
-  "Auth.js credentials with Prisma requires the Prisma/PostgreSQL combination.",
-  "shadcn/ui requires Tailwind CSS. Because Tailwind is fixed in the MVP, shadcn/ui is normally compatible.",
-] as const;
-
-const limitations = [
-  "The CLI package is published as @baseforge/create.",
-  "Only Next.js is supported.",
-  "Only TypeScript is supported.",
-  "Only App Router is supported.",
-  "Generated projects do not use `src/`.",
-  "Only Tailwind CSS is supported.",
-  "Only PostgreSQL is supported as a database option.",
-  "Only Prisma is supported as an ORM option.",
-  "Auth.js credentials is a scaffold, not complete production auth.",
-  "BaseForge does not host databases.",
-  "BaseForge does not install generated dependencies.",
-  "BaseForge does not run generated project code on the server.",
-  "BaseForge does not save project presets.",
-  "BaseForge does not provide user accounts in the MVP.",
-] as const;
-
-const troubleshooting = [
-  ["Invalid project name", "Use lowercase letters, numbers, and hyphens only."],
-  ["Prisma option is disabled", "Select PostgreSQL first."],
-  ["Docker PostgreSQL is disabled", "Select PostgreSQL first."],
-  ["Download failed", "Check selected options and try again."],
-  ["npm install fails", "Check Node.js version and network access."],
-  ["Build fails after download", "Verify env vars and optional feature setup."],
-  [
-    "Auth does not work out of the box",
-    "Auth.js credentials output is a scaffold; implement real user lookup and password verification.",
-  ],
-] as const;
 
 export function DocsPage() {
   return (
@@ -168,9 +83,8 @@ export function DocsPage() {
               BaseForge documentation
             </h1>
             <p className="mt-4 text-base leading-7 text-muted-foreground">
-              Practical notes for the website builder, generated project output,
-              supported stack options, and the published CLI package that reuses
-              the same shared generator core.
+              Practical guidance for using the website builder, setting up the
+              generated app, and understanding the web stack BaseForge creates.
             </p>
             <Link
               href="/builder"
@@ -197,46 +111,27 @@ export function DocsPage() {
             </p>
             <p>
               The generated project is intended to be unzipped and edited
-              locally. The shared generator core is also used by the published
-              `@baseforge/create` CLI package.
+              locally. These docs are organized around the website builder flow
+              and the generated web app that developers work with after
+              download.
+            </p>
+            <p>
+              Read the page in order when evaluating a new generated app: choose
+              options in the builder, confirm the supported stack, set up the
+              downloaded project, then review feature-specific work before
+              deployment.
             </p>
           </DocsSection>
 
-          <DocsSection id="quick-start" eyebrow="02" title="Quick Start">
-            <ol className="grid gap-2">
-              {quickStartSteps.map((step, index) => (
-                <li key={step} className="flex gap-3">
-                  <span className="font-mono text-xs text-primary">
-                    {index + 1}
-                  </span>
-                  <span>{step}</span>
-                </li>
-              ))}
-            </ol>
-            <CodeBlock>{`unzip my-app.zip
-cd my-app
-npm install
-npm run dev
-npm run typecheck
-npm run build`}</CodeBlock>
-            <div>
-              <h3 className="text-sm font-semibold text-foreground">
-                pnpm variant
-              </h3>
-              <p className="mt-1">
-                The generated project supports pnpm guidance when pnpm is
-                selected in the builder.
-              </p>
-            </div>
-            <CodeBlock>{`pnpm install
-pnpm dev`}</CodeBlock>
-          </DocsSection>
-
           <DocsSection
-            id="builder-flow"
-            eyebrow="03"
-            title="Website Builder Flow"
+            id="web-builder-guide"
+            eyebrow="02"
+            title="Web Builder Guide"
           >
+            <p>
+              Start here to understand how the web builder turns project
+              selections into a downloadable web app.
+            </p>
             <dl className="grid gap-3">
               {builderFlow.map(([label, description]) => (
                 <div
@@ -250,11 +145,26 @@ pnpm dev`}</CodeBlock>
                 </div>
               ))}
             </dl>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                Before downloading
+              </h3>
+              <ul className="mt-3 grid gap-2">
+                {builderReviewChecks.map((check) => (
+                  <li
+                    key={check}
+                    className="rounded-lg border border-border bg-card p-4"
+                  >
+                    {check}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </DocsSection>
 
           <DocsSection
             id="supported-stack"
-            eyebrow="04"
+            eyebrow="03"
             title="Supported Stack"
           >
             <p>
@@ -267,19 +177,65 @@ pnpm dev`}</CodeBlock>
           </DocsSection>
 
           <DocsSection
-            id="generated-structure"
-            eyebrow="05"
-            title="Generated Project Structure"
+            id="generated-app-setup"
+            eyebrow="04"
+            title="Generated App Setup"
           >
-            <GeneratedFilesSection />
+            <p>
+              The downloaded zip is a normal Next.js project. Set it up outside
+              BaseForge, install dependencies locally, and run checks inside the
+              generated app directory.
+            </p>
+            <dl className="grid gap-3">
+              {setupStages.map(([stage, description]) => (
+                <div
+                  key={stage}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  <dt className="text-sm font-semibold text-foreground">
+                    {stage}
+                  </dt>
+                  <dd className="mt-1">{description}</dd>
+                </div>
+              ))}
+            </dl>
+            <ol className="grid gap-2">
+              {quickStartSteps.map((step, index) => (
+                <li key={step} className="flex gap-3">
+                  <span className="font-mono text-xs text-primary">
+                    {index + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+            <CodeBlock>{npmSetupCommands}</CodeBlock>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                pnpm variant
+              </h3>
+              <p className="mt-1">
+                The generated project supports pnpm guidance when pnpm is
+                selected in the builder.
+              </p>
+            </div>
+            <CodeBlock>{pnpmSetupCommands}</CodeBlock>
+          </DocsSection>
+
+          <DocsSection id="feature-guides" eyebrow="05" title="Feature Guides">
+            <p>
+              Each optional feature changes the generated files, dependencies,
+              environment variables, and setup work in the downloaded app.
+            </p>
+            <FeatureNotes />
           </DocsSection>
 
           <DocsSection
-            id="optional-features"
+            id="generated-files"
             eyebrow="06"
-            title="Optional Features"
+            title="Generated Files"
           >
-            <FeatureNotes />
+            <GeneratedFilesSection />
           </DocsSection>
 
           <DocsSection
@@ -290,6 +246,12 @@ pnpm dev`}</CodeBlock>
             <p>
               `.env.example` is only an example. Replace placeholder secrets and
               keep production values out of source control.
+            </p>
+            <p>
+              BaseForge only documents the variables needed by selected
+              features. The generated app reads real values from your local
+              `.env.local` file or from the environment configured by your
+              deployment platform.
             </p>
             <dl className="grid gap-3 sm:grid-cols-2">
               {envVars.map(([name, description]) => (
@@ -304,13 +266,44 @@ pnpm dev`}</CodeBlock>
                 </div>
               ))}
             </dl>
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-foreground">
+                `.env.local` examples
+              </h3>
+              <div className="mt-3 grid min-w-0 gap-3">
+                {envExamples.map((example) => (
+                  <div key={example.title} className="min-w-0">
+                    <h4 className="text-sm font-semibold text-foreground">
+                      {example.title}
+                    </h4>
+                    <div className="mt-2 min-w-0">
+                      <CodeBlock language="dotenv">{example.code}</CodeBlock>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </DocsSection>
 
-          <DocsSection id="scripts" eyebrow="08" title="Scripts">
+          <DocsSection
+            id="scripts-and-checks"
+            eyebrow="08"
+            title="Scripts and Checks"
+          >
             <p>
               Common scripts are generated for every project. Prisma scripts are
               added only when Prisma is selected.
             </p>
+            <ul className="grid gap-2">
+              {scriptWorkflow.map((item) => (
+                <li
+                  key={item}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
             <dl className="grid gap-2">
               {scripts.map(([name, description]) => (
                 <div
@@ -324,31 +317,28 @@ pnpm dev`}</CodeBlock>
                 </div>
               ))}
             </dl>
-          </DocsSection>
-
-          <DocsSection
-            id="downloaded-project-usage"
-            eyebrow="09"
-            title="Downloaded Project Usage"
-          >
-            <p>
-              After download, unzip locally, install dependencies, copy
-              `.env.example` to `.env.local` when selected features need env
-              vars, configure values, and run checks before deployment.
-            </p>
-            <CodeBlock>{`cp .env.example .env.local
-npm install
-npm run dev
-npm run typecheck
-npm run build`}</CodeBlock>
-            <p>
-              The exact env setup depends on the selected optional features.
-            </p>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                Command workflows
+              </h3>
+              <div className="mt-3 grid gap-3">
+                {generatedProjectWorkflows.map((workflow) => (
+                  <div key={workflow.title}>
+                    <h4 className="text-sm font-semibold text-foreground">
+                      {workflow.title}
+                    </h4>
+                    <div className="mt-2">
+                      <CodeBlock>{workflow.code}</CodeBlock>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </DocsSection>
 
           <DocsSection
             id="compatibility-rules"
-            eyebrow="10"
+            eyebrow="09"
             title="Compatibility Rules"
           >
             <ul className="grid gap-2">
@@ -363,31 +353,9 @@ npm run build`}</CodeBlock>
             </ul>
           </DocsSection>
 
-          <DocsSection id="limitations" eyebrow="11" title="Limitations">
-            <ul className="grid gap-2">
-              {limitations.map((limitation) => (
-                <li
-                  key={limitation}
-                  className="rounded-lg border border-border bg-card p-4"
-                >
-                  {limitation}
-                </li>
-              ))}
-            </ul>
-          </DocsSection>
-
-          <DocsSection id="cli-status" eyebrow="12" title="CLI Status">
-            <p>
-              CLI generation is available through the published
-              `@baseforge/create` package and uses the same shared generator
-              core as the website.
-            </p>
-            <CodeBlock>{`npx @baseforge/create@latest`}</CodeBlock>
-          </DocsSection>
-
           <DocsSection
             id="troubleshooting"
-            eyebrow="13"
+            eyebrow="10"
             title="Troubleshooting"
           >
             <dl className="grid gap-3">
@@ -403,6 +371,57 @@ npm run build`}</CodeBlock>
                 </div>
               ))}
             </dl>
+          </DocsSection>
+
+          <DocsSection
+            id="deployment-notes"
+            eyebrow="11"
+            title="Deployment Notes"
+          >
+            <p>
+              After download, unzip locally, install dependencies, copy
+              `.env.example` to `.env.local` when selected features need env
+              vars, configure values, and run checks before deployment.
+            </p>
+            <CodeBlock>{`cp .env.example .env.local
+npm install
+npm run dev
+npm run typecheck
+npm run build`}</CodeBlock>
+            <p>
+              The exact env setup depends on the selected optional features.
+            </p>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                Production environment example
+              </h3>
+              <div className="mt-2">
+                <CodeBlock language="dotenv">{deploymentEnvExample}</CodeBlock>
+              </div>
+            </div>
+            <ul className="grid gap-2">
+              {deploymentChecks.map((check) => (
+                <li
+                  key={check}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  {check}
+                </li>
+              ))}
+            </ul>
+          </DocsSection>
+
+          <DocsSection id="limitations" eyebrow="12" title="Limitations">
+            <ul className="grid gap-2">
+              {limitations.map((limitation) => (
+                <li
+                  key={limitation}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  {limitation}
+                </li>
+              ))}
+            </ul>
           </DocsSection>
         </div>
       </div>
