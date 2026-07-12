@@ -19,12 +19,28 @@ const docsSource = readFileSync(
   join(appRoot, "components/docs/docs-page.tsx"),
   "utf8",
 );
+const docsRouteSource = readFileSync(
+  join(appRoot, "app/docs/page.tsx"),
+  "utf8",
+);
 const docsContentSource = readFileSync(
   join(appRoot, "components/docs/docs-content.ts"),
   "utf8",
 );
 const featureNotesDataSource = readFileSync(
   join(appRoot, "components/docs/feature-notes-data.ts"),
+  "utf8",
+);
+const featureNotesSource = readFileSync(
+  join(appRoot, "components/docs/feature-notes.tsx"),
+  "utf8",
+);
+const codeBlockSource = readFileSync(
+  join(appRoot, "components/docs/code-block.tsx"),
+  "utf8",
+);
+const docsSidebarSource = readFileSync(
+  join(appRoot, "components/docs/docs-sidebar.tsx"),
   "utf8",
 );
 const landingNavSource = readFileSync(
@@ -69,6 +85,8 @@ describe("Phase 8 docs page", () => {
     expect(docsSource).not.toContain("CLI Status");
     expect(docsSource).not.toContain("npx @baseforge/create@latest");
     expect(docsSource).not.toContain("npm create @baseforge@latest");
+    expect(docsRouteSource).not.toContain("how to use the CLI");
+    expect(docsRouteSource).toContain("Use the BaseForge web builder");
     expect(docsContentSource).toContain("Generated projects do not use `src/`.");
     expect(docsContentSource).toContain("Auth.js credentials output is a scaffold");
     expect(docsSource).toContain("website builder flow");
@@ -92,6 +110,17 @@ describe("Phase 8 docs page", () => {
     expect(featureNotesDataSource).toContain("model Post");
     expect(featureNotesDataSource).toContain("Replace the generated authorize placeholder");
     expect(featureNotesDataSource).toContain("docker compose up -d");
+  });
+
+  it("keeps dense docs navigation and code examples readable on small screens", () => {
+    expect(docsSidebarSource).toContain("grid gap-1");
+    expect(docsSidebarSource).toContain("break-words");
+    expect(docsSidebarSource).not.toContain("overflow-x-auto");
+    expect(docsSidebarSource).not.toContain("whitespace-nowrap");
+    expect(codeBlockSource).toContain("text-xs");
+    expect(codeBlockSource).toContain("sm:text-sm");
+    expect(codeBlockSource).toContain("min-w-0");
+    expect(featureNotesSource).toContain("min-w-0");
   });
 
   it("keeps navigation connected between landing, builder, and docs", () => {

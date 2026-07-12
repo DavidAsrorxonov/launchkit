@@ -21,7 +21,7 @@ export function DocsSidebar({ items }: DocsSidebarProps) {
           <li key={item.id}>
             <a
               href={`#${item.id}`}
-              className="block rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="block break-words rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {item.label}
             </a>
