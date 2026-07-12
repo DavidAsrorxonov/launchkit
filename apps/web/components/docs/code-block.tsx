@@ -18,7 +18,7 @@ export function CodeBlock({ children, language = "bash" }: CodeBlockProps) {
   };
 
   return (
-    <pre className="relative w-full max-w-full min-w-0 overflow-x-auto rounded-md border border-border bg-muted p-3 text-xs leading-6 text-foreground sm:rounded-lg sm:p-4 sm:text-sm">
+    <pre className="relative w-full max-w-full min-w-0 overflow-x-auto rounded-md border border-border bg-muted p-3 pr-14 text-xs leading-6 text-foreground sm:rounded-lg sm:p-4 sm:pr-16 sm:text-sm">
       <button
         type="button"
         aria-label={copied ? "Copied command" : "Copy command"}

@@ -120,7 +120,10 @@ describe("Phase 8 docs page", () => {
     expect(codeBlockSource).toContain("text-xs");
     expect(codeBlockSource).toContain("sm:text-sm");
     expect(codeBlockSource).toContain("min-w-0");
+    expect(codeBlockSource).toContain("pr-14");
     expect(featureNotesSource).toContain("min-w-0");
+    expect(docsSource).toContain('className="mt-3 grid min-w-0 gap-3"');
+    expect(docsSource).toContain('className="mt-2 min-w-0"');
   });
 
   it("keeps navigation connected between landing, builder, and docs", () => {

@@ -266,17 +266,17 @@ export function DocsPage() {
                 </div>
               ))}
             </dl>
-            <div>
+            <div className="min-w-0">
               <h3 className="text-sm font-semibold text-foreground">
                 `.env.local` examples
               </h3>
-              <div className="mt-3 grid gap-3">
+              <div className="mt-3 grid min-w-0 gap-3">
                 {envExamples.map((example) => (
-                  <div key={example.title}>
+                  <div key={example.title} className="min-w-0">
                     <h4 className="text-sm font-semibold text-foreground">
                       {example.title}
                     </h4>
-                    <div className="mt-2">
+                    <div className="mt-2 min-w-0">
                       <CodeBlock language="dotenv">{example.code}</CodeBlock>
                     </div>
                   </div>
