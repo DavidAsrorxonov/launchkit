@@ -66,6 +66,14 @@ describe("Phase 8 docs page", () => {
     expect(docsSource).toContain("website builder flow");
   });
 
+  it("includes practical generated-app guidance for setup, scripts, env vars, and deployment", () => {
+    expect(docsSource).toContain("Before downloading");
+    expect(docsSource).toContain("Do not mix npm and pnpm lockfiles");
+    expect(docsSource).toContain("BaseForge does not create the database");
+    expect(docsSource).toContain("Run Prisma scripts only when Prisma is selected");
+    expect(docsSource).toContain("Set production environment variables");
+  });
+
   it("keeps navigation connected between landing, builder, and docs", () => {
     expect(docsSource).toContain('href="/"');
     expect(docsSource).toContain('href="/builder"');

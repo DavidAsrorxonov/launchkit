@@ -56,22 +56,61 @@ const builderFlow = [
   ["Download", "Generate and download the project zip."],
 ] as const;
 
+const builderReviewChecks = [
+  "Confirm the package manager matches how you want to install and run the downloaded app.",
+  "Use the preview step to check dependencies, scripts, env vars, and generated files before downloading.",
+  "If Prisma or Docker is disabled, go back and select PostgreSQL first.",
+  "Treat Auth.js credentials as a scaffold choice, not a complete login system.",
+] as const;
+
+const setupStages = [
+  [
+    "Prepare the project folder",
+    "Unzip the download, enter the generated directory, and keep the generated files together before installing dependencies.",
+  ],
+  [
+    "Install dependencies",
+    "Run the install command for the package manager selected in the builder. Do not mix npm and pnpm lockfiles in the same generated app.",
+  ],
+  [
+    "Configure runtime values",
+    "Copy `.env.example` to `.env.local` when the selected features need environment variables, then replace placeholders before running feature code.",
+  ],
+  [
+    "Run local checks",
+    "Start the dev server for manual QA, then run typecheck and build before treating the generated app as deployable.",
+  ],
+] as const;
+
 const envVars = [
-  ["DATABASE_URL", "Appears when PostgreSQL is selected."],
-  ["AUTH_SECRET", "Appears when Auth.js credentials is selected."],
+  [
+    "DATABASE_URL",
+    "Appears when PostgreSQL is selected. Use a local or managed PostgreSQL connection string; BaseForge does not create the database.",
+  ],
+  [
+    "AUTH_SECRET",
+    "Appears when Auth.js credentials is selected. Replace the placeholder with a strong secret before testing auth flows.",
+  ],
 ] as const;
 
 const scripts = [
-  ["dev", "Run the Next.js development server."],
-  ["build", "Build the generated Next.js app."],
-  ["start", "Start the built app."],
-  ["typecheck", "Run TypeScript without emitting files."],
-  ["db:generate", "Optional Prisma script for generating Prisma Client."],
+  ["dev", "Run the Next.js development server while editing the generated app."],
+  ["build", "Build the generated Next.js app and catch production build issues."],
+  ["start", "Start the already-built app after `build` succeeds."],
+  ["typecheck", "Run TypeScript without emitting files before shipping changes."],
+  ["db:generate", "Optional Prisma script for generating Prisma Client after schema edits."],
   [
     "db:push",
-    "Optional Prisma script for syncing the schema to a development database.",
+    "Optional Prisma script for syncing the schema to a development database after confirming `DATABASE_URL`.",
   ],
-  ["db:studio", "Optional Prisma script for opening Prisma Studio."],
+  ["db:studio", "Optional Prisma script for inspecting local data in Prisma Studio."],
+] as const;
+
+const scriptWorkflow = [
+  "Use `dev` while editing UI, routes, and feature wiring.",
+  "Use `typecheck` after changing TypeScript, Prisma helpers, Auth.js logic, or shared utilities.",
+  "Use `build` before deployment because it catches errors that may not show during local development.",
+  "Run Prisma scripts only when Prisma is selected and `DATABASE_URL` points at the intended development database.",
 ] as const;
 
 const compatibilityRules = [
@@ -109,6 +148,14 @@ const troubleshooting = [
     "Auth does not work out of the box",
     "Auth.js credentials output is a scaffold; implement real user lookup and password verification.",
   ],
+] as const;
+
+const deploymentChecks = [
+  "Run typecheck and build in the generated app before connecting it to hosting.",
+  "Set production environment variables in the hosting provider, not only in `.env.local`.",
+  "Use a real PostgreSQL provider for production when database features are selected.",
+  "Replace Auth.js placeholder logic with real user lookup, password hashing, and verification before enabling sign-in.",
+  "Review generated README notes for selected features before handing the app to another developer.",
 ] as const;
 
 export function DocsPage() {
@@ -198,6 +245,12 @@ export function DocsPage() {
               and the generated web app that developers work with after
               download.
             </p>
+            <p>
+              Read the page in order when evaluating a new generated app:
+              choose options in the builder, confirm the supported stack, set up
+              the downloaded project, then review feature-specific work before
+              deployment.
+            </p>
           </DocsSection>
 
           <DocsSection
@@ -222,6 +275,21 @@ export function DocsPage() {
                 </div>
               ))}
             </dl>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                Before downloading
+              </h3>
+              <ul className="mt-3 grid gap-2">
+                {builderReviewChecks.map((check) => (
+                  <li
+                    key={check}
+                    className="rounded-lg border border-border bg-card p-4"
+                  >
+                    {check}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </DocsSection>
 
           <DocsSection
@@ -243,6 +311,24 @@ export function DocsPage() {
             eyebrow="04"
             title="Generated App Setup"
           >
+            <p>
+              The downloaded zip is a normal Next.js project. Set it up outside
+              BaseForge, install dependencies locally, and run checks inside the
+              generated app directory.
+            </p>
+            <dl className="grid gap-3">
+              {setupStages.map(([stage, description]) => (
+                <div
+                  key={stage}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  <dt className="text-sm font-semibold text-foreground">
+                    {stage}
+                  </dt>
+                  <dd className="mt-1">{description}</dd>
+                </div>
+              ))}
+            </dl>
             <ol className="grid gap-2">
               {quickStartSteps.map((step, index) => (
                 <li key={step} className="flex gap-3">
@@ -301,6 +387,12 @@ pnpm dev`}</CodeBlock>
               `.env.example` is only an example. Replace placeholder secrets and
               keep production values out of source control.
             </p>
+            <p>
+              BaseForge only documents the variables needed by selected
+              features. The generated app reads real values from your local
+              `.env.local` file or from the environment configured by your
+              deployment platform.
+            </p>
             <dl className="grid gap-3 sm:grid-cols-2">
               {envVars.map(([name, description]) => (
                 <div
@@ -325,6 +417,16 @@ pnpm dev`}</CodeBlock>
               Common scripts are generated for every project. Prisma scripts are
               added only when Prisma is selected.
             </p>
+            <ul className="grid gap-2">
+              {scriptWorkflow.map((item) => (
+                <li
+                  key={item}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
             <dl className="grid gap-2">
               {scripts.map(([name, description]) => (
                 <div
@@ -395,6 +497,16 @@ npm run build`}</CodeBlock>
             <p>
               The exact env setup depends on the selected optional features.
             </p>
+            <ul className="grid gap-2">
+              {deploymentChecks.map((check) => (
+                <li
+                  key={check}
+                  className="rounded-lg border border-border bg-card p-4"
+                >
+                  {check}
+                </li>
+              ))}
+            </ul>
           </DocsSection>
 
           <DocsSection id="limitations" eyebrow="12" title="Limitations">
