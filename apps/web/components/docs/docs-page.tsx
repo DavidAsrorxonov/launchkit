@@ -116,9 +116,9 @@ export function DocsPage() {
               download.
             </p>
             <p>
-              Read the page in order when evaluating a new generated app:
-              choose options in the builder, confirm the supported stack, set up
-              the downloaded project, then review feature-specific work before
+              Read the page in order when evaluating a new generated app: choose
+              options in the builder, confirm the supported stack, set up the
+              downloaded project, then review feature-specific work before
               deployment.
             </p>
           </DocsSection>
@@ -222,11 +222,7 @@ export function DocsPage() {
             <CodeBlock>{pnpmSetupCommands}</CodeBlock>
           </DocsSection>
 
-          <DocsSection
-            id="feature-guides"
-            eyebrow="05"
-            title="Feature Guides"
-          >
+          <DocsSection id="feature-guides" eyebrow="05" title="Feature Guides">
             <p>
               Each optional feature changes the generated files, dependencies,
               environment variables, and setup work in the downloaded app.
