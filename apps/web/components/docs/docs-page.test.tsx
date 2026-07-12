@@ -19,8 +19,12 @@ const docsSource = readFileSync(
   join(appRoot, "components/docs/docs-page.tsx"),
   "utf8",
 );
-const featureNotesSource = readFileSync(
-  join(appRoot, "components/docs/feature-notes.tsx"),
+const docsContentSource = readFileSync(
+  join(appRoot, "components/docs/docs-content.ts"),
+  "utf8",
+);
+const featureNotesDataSource = readFileSync(
+  join(appRoot, "components/docs/feature-notes-data.ts"),
   "utf8",
 );
 const landingNavSource = readFileSync(
@@ -65,29 +69,29 @@ describe("Phase 8 docs page", () => {
     expect(docsSource).not.toContain("CLI Status");
     expect(docsSource).not.toContain("npx @baseforge/create@latest");
     expect(docsSource).not.toContain("npm create @baseforge@latest");
-    expect(docsSource).toContain("Generated projects do not use `src/`.");
-    expect(docsSource).toContain("Auth.js credentials output is a scaffold");
+    expect(docsContentSource).toContain("Generated projects do not use `src/`.");
+    expect(docsContentSource).toContain("Auth.js credentials output is a scaffold");
     expect(docsSource).toContain("website builder flow");
   });
 
   it("includes practical generated-app guidance for setup, scripts, env vars, and deployment", () => {
     expect(docsSource).toContain("Before downloading");
-    expect(docsSource).toContain("Do not mix npm and pnpm lockfiles");
-    expect(docsSource).toContain("BaseForge does not create the database");
-    expect(docsSource).toContain("Run Prisma scripts only when Prisma is selected");
-    expect(docsSource).toContain("Set production environment variables");
+    expect(docsContentSource).toContain("Do not mix npm and pnpm lockfiles");
+    expect(docsContentSource).toContain("BaseForge does not create the database");
+    expect(docsContentSource).toContain("Run Prisma scripts only when Prisma is selected");
+    expect(docsContentSource).toContain("Set production environment variables");
   });
 
   it("includes copy-paste examples for generated project workflows and feature setup", () => {
-    expect(docsSource).toContain("pnpm typecheck");
-    expect(docsSource).toContain("PostgreSQL plus Auth.js credentials");
-    expect(docsSource).toContain("Docker PostgreSQL plus Prisma");
+    expect(docsContentSource).toContain("pnpm typecheck");
+    expect(docsContentSource).toContain("PostgreSQL plus Auth.js credentials");
+    expect(docsContentSource).toContain("Docker PostgreSQL plus Prisma");
     expect(docsSource).toContain("Production environment example");
 
-    expect(featureNotesSource).toContain("Use the generated button component");
-    expect(featureNotesSource).toContain("model Post");
-    expect(featureNotesSource).toContain("Replace the generated authorize placeholder");
-    expect(featureNotesSource).toContain("docker compose up -d");
+    expect(featureNotesDataSource).toContain("Use the generated button component");
+    expect(featureNotesDataSource).toContain("model Post");
+    expect(featureNotesDataSource).toContain("Replace the generated authorize placeholder");
+    expect(featureNotesDataSource).toContain("docker compose up -d");
   });
 
   it("keeps navigation connected between landing, builder, and docs", () => {
