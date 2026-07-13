@@ -11,7 +11,7 @@ import { OrmStep } from "@/components/builder/steps/orm-step";
 import { PreviewStep } from "@/components/builder/steps/preview-step";
 import { ProjectStep } from "@/components/builder/steps/project-step";
 import { StylingUiStep } from "@/components/builder/steps/styling-ui-step";
-import { SupportedStackSection } from "@/components/builder/supported-stack-section";
+// import { SupportedStackSection } from "@/components/builder/supported-stack-section";
 import {
   createInitialBuilderState,
   type BuilderConfigPatch,
