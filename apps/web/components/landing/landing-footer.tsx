@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import { GitHub } from "@/components/icons/github";
 import { NPM } from "@/components/icons/npm";
@@ -30,6 +31,24 @@ export function LandingFooter() {
             GitHub
           </a>
         </div>
+
+        <nav
+          aria-label="Legal links"
+          className="mb-8 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground"
+        >
+          <Link
+            href="/privacy"
+            className="rounded-md transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          >
+            Privacy
+          </Link>
+          <Link
+            href="/terms"
+            className="rounded-md transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          >
+            Terms
+          </Link>
+        </nav>
 
         <div className="flex items-center justify-center gap-3 sm:gap-5">
           <Image
